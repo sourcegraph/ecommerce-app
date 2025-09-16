@@ -10,7 +10,7 @@
 - Multiple AGENTS.md
 - Security/remediation
 
-Terminal specific
+### Terminal specific
 
 - CLI -x and piping -> Git history, analyse files
 - Custom slash commands
