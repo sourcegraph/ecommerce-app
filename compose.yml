@@ -1,0 +1,55 @@
+version: "3.9"
+
+# ───── reusable blocks ────────────────────────────────────────────────
+x-backend-env: &backend-env
+  environment:
+    - DATABASE_URL=sqlite:///./store.db
+
+x-frontend-env: &frontend-env
+  environment:
+    - VITE_API_URL=http://localhost:8001
+
+# ───── services ───────────────────────────────────────────────────────
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    <<: *backend-env
+    environment:
+      - DATABASE_URL=sqlite:///./store.db
+      - DEBUG=true
+    command: uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+    ports: ["8001:8001"]
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    <<: *frontend-env
+    environment:
+      - VITE_API_URL=http://localhost:8001
+    command: npm run dev -- --host 0.0.0.0
+    ports: ["3001:3001"]
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on: [backend]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# ───── named volumes ─────────────────────────────────────────────────
+volumes: {}
