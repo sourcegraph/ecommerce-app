@@ -6,6 +6,9 @@ For more information about Amp visit the [Amp manual](https://ampcode.com/manual
 
 See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from fixes an issue with a PR to advanced refactors.
 
+<img width="1673" height="1010" alt="Screenshot 2025-09-17 at 3 48 15 PM" src="https://github.com/user-attachments/assets/2fd2b128-d937-4cc9-9437-5386c3ebc1f6" />
+
+
 ## Project Structure
 
 ```
