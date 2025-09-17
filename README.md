@@ -138,3 +138,7 @@ just health           # Check service health
 just logs [service]   # View recent logs (default: backend)
 just logs-follow [service]  # Follow live logs
 ```
+
+### Source
+
+Based on the [ecommerce-demo repo](https://github.com/ViaxCo/ecommerce-demo).
