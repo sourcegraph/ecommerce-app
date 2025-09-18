@@ -31,6 +31,11 @@ Demostrate Amp Github code review feature.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo and show the Github PR bot working automatically.
 - Example PR https://github.com/sourcegraph/amp-demo/pull/7 (Note, this isn't working atm. working on getting it fixed).
 
+## Small change - Amp demo in <2 mins 
+If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
+- Start the website using the command 'just up'
+- Run this prompt 'Make the backgound light blue instead of white' and Amp will upgrade the CSS to make background blue
+- Restart the website; execute 'just down' then 'just up'
 
 # Complex subagent change with Oracle
 **Purpose**
@@ -95,6 +100,7 @@ Key to emphasise that Amp needs a good AGENTS.md file instructions for optimal p
 - Master [AGENTS.md file](https://github.com/sourcegraph/amp-demo/blob/main/AGENTS.md)
 - [AGENTS.md](https://github.com/sourcegraph/amp-demo/blob/main/backend/AGENTS.md) file for backend
 - [AGENTS.md](https://github.com/sourcegraph/amp-demo/blob/main/frontend/AGENTS.md) file for frontend
+
 Study our guidance on how to write a [good AGENTS.md file](https://github.com/sourcegraph/amp-examples-and-guides/blob/main/guides/agent-file/Best_Practices.md) and convey the key points. Also review https://agents.md
 
 Having hierarchial AGENTS.md structure is important for large monorepos, you can also show our own [Sourcegraph](https://github.com/sourcegraph/sourcegraph) Repo to emphasise this point.
@@ -109,7 +115,7 @@ Additionally, install the Github CLI from [here](https://cli.github.com) and set
 // TODO update this section to use with Sourcegraph MCP to demo Amp + Sourcegraph search
 
 
-# Terminal specific
+# Terminal demo prompt
 
 - CLI -x and piping -> Git history, analyse files
 - Custom slash commands
