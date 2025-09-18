@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Response
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -7,7 +7,7 @@ from typing import List, Optional
 import io
 
 from .db import get_session, create_db_and_tables
-from .models import Product, Category
+
 from .schemas import (
     ProductRead, ProductCreate, ProductUpdate, ProductReadWithCategory,
     CategoryRead, CategoryCreate, CategoryReadWithProducts
@@ -216,8 +216,6 @@ def get_product_image(
         raise HTTPException(status_code=404, detail="No image found for this product")
     
     # Return image as streaming response
-    image_stream = io.BytesIO(product.image_data)
-    
     return StreamingResponse(
         io.BytesIO(product.image_data),
         media_type=product.image_mime_type or "image/jpeg",
