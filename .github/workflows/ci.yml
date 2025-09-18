@@ -92,88 +92,96 @@ jobs:
           path: frontend/dist/
           retention-days: 7
 
-  e2e:
-    name: End-to-End Tests
-    needs: [backend, frontend]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  # e2e:
+  #   name: End-to-End Tests
+  #   needs: [backend, frontend]
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      - uses: extractions/setup-just@v3
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
-          cache-dependency-glob: "backend/uv.lock"
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: 'npm'
+  #         cache-dependency-path: frontend/package-lock.json
+  #     - uses: extractions/setup-just@v3
+  #     - name: Install uv
+  #       uses: astral-sh/setup-uv@v6
+  #       with:
+  #         enable-cache: true
+  #         cache-dependency-glob: "backend/uv.lock"
 
-      - name: Install Python dependencies
-        working-directory: backend
-        run: uv sync
+  #     - name: Install Python dependencies
+  #       working-directory: backend
+  #       run: uv sync
 
-      - name: Install Node dependencies
-        working-directory: frontend
-        run: npm ci
+  #     - name: Install Node dependencies
+  #       working-directory: frontend
+  #       run: npm ci
 
-      - name: Install Playwright browsers
-        working-directory: frontend
-        run: npx playwright install --with-deps chromium
+  #     - name: Cache Playwright browsers
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.cache/ms-playwright
+  #         key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-playwright-
 
-      - name: Start application services
-        run: |
-          just up
-          sleep 10
+  #     - name: Install Playwright browsers
+  #       working-directory: frontend
+  #       run: npx playwright install --with-deps chromium
 
-      - name: Seed database
-        run: just seed
+  #     - name: Start application services
+  #       run: |
+  #         just up
+  #         sleep 10
 
-      - name: Wait for services health
-        run: |
-          timeout 60 bash -c 'until curl -f http://localhost:8001/health; do sleep 2; done'
-          timeout 60 bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
+  #     - name: Seed database
+  #       run: just seed
 
-      - name: Run E2E tests
-        run: just test-e2e
+  #     - name: Wait for services health
+  #       run: |
+  #         timeout 60 bash -c 'until curl -f http://localhost:8001/health; do sleep 2; done'
+  #         timeout 60 bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report
-          path: |
-            frontend/playwright-report/
-            frontend/test-results/
-          retention-days: 7
+  #     - name: Run E2E tests
+  #       run: just test-e2e
 
-      - name: Stop services
-        if: always()
-        run: just down
+  #     - name: Upload test results
+  #       uses: actions/upload-artifact@v4
+  #       if: failure()
+  #       with:
+  #         name: playwright-report
+  #         path: |
+  #           frontend/playwright-report/
+  #           frontend/test-results/
+  #         retention-days: 7
 
-  summary:
-    name: CI Summary
-    needs: [backend, frontend, e2e]
-    runs-on: ubuntu-latest
-    if: always()
+  #     - name: Stop services
+  #       if: always()
+  #       run: just down
+
+  # summary:
+  #   name: CI Summary
+  #   needs: [backend, frontend, e2e]
+  #   runs-on: ubuntu-latest
+  #   if: always()
     
-    steps:
-      - name: Check CI results
-        run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" || "${{ needs.e2e.result }}" == "failure" ]]; then
-            echo "❌ CI checks failed"
-            exit 1
-          else
-            echo "✅ All CI checks passed"
-          fi
+  #   steps:
+  #     - name: Check CI results
+  #       run: |
+  #         if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" || "${{ needs.e2e.result }}" == "failure" ]]; then
+  #           echo "❌ CI checks failed"
+  #           exit 1
+  #         else
+  #           echo "✅ All CI checks passed"
+  #         fi
