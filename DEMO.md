@@ -33,9 +33,9 @@ Demostrate Amp Github code review feature.
 
 ## Small change - Amp demo in <2 mins 
 If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
-- Start the website using the command 'just up'
-- Run this prompt 'Make the backgound light blue instead of white' and Amp will upgrade the CSS to make background blue
-- Restart the website; execute 'just down' then 'just up'
+- Start the website using the command 'just up'. Show that website on localhost:3001 has a white background and you will change it to light blue.
+- Run this prompt 'Make the backgound light blue instead of white' and Amp will upgrade the CSS to make background light blue.
+- Restart the website; execute 'just down' then 'just up'.
 
 # Complex subagent change with Oracle
 **Purpose**
