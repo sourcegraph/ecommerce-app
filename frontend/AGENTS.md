@@ -29,14 +29,7 @@
 - `npx playwright install` - Install browser dependencies
 - `npx playwright codegen localhost:3001` - Generate test code
 
-## TDD Development Process
-
-### CRITICAL: Test-First Component Development
-Every React component and hook must be developed using TDD:
-
-1. **Red:** Write failing test describing expected component behavior
-2. **Green:** Write minimal component code to pass test
-3. **Refactor:** Improve component while keeping tests green
+## Testing Process
 
 ### Frontend Testing Patterns
 

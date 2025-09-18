@@ -32,21 +32,6 @@
 - For test failures, check `e2e-reports/` directory for detailed logs
 - Use `just down && just up` to reset containers if issues persist
 
-## Development Philosophy
-
-### TEST-DRIVEN DEVELOPMENT IS NON-NEGOTIABLE
-Every single line of production code must be written in response to a failing test. No exceptions. This is the fundamental practice that enables all other principles.
-
-**Core TDD Process:**
-1. **Red:** Write a failing test for desired behavior - NO PRODUCTION CODE until you have a failing test
-2. **Green:** Write MINIMUM code to make the test pass - resist writing more than needed
-3. **Refactor:** Assess code for improvement opportunities while keeping tests green
-
-**TDD Violations to Avoid:**
-- Writing production code without a failing test first
-- Writing multiple tests before making the first one pass
-- Writing more production code than needed to pass the current test
-- Skipping the refactor assessment step
 
 ## Testing Guidelines
 

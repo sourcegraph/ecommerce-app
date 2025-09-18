@@ -29,14 +29,8 @@
 - `uv run ruff format` - Format code
 - `uv run mypy app/` - Type checking
 
-## TDD Development Process
+## Testing Process
 
-### CRITICAL: No Production Code Without Failing Test
-Every line of backend code must be written in response to a failing test:
-
-1. **Red:** Write failing test describing expected API behavior
-2. **Green:** Write minimal code to make test pass
-3. **Refactor:** Clean up while keeping tests green
 
 ### Backend Testing Patterns
 
