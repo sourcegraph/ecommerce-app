@@ -1,0 +1,179 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'DEMO.md'
+      - 'README.md'
+
+env:
+  PYTHON_VERSION: '3.13'
+  NODE_VERSION: '20'
+
+jobs:
+  backend:
+    name: Backend Quality Checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.13']
+      fail-fast: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: uv sync
+
+      - name: Run code quality checks
+        working-directory: backend
+        run: |
+          # Map to existing justfile commands
+          uv run ruff check .
+          uv run mypy .
+
+      - name: Run tests with coverage
+        working-directory: backend
+        run: |
+          uv run pytest --cov=app --cov-report=html
+
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend-py${{ matrix.python-version }}
+          path: backend/htmlcov/
+          retention-days: 7
+
+  frontend:
+    name: Frontend Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Type check and build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+          retention-days: 7
+
+  e2e:
+    name: End-to-End Tests
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: uv sync
+
+      - name: Install Node dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start application services
+        run: |
+          just up
+          sleep 10
+
+      - name: Seed database
+        run: just seed
+
+      - name: Wait for services health
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:8001/health; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
+
+      - name: Run E2E tests
+        run: just test-e2e
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 7
+
+      - name: Stop services
+        if: always()
+        run: just down
+
+  summary:
+    name: CI Summary
+    needs: [backend, frontend, e2e]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check CI results
+        run: |
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" || "${{ needs.e2e.result }}" == "failure" ]]; then
+            echo "❌ CI checks failed"
+            exit 1
+          else
+            echo "✅ All CI checks passed"
+          fi
