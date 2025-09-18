@@ -83,7 +83,7 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         # Try to use a font, fallback to default if not available
         try:
             font = ImageFont.truetype("Arial", 16)
-        except:
+        except OSError:
             font = ImageFont.load_default()
         
         # Calculate text position (center it)

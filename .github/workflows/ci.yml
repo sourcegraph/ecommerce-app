@@ -96,7 +96,7 @@ jobs:
     name: End-to-End Tests
     needs: [backend, frontend]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     
     steps:
       - name: Checkout code

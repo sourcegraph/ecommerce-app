@@ -3,7 +3,7 @@ import io
 from PIL import Image
 from sqlmodel import Session
 from app.models import Category, Product
-from app.schemas import CategoryCreate, ProductCreate
+from app.schemas import CategoryCreate
 
 
 def create_test_category(session: Session, name: Optional[str] = None) -> Category:

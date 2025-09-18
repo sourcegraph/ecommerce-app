@@ -193,11 +193,13 @@ export const Provider: FC<Props> = ({ children }) => {
 
   const deleteFromCart = (id: number | string) => {
     setProducts(prevProducts => {
-      const updatedProducts = prevProducts.map(prevProduct =>
-        prevProduct.id === id
-          ? { ...prevProduct, inCart: false, quantity: undefined }
-          : prevProduct
-      );
+      const updatedProducts = prevProducts.map(prevProduct => {
+        if (prevProduct.id === id) {
+          const { quantity, ...productWithoutQuantity } = prevProduct as ProductInCart;
+          return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
+        }
+        return prevProduct;
+      });
       saveCartState(updatedProducts);
       return updatedProducts;
     });

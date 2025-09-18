@@ -11,7 +11,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.models import SQLModel
-from app.db import engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
