@@ -57,6 +57,8 @@ frontend/coverage/
 playwright-report/
 test-results/
 *.trace.zip
+test-results.xml
+test-results.json
 
 # Logs
 logs/

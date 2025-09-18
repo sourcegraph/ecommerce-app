@@ -42,7 +42,7 @@ def get_product(session: Session, product_id: int) -> Optional[Product]:
     return session.get(Product, product_id)
 
 def update_product(session: Session, product_id: int, product_update: ProductUpdate) -> Optional[Product]:
-    from datetime import datetime
+    from datetime import datetime, timezone
     
     db_product = session.get(Product, product_id)
     if not db_product:
@@ -53,7 +53,7 @@ def update_product(session: Session, product_id: int, product_update: ProductUpd
         setattr(db_product, field, value)
     
     # Update the timestamp
-    db_product.updated_at = datetime.utcnow()
+    db_product.updated_at = datetime.now(timezone.utc)
     
     session.add(db_product)
     session.commit()

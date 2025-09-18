@@ -24,19 +24,19 @@ install-e2e:
 # ─── containers (hot-reload, canonical ports) ─────────────
 # Start both services with hot-reload
 up:
-    @echo "🐳 Starting dev containers on 3001/8001..."
+    @echo "Starting dev containers on 3001/8001..."
     {{CM}} up --build -d
 
 # Stop all containers
 down:
-    @echo "🛑 Stopping and cleaning up containers..."
+    @echo "Stopping and cleaning up containers..."
     -{{CM}} down --remove-orphans 2>/dev/null || true
-    @echo "🧹 Force removing any remaining containers and networks..."
+    @echo "Force removing any remaining containers and networks..."
     -podman container stop $(podman ps -aq) 2>/dev/null || true
     -podman container rm -f $(podman ps -aq) 2>/dev/null || true  
     -podman pod rm -f $(podman pod ls -q) 2>/dev/null || true
     -podman network rm $(podman network ls --filter "name=amp-demo" -q) 2>/dev/null || true
-    @echo "✅ Cleanup complete"
+    @echo "Cleanup complete"
 
 # Run backend only
 backend:
@@ -73,7 +73,7 @@ test-local-single TEST:
 
 # Run E2E tests in containers (headless - default)
 test-e2e:
-    @echo "🎭 Running E2E tests in containers (headless)..."
+    @echo "Running E2E tests in containers (headless)..."
     {{CM}} --profile test up -d backend frontend
     @sleep 5
     {{CM}} --profile test run --rm -e HEADED=0 e2e
@@ -81,7 +81,7 @@ test-e2e:
 
 # Run E2E tests in containers (headed mode for debugging)
 test-e2e-headed:
-    @echo "🎭 Running E2E tests in containers (headed)..."
+    @echo "Running E2E tests in containers (headed)..."
     {{CM}} --profile test up -d backend frontend
     @sleep 5
     {{CM}} --profile test run --rm -e HEADED=1 e2e
@@ -111,13 +111,13 @@ test-all-local:
 
 # Run CI checks locally (mirrors CI pipeline)
 ci:
-    @echo "🚀 Running full CI pipeline locally..."
+    @echo "Running full CI pipeline locally..."
     @just check
     @just test-cov
     cd frontend && npm run lint
     @just build
     @just test-e2e
-    @echo "✅ All CI checks passed!"
+    @echo "All CI checks passed!"
 
 # View recent logs for a specific service (default: backend)
 logs SERVICE="backend":
@@ -146,9 +146,9 @@ reset-db:
 
 # Health check for running services
 health:
-    @echo "🔍 Checking service health..."
-    @curl -f http://localhost:8001/health || echo "❌ Backend not responding"
-    @curl -f http://localhost:3001 || echo "❌ Frontend not responding"
+    @echo "Checking service health..."
+    @curl -f http://localhost:8001/health || echo "Backend not responding"
+    @curl -f http://localhost:3001 || echo "Frontend not responding"
 
 # Run database shell (SQLite CLI)
 db-shell:

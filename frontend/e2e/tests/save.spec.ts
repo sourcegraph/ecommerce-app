@@ -104,7 +104,7 @@ test.describe('Save/Wishlist Functionality', () => {
     await page.goto('/');
     
     // Look for wishlist/saved items navigation
-    const wishlistLink = page.locator('[data-testid="wishlist-link"], a:has-text("Wishlist"), a:has-text("Saved"), nav a:has-text("♡")');
+    const wishlistLink = page.locator('[data-testid="wishlist-link"], a:has-text("Wishlist"), a:has-text("Saved"), nav a:has-text("Heart")');
     
     if (await wishlistLink.count() > 0) {
       await wishlistLink.click();
