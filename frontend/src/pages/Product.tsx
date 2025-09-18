@@ -34,8 +34,7 @@ const Product = () => {
   const { id } = useParams();
   useEffect(() => {
     isLoading && fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoading, fetchProducts]);
   const product = products.find(product => product.id.toString() === id);
   const toast = useToast();
   return isLoading ? (

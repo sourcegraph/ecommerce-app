@@ -109,6 +109,16 @@ test-all-local:
     @just test-local
     @just test-e2e-local
 
+# Run CI checks locally (mirrors CI pipeline)
+ci:
+    @echo "🚀 Running full CI pipeline locally..."
+    @just check
+    @just test-cov
+    cd frontend && npm run lint
+    @just build
+    @just test-e2e
+    @echo "✅ All CI checks passed!"
+
 # View recent logs for a specific service (default: backend)
 logs SERVICE="backend":
     {{CM}} logs --tail=50 {{SERVICE}}
@@ -119,12 +129,12 @@ logs-follow SERVICE="backend":
 
 # Check backend code quality
 check:
-    {{CM}} run --rm backend ruff check .
-    {{CM}} run --rm backend mypy .
+    cd backend && uv run ruff check .
+    cd backend && uv run mypy .
 
 # Format backend code
 format:
-    {{CM}} run --rm backend ruff format .
+    cd backend && uv run ruff format .
 
 # Build frontend for production
 build:

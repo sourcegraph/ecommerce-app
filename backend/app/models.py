@@ -16,7 +16,7 @@ class Category(SQLModel, table=True):
 class Product(SQLModel, table=True):
     __tablename__ = "products"
     
-    id: int = Field(primary_key=True)  # Keep existing JSON IDs
+    id: Optional[int] = Field(default=None, primary_key=True)  # Keep existing JSON IDs
     title: str
     description: str
     price: float
