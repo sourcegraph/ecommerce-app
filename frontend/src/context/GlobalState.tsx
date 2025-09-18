@@ -195,7 +195,7 @@ export const Provider: FC<Props> = ({ children }) => {
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(prevProduct => {
         if (prevProduct.id === id) {
-          const { quantity, ...productWithoutQuantity } = prevProduct as ProductInCart;
+          const { quantity: _quantity, ...productWithoutQuantity } = prevProduct as ProductInCart;
           return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
         }
         return prevProduct;
