@@ -61,8 +61,7 @@ const ProductCard = ({ product }: Props) => {
         data-testid="product-card"
         p={{ base: 2, sm: 3 }}
         rounded="md"
-        border={{ base: "1px solid", sm: "none" }}
-        borderColor={{ base: "gray.200", sm: "transparent" }}
+        border="none"
         _hover={{
           ".product-title": {
             color: "appBlue.600",
@@ -86,6 +85,9 @@ const ProductCard = ({ product }: Props) => {
             w="100%"
             h="100%"
             objectFit="contain"
+            bg="white"
+            borderRadius="md"
+            style={{ backgroundColor: 'white' }}
           />
         </Skeleton>
         <LinkOverlay

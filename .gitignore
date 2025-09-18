@@ -36,6 +36,8 @@ coverage.*
 # Intentionally keeping these commented so the project is easy to clone and get started with
 #*.sqlite3
 #*.db
+*.db-shm
+*.db-wal
 
 # Environment files
 .env
