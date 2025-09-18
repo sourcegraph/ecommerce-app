@@ -108,7 +108,22 @@ def create_product(
     if not category:
         raise HTTPException(status_code=400, detail="Category not found")
     
-    return crud.create_product(session, product)
+    created_product = crud.create_product(session, product)
+    
+    # Convert to response format with image URL
+    product_dict = {
+        "id": created_product.id,
+        "title": created_product.title,
+        "description": created_product.description,
+        "price": created_product.price,
+        "category_id": created_product.category_id,
+        "is_saved": created_product.is_saved,
+        "created_at": created_product.created_at,
+        "updated_at": created_product.updated_at,
+        "image_url": f"/products/{created_product.id}/image" if created_product.image_data else None,
+    }
+    
+    return product_dict
 
 @app.get("/products", response_model=List[ProductRead])
 def get_products(
@@ -187,11 +202,20 @@ def update_product(
     if not updated_product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    # Add image URL
-    if updated_product.image_data:
-        updated_product.image_url = f"/products/{product_id}/image"
+    # Convert to response format with image URL
+    product_dict = {
+        "id": updated_product.id,
+        "title": updated_product.title,
+        "description": updated_product.description,
+        "price": updated_product.price,
+        "category_id": updated_product.category_id,
+        "is_saved": updated_product.is_saved,
+        "created_at": updated_product.created_at,
+        "updated_at": updated_product.updated_at,
+        "image_url": f"/products/{product_id}/image" if updated_product.image_data else None,
+    }
     
-    return updated_product
+    return product_dict
 
 @app.delete("/products/{product_id}")
 def delete_product(

@@ -35,8 +35,10 @@ class ProductBase(BaseModel):
     def price_must_be_positive(cls, v):
         if v <= 0:
             raise ValueError('Price must be positive')
-        # Round to 2 decimal places
-        return round(v, 2)
+        # Check decimal places (reject more than 2 decimal places)
+        if round(v, 2) != v:
+            raise ValueError('Price can have at most 2 decimal places')
+        return v
 
 class ProductCreate(ProductBase):
     category_id: int

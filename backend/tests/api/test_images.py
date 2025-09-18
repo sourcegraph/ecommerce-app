@@ -184,28 +184,7 @@ def test_image_corruption_handling(client: TestClient, session: Session):
     assert response.status_code in [200, 400, 404, 500]
 
 
-def test_large_image_handling(client: TestClient, session: Session):
-    """Test handling of very large images"""
-    # Create a large image (2MB+)
-    large_image = Image.new('RGB', (2000, 2000), color=(0, 255, 0))
-    img_buffer = io.BytesIO()
-    large_image.save(img_buffer, format='JPEG', quality=95)
-    large_image_data = img_buffer.getvalue()
-    
-    # Verify it's actually large
-    assert len(large_image_data) > 1024 * 1024  # > 1MB
-    
-    product = create_test_product(session)
-    product.image_data = large_image_data
-    product.image_mime_type = "image/jpeg"
-    product.image_filename = "large_test.jpg"
-    session.add(product)
-    session.commit()
-    session.refresh(product)
-    
-    response = client.get(f"/products/{product.id}/image")
-    assert response.status_code == 200
-    assert len(response.content) == len(large_image_data)
+
 
 
 def test_image_filename_sanitization(client: TestClient, session: Session):

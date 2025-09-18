@@ -42,6 +42,8 @@ def get_product(session: Session, product_id: int) -> Optional[Product]:
     return session.get(Product, product_id)
 
 def update_product(session: Session, product_id: int, product_update: ProductUpdate) -> Optional[Product]:
+    from datetime import datetime
+    
     db_product = session.get(Product, product_id)
     if not db_product:
         return None
@@ -49,6 +51,9 @@ def update_product(session: Session, product_id: int, product_update: ProductUpd
     update_data = product_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_product, field, value)
+    
+    # Update the timestamp
+    db_product.updated_at = datetime.utcnow()
     
     session.add(db_product)
     session.commit()
