@@ -28,3 +28,11 @@ FastAPI (Python 3.13+) + React TypeScript. SQLite + Alembic. Docker with hot-rel
 ## Code Style
 **Backend:** Type hints, SQLModel, Pydantic, HTTPException, async/await, Depends()  
 **Frontend:** Functional components, TypeScript interfaces, Chakra UI, Context API, Formik+Yup
+
+## GitHub Workflow
+
+### Issue & Pull Request Management
+- Always use GitHub CLI for interacting with the GitHub repository
+- Use GitHub CLI for fetching issues, creating pull requests, commenting, and any other GitHub operations
+- Never use curl commands or MC for GitHub API operations
+- For operations like fetching issues, commit changes, or creating pull requests, rely exclusively on the GitHub CLI tools
