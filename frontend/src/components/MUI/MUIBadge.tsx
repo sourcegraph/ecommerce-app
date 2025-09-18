@@ -5,14 +5,15 @@ import { ReactNode } from "react";
 type Props = {
   badgeContent?: number;
   children: ReactNode;
+  testId?: string;
 };
 
 const theme = createTheme();
 
-const MUIBadge = ({ badgeContent, children }: Props) => {
+const MUIBadge = ({ badgeContent, children, testId = "cart-count" }: Props) => {
   return (
     <ThemeProvider theme={theme}>
-      <Badge badgeContent={badgeContent} color="secondary">
+      <Badge badgeContent={badgeContent} color="secondary" data-testid={testId}>
         {children}
       </Badge>
     </ThemeProvider>

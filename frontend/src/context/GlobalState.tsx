@@ -66,6 +66,35 @@ export const Provider: FC<Props> = ({ children }) => {
   const [savedItemsCount, setSavedItemsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load cart state from localStorage
+  const loadCartState = () => {
+    try {
+      const savedCart = localStorage.getItem('cart-state');
+      return savedCart ? JSON.parse(savedCart) : {};
+    } catch (error) {
+      console.error('Failed to load cart state:', error);
+      return {};
+    }
+  };
+
+  // Save cart state to localStorage
+  const saveCartState = (products: ProductType[]) => {
+    try {
+      const cartState: { [key: string]: { inCart: boolean; quantity: number } } = {};
+      products.forEach(product => {
+        if (product.inCart) {
+          cartState[product.id] = {
+            inCart: true,
+            quantity: +product.quantity
+          };
+        }
+      });
+      localStorage.setItem('cart-state', JSON.stringify(cartState));
+    } catch (error) {
+      console.error('Failed to save cart state:', error);
+    }
+  };
+
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -79,23 +108,37 @@ export const Provider: FC<Props> = ({ children }) => {
       
       const products: ProductType[] = await response.json();
       
-      // Convert backend format to frontend format
-      const formattedProducts = products.map(product => ({
-        ...product,
-        // Ensure isSaved is set to false if not provided
-        isSaved: product.isSaved || false,
-      }));
+      // Convert backend format to frontend format and apply saved cart state
+      const savedCartState = loadCartState();
+      const formattedProducts = products.map(product => {
+        const cartItem = savedCartState[product.id];
+        return {
+          ...product,
+          // Ensure isSaved is set to false if not provided
+          isSaved: product.isSaved || false,
+          // Apply saved cart state
+          inCart: cartItem?.inCart || false,
+          quantity: cartItem?.quantity || undefined,
+        };
+      });
       
       setProducts(formattedProducts);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       // Fallback to seed data if API is not available
       console.log("Using fallback seed data");
-      const products: ProductType[] = seed.map(product => ({
-        ...product,
-        image_url: product.image, // Convert old format
-        isSaved: false
-      }));
+      const savedCartState = loadCartState();
+      const products: ProductType[] = seed.map(product => {
+        const cartItem = savedCartState[product.id];
+        return {
+          ...product,
+          image_url: product.image, // Convert old format
+          isSaved: false,
+          // Apply saved cart state
+          inCart: cartItem?.inCart || false,
+          quantity: cartItem?.quantity || undefined,
+        };
+      });
       setProducts(products);
     } finally {
       setIsLoading(false);
@@ -137,53 +180,63 @@ export const Provider: FC<Props> = ({ children }) => {
       duration: 1500,
       isClosable: true,
     });
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.id === product.id
           ? { ...prevProduct, quantity: 1, inCart: true }
           : prevProduct
-      )
-    );
+      );
+      saveCartState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const deleteFromCart = (id: number | string) => {
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.id === id
           ? { ...prevProduct, inCart: false, quantity: undefined }
           : prevProduct
-      )
-    );
+      );
+      saveCartState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const setQuantity = (qty: string, id: number | string) => {
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.inCart && prevProduct.id === id
           ? { ...prevProduct, quantity: qty }
           : prevProduct
-      )
-    );
+      );
+      saveCartState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const decrementQty = (id: number | string) => {
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.inCart && prevProduct.id === id
           ? { ...prevProduct, quantity: +prevProduct.quantity - 1 }
           : prevProduct
-      )
-    );
+      );
+      saveCartState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const incrementQty = (id: number | string) => {
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.inCart && prevProduct.id === id
           ? { ...prevProduct, quantity: +prevProduct.quantity + 1 }
           : prevProduct
-      )
-    );
+      );
+      saveCartState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   return (

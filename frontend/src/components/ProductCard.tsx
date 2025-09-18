@@ -58,6 +58,7 @@ const ProductCard = ({ product }: Props) => {
         flexDirection="column"
         h="100%"
         className="product-card"
+        data-testid="product-card"
         p={{ base: 2, sm: 3 }}
         rounded="md"
         border={{ base: "1px solid", sm: "none" }}
@@ -134,6 +135,7 @@ const ProductCard = ({ product }: Props) => {
             <Button
               opacity={product.isSaved ? 1 : { base: 1, sm: 0 }}
               className="btn"
+              data-testid="save-button"
               colorScheme="appBlue"
               variant="outline"
               height={9}
@@ -162,6 +164,7 @@ const ProductCard = ({ product }: Props) => {
         <Button
           opacity={{ base: 1, sm: 0 }}
           className="btn"
+          data-testid="add-to-cart"
           mt={3}
           colorScheme="red"
           variant="outline"

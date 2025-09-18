@@ -95,19 +95,35 @@ cd frontend && npm run dev
 
 ### Testing & Quality
 
+#### Container Testing (Recommended - Guaranteed Portability)
 ```bash
-just test             # Run backend tests (pytest)
-just test-cov         # Run backend tests with coverage
-just test-e2e         # Run E2E tests (Playwright)
-just test-all         # Run all tests
+just test             # Backend tests in container
+just test-cov         # Backend tests with coverage in container
+just test-e2e         # E2E tests in container (headless)
+just test-e2e-headed  # E2E tests in container (headed - for debugging)
+just test-all         # All tests in containers (CI equivalent)
+```
 
-# Backend code quality
+#### Local Testing (Optional - Faster Development)
+```bash
+# Setup local environment first
+./backend/setup-dev.sh                 # Setup backend for local testing
+just setup-e2e-local                   # Setup E2E testing locally
+
+# Run tests locally
+just test-local                        # Backend tests locally
+just test-cov-local                    # Backend coverage locally  
+just test-local-single TEST            # Run single test locally
+just test-e2e-local                    # E2E tests locally (headless)
+just test-e2e-local-headed             # E2E tests locally (headed - for debugging)
+just test-all-local                    # All tests locally
+```
+
+#### Code Quality
+```bash
 just check            # Run linting (ruff) and type checking (mypy)
 just format           # Format backend code
-
-# Frontend testing
-cd frontend && npm run test:e2e        # E2E tests
-cd frontend && npm run test:e2e:ui     # E2E tests with UI
+cd frontend && npm run lint            # Lint frontend TypeScript
 ```
 
 ### Build & Deployment

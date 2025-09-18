@@ -58,14 +58,56 @@ test:
 test-cov:
     {{CM}} run --rm backend pytest --cov=app --cov-report=html
 
-# Run E2E tests
-test-e2e:
-    cd frontend && npx playwright test
+# ─── local testing (faster development) ──────────────────────
+# Run backend tests locally (requires: uv sync)
+test-local:
+    cd backend && uv run pytest
 
-# Run all tests (backend + E2E)
+# Run backend tests with coverage locally
+test-cov-local:
+    cd backend && uv run pytest --cov=app --cov-report=html --cov-report=term
+
+# Run single test locally
+test-local-single TEST:
+    cd backend && uv run pytest {{TEST}}
+
+# Run E2E tests in containers (headless - default)
+test-e2e:
+    @echo "🎭 Running E2E tests in containers (headless)..."
+    {{CM}} --profile test up -d backend frontend
+    @sleep 5
+    {{CM}} --profile test run --rm -e HEADED=0 e2e
+    {{CM}} --profile test down
+
+# Run E2E tests in containers (headed mode for debugging)
+test-e2e-headed:
+    @echo "🎭 Running E2E tests in containers (headed)..."
+    {{CM}} --profile test up -d backend frontend
+    @sleep 5
+    {{CM}} --profile test run --rm -e HEADED=1 e2e
+    {{CM}} --profile test down
+
+# Run E2E tests locally (headless - default)
+test-e2e-local:
+    cd frontend && HEADED=0 npx playwright test
+
+# Run E2E tests locally (headed mode for debugging)
+test-e2e-local-headed:
+    cd frontend && HEADED=1 npx playwright test
+
+# Setup E2E testing locally
+setup-e2e-local:
+    cd frontend && npx playwright install --with-deps
+
+# Run all tests (backend + E2E) - containers
 test-all:
     @just test
     @just test-e2e
+
+# Run all tests locally (backend + E2E) - faster development
+test-all-local:
+    @just test-local
+    @just test-e2e-local
 
 # View recent logs for a specific service (default: backend)
 logs SERVICE="backend":

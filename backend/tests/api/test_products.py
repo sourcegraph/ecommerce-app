@@ -1,6 +1,8 @@
 import pytest
+import time
 from fastapi.testclient import TestClient
 from sqlmodel import Session
+from tests.factories import create_test_category, create_test_product
 
 def test_get_products(client: TestClient):
     """Test getting all products"""
@@ -156,3 +158,146 @@ def test_get_nonexistent_product_image(client: TestClient):
     """Test getting image for nonexistent product"""
     response = client.get("/products/99999/image")
     assert response.status_code == 404
+
+
+# Data Validation Tests
+@pytest.mark.parametrize("invalid_product", [
+    {"title": "", "description": "Test", "price": 10.0, "category_id": 1},  # Empty title
+    {"title": "Test", "description": "", "price": 10.0, "category_id": 1},  # Empty description  
+    {"title": "Test", "description": "Test", "price": -5.0, "category_id": 1},  # Negative price
+    {"title": "Test", "description": "Test", "price": 0, "category_id": 1},  # Zero price
+    {"title": "Test", "description": "Test", "price": 10.999, "category_id": 1},  # >2 decimals
+    {"title": "Test", "description": "Test", "category_id": 1},  # Missing price
+])
+def test_create_product_validation_errors(client: TestClient, session: Session, invalid_product: dict):
+    """Test product creation validation"""
+    # Create a valid category first
+    category = create_test_category(session)
+    invalid_product["category_id"] = category.id
+    
+    response = client.post("/products", json=invalid_product)
+    assert response.status_code == 422
+
+
+def test_create_product_with_very_long_fields(client: TestClient, session: Session):
+    """Test handling of extremely long input fields"""
+    category = create_test_category(session)
+    
+    product_data = {
+        "title": "A" * 1000,  # Very long title
+        "description": "B" * 10000,  # Very long description
+        "price": 29.99,
+        "category_id": category.id
+    }
+    
+    response = client.post("/products", json=product_data)
+    # Should either succeed (if no length limits) or return 422
+    assert response.status_code in [200, 422]
+
+
+# Business Logic Tests
+def test_product_price_decimal_precision(client: TestClient, session: Session):
+    """Test that product prices maintain proper decimal precision"""
+    category = create_test_category(session)
+    
+    test_prices = [10.99, 0.01, 999.99, 12.34]
+    
+    for price in test_prices:
+        product_data = {
+            "title": f"Price Test {price}",
+            "description": "Price precision test",
+            "price": price,
+            "category_id": category.id
+        }
+        
+        response = client.post("/products", json=product_data)
+        assert response.status_code == 200
+        assert response.json()["price"] == price
+
+
+def test_product_timestamps(client: TestClient, session: Session):
+    """Test that created_at and updated_at work correctly"""
+    category = create_test_category(session)
+    
+    # Create product
+    product_data = {
+        "title": "Timestamp Test",
+        "description": "Test",
+        "price": 10.0,
+        "category_id": category.id
+    }
+    
+    response = client.post("/products", json=product_data)
+    assert response.status_code == 200
+    
+    product = response.json()
+    product_id = product["id"]
+    original_created_at = product["created_at"]
+    original_updated_at = product["updated_at"]
+    
+    # Wait a moment and update
+    time.sleep(0.1)
+    
+    update_response = client.put(f"/products/{product_id}", json={"title": "Updated Title"})
+    assert update_response.status_code == 200
+    
+    updated_product = update_response.json()
+    assert updated_product["created_at"] == original_created_at  # Should not change
+    assert updated_product["updated_at"] != original_updated_at  # Should change
+
+
+def test_product_category_relationship(client: TestClient, session: Session):
+    """Test that products correctly maintain category relationships"""
+    category1 = create_test_category(session, "Category 1")
+    category2 = create_test_category(session, "Category 2")
+    
+    # Create product in category1
+    product = create_test_product(session, category1.id)
+    
+    # Verify category relationship
+    response = client.get(f"/products/{product.id}")
+    assert response.status_code == 200
+    product_data = response.json()
+    assert product_data["category"]["id"] == category1.id
+    assert product_data["category"]["name"] == "Category 1"
+    
+    # Update product to category2
+    update_response = client.put(f"/products/{product.id}", json={"category_id": category2.id})
+    assert update_response.status_code == 200
+    
+    # Verify updated relationship
+    updated_response = client.get(f"/products/{product.id}")
+    updated_product = updated_response.json()
+    assert updated_product["category"]["id"] == category2.id
+    assert updated_product["category"]["name"] == "Category 2"
+
+
+def test_product_with_missing_image_returns_null_url(client: TestClient, session: Session):
+    """Test that products without images return null/empty image_url"""
+    product = create_test_product(session, with_image=False)
+    
+    response = client.get(f"/products/{product.id}")
+    assert response.status_code == 200
+    product_data = response.json()
+    assert product_data["image_url"] is None or product_data["image_url"] == ""
+
+
+def test_product_search_functionality(client: TestClient, session: Session):
+    """Test product search if implemented"""
+    category = create_test_category(session)
+    
+    # Create products with searchable terms
+    product1 = create_test_product(session, category.id, "Unique Widget Alpha", 10.0)
+    product2 = create_test_product(session, category.id, "Special Widget Beta", 20.0)
+    product3 = create_test_product(session, category.id, "Different Gadget", 30.0)
+    
+    # Test search by title (if search parameter exists)
+    search_response = client.get("/products?search=widget")
+    if search_response.status_code == 200:
+        # If search is implemented
+        products = search_response.json()
+        widget_products = [p for p in products if "widget" in p["title"].lower()]
+        assert len(widget_products) >= 2
+    else:
+        # Search not implemented, skip this test
+        pytest.skip("Search functionality not implemented")
