@@ -82,6 +82,9 @@ const CartItemMobile = ({ product }: Props) => {
               maxW="100%"
               maxH="100%"
               objectFit="contain"
+              bg="white"
+              borderRadius="md"
+              style={{ backgroundColor: 'white' }}
             />
             <Box w="120px" h="120px">
               <MUISkeleton

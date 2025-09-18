@@ -68,7 +68,15 @@ const Product = () => {
             divider={<StackDivider borderColor="blackAlpha.300" borderWidth="2px" />}
           >
             <Flex align="center" justify="center" w="220px" h="220px" m="auto">
-              <Image src={getImageUrl(product)} maxW="100%" maxH="100%" objectFit="contain" />
+              <Image 
+                src={getImageUrl(product)} 
+                maxW="100%" 
+                maxH="100%" 
+                objectFit="contain" 
+                bg="white" 
+                borderRadius="md"
+                style={{ backgroundColor: 'white' }} 
+              />
             </Flex>
             <Box>
               <Heading fontSize="2xl" mb={4}>
