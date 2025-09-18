@@ -53,14 +53,7 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct cur
 #### Oracle Planning prompts
 
 To demonstrate Oracle using this repo, run any of the provided prompts for the given use case.
-**Think hard:**  Make it clear to the end user that Amp will increase token allocation for the Oracle tool whenever this term appears in the prompt
-Feature Implementation
-```
-Use Oracle to evaluate how to add the following feature:
-Add currency localisation for international customer, the current default is USD $. 
-Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct currency conversion based on latest FX rates.
-```
-
+**Think hard or Think extremely hard:**  Make it clear to the end user that Amp will increase token allocation for the Oracle tool whenever this term appears in the prompt
 
 Architecture Review:
 ```
@@ -92,10 +85,18 @@ Amp will automatically read IDE diagnostics while implementing a feature or fixi
 
 <img width="648" height="529" alt="Screenshot 2025-09-18 at 11 56 52" src="https://github.com/user-attachments/assets/793c1008-41ac-43c4-a734-8124e565c153" />
 
+### AGENTS.md / Multiple AGENTS.md
+Key to emphasise that Amp needs a good AGENTS.md file instructions for optimal performance. There are 3 different AGENTS.md file in this repo:
+- Master [AGENTS.md file](https://github.com/sourcegraph/amp-demo/blob/main/AGENTS.md)
+- [AGENTS.md](https://github.com/sourcegraph/amp-demo/blob/main/backend/AGENTS.md) file for backend
+- [AGENTS.md](https://github.com/sourcegraph/amp-demo/blob/main/frontend/AGENTS.md) file for frontend
+Study our guidance on how to write a [good AGENTS.md file](https://github.com/sourcegraph/amp-examples-and-guides/blob/main/guides/agent-file/Best_Practices.md) and convey the key points. Also review https://agents.md
+
+Having hierarchial AGENTS.md structure is important for large monorepos, you can also show our own [Sourcegraph](https://github.com/sourcegraph/sourcegraph) Repo to emphasise this point.
+
 - Testing
 - MCP
 
-### AGENTS.md / Multiple AGENTS.md
   
 - Security/remediation
 
