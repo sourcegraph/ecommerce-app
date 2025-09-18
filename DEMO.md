@@ -7,7 +7,7 @@ Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 **Steps:**
 - The filtering on the landing page doesn't work, show this in the UI by going to localhost:7001 and tell the a audience that you will now ask Amp to fix this Github issue.
 - In VS Code or Terminal type ```Fix bug https://github.com/sourcegraph/amp-demo/issues/5 in a new branch, test and validate changes. Then create a pull request```
-- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-3eaabc98-69dd-4896-8616-13b51c5f8320) that was run to fix this issue. Or you can switch to _fix-sort-filters_ branch locally and run this branch, which has the fix in case something goes wrong. 
+- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-3eaabc98-69dd-4896-8616-13b51c5f8320) that was run to fix this issue. Or you can switch to [_fix-sort-filters_](https://github.com/sourcegraph/amp-demo/tree/fix-sort-filters) branch locally and run this branch, which has the fix in case something goes wrong. 
 - One its fixed the dropdown for category, shipping and sort by will be populated. And the the product list will change based on what is selected.
 <img width="364" height="194" alt="Screenshot 2025-09-18 at 12 18 34" src="https://github.com/user-attachments/assets/c85c7734-3454-452f-9ee7-91229f4bc143" />
 
