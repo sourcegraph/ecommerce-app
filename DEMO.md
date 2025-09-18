@@ -1,7 +1,7 @@
-## Requirements 
 
-### Issue to PR
-#### Fixing Github Issue Bug
+
+# Issue to PR
+## Fixing Github Issue Bug
 **Purpose**
 Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 **Steps:**
@@ -11,7 +11,7 @@ Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 - One its fixed the dropdown for category, shipping and sort by will be populated. And the the product list will change based on what is selected.
 <img width="364" height="194" alt="Screenshot 2025-09-18 at 12 18 34" src="https://github.com/user-attachments/assets/c85c7734-3454-452f-9ee7-91229f4bc143" />
 
-#### Implementing a new feature
+## Implementing a new feature
 **Purpose**
 Demonstrate how you can Amp to Issue implement a new feature from issue to PR in one prompt
 **Steps:**
@@ -19,7 +19,7 @@ Demonstrate how you can Amp to Issue implement a new feature from issue to PR in
 - In VS Code or Terminal type ```Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes. Then create a pull request```
 - While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-38dc99a9-55cf-412a-a21d-e9df22a3f49d) that was run to for the feature
   
-#### PR review bot
+## PR review bot
 **Purpose**
 Demostrate Amp Github code review feature. 
 **Steps:**
@@ -28,7 +28,7 @@ Demostrate Amp Github code review feature.
 - Example PR https://github.com/sourcegraph/amp-demo/pull/7 (Note, this isn't working atm. working on getting it fixed).
 
 
-### Complex subagent chang with Oracle
+# Complex subagent change with Oracle
 **Purpose**
 Demostrate Amp's advanced capability of Amp leveraging Oracle and subagents. Right now the web app only displays one currency. We will instruct Amp to:
 - Use Oracle to analyse what changes needs to be made to add support for multiple currencies
@@ -50,7 +50,7 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct cur
 - Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/amp-demo/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
 <img width="1736" height="587" alt="Screenshot 2025-09-18 at 12 56 46" src="https://github.com/user-attachments/assets/9a4ee0b6-6f27-4f6d-a81f-4f7b9985bc73" />
 
-#### Oracle Planning prompts
+## Oracle Planning prompts
 
 To demonstrate Oracle using this repo, run any of the provided prompts for the given use case.
 **Think hard or Think extremely hard:**  Make it clear to the end user that Amp will increase token allocation for the Oracle tool whenever this term appears in the prompt
@@ -79,13 +79,14 @@ Debugging Complex Issue:
 ```
 There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Help debug and plan a solution.
 ```
+# Misc demo blocks
 
-### IDE diagnostics
+## IDE diagnostics
 Amp will automatically read IDE diagnostics while implementing a feature or fixing a bug, you don't need to do any configuration here. Just tell the user that Amp reads IDE diagnostics and fixes issues/autocorrects any problems as they appear
 
 <img width="648" height="529" alt="Screenshot 2025-09-18 at 11 56 52" src="https://github.com/user-attachments/assets/793c1008-41ac-43c4-a734-8124e565c153" />
 
-### AGENTS.md / Multiple AGENTS.md
+## AGENTS.md / Multiple AGENTS.md
 Key to emphasise that Amp needs a good AGENTS.md file instructions for optimal performance. There are 3 different AGENTS.md file in this repo:
 - Master [AGENTS.md file](https://github.com/sourcegraph/amp-demo/blob/main/AGENTS.md)
 - [AGENTS.md](https://github.com/sourcegraph/amp-demo/blob/main/backend/AGENTS.md) file for backend
@@ -94,13 +95,17 @@ Study our guidance on how to write a [good AGENTS.md file](https://github.com/so
 
 Having hierarchial AGENTS.md structure is important for large monorepos, you can also show our own [Sourcegraph](https://github.com/sourcegraph/sourcegraph) Repo to emphasise this point.
 
-- Testing
-- MCP
+## Testing
 
-  
-- Security/remediation
+## MCP and tool calling
+Amp can integrate with various MCP servers (remote and local), and leverage tool calling to execute commands. Amp ships with Playwright which lets it take screenshots of your browser. In the Issue to PR demo block above. Amp will validate changes using playwright. 
 
-### Terminal specific
+Additionally, install the Github CLI from [here](https://cli.github.com) and set it up using your personal Github account. So that Amp can use tool calling ability to fetch Github issues, pull your code changes and create Pull Request on Github.
+
+// TODO update this section to use with Sourcegraph MCP to demo Amp + Sourcegraph search
+
+
+# Terminal specific
 
 - CLI -x and piping -> Git history, analyse files
 - Custom slash commands
