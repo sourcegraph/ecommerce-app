@@ -109,6 +109,16 @@ test-all-local:
     @just test-local
     @just test-e2e-local
 
+# Run CI checks locally (mirrors CI pipeline)
+ci:
+    @echo "🚀 Running full CI pipeline locally..."
+    @just check
+    @just test-cov
+    cd frontend && npm run lint
+    @just build
+    @just test-e2e
+    @echo "✅ All CI checks passed!"
+
 # View recent logs for a specific service (default: backend)
 logs SERVICE="backend":
     {{CM}} logs --tail=50 {{SERVICE}}

@@ -1,4 +1,3 @@
-import pytest
 import io
 from PIL import Image
 from fastapi.testclient import TestClient
@@ -112,7 +111,6 @@ def test_image_response_performance(client: TestClient, session: Session):
 def test_concurrent_image_requests(client: TestClient, session: Session):
     """Test handling of concurrent image requests"""
     import concurrent.futures
-    import threading
     
     product = create_test_product(session, with_image=True)
     

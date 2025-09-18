@@ -1,49 +1,30 @@
 # ecommerce-demo Agent Guide
 
-## Running the App
-**With containers (recommended for development):**
+## Essential Commands
 
-**Containers (hot-reload, ports 3001/8001):**
-- `just up` - Both services with hot-reload (recommended)
-- `just down` - Stop all containers
-- `just backend` - Backend only (auto-reload)
-- `just frontend` - Frontend only (Vite hot-reload)
+**Pass CI:** `just ci` (runs lint, tests, build, e2e)  
+**Run app:** `just up` (ports 3001/8001)  
+**Run tests:** `just test-all` (backend + e2e in containers)  
+**Stop:** `just down`
 
-**Locally without containers:**
-- `cd backend && uv run uvicorn main:app --reload` - Backend only
-- `cd frontend && npm run dev` - Frontend only
+## Development
 
-**URLs:** Frontend http://localhost:3001, Backend http://localhost:8001, Docs http://localhost:8001/docs
+**Quick start:**
+- `just up` - Start both services (hot-reload)
+- `just seed` - Add sample data
+- `just check` - Lint & type check backend
+- `cd frontend && npm run lint` - Lint frontend
 
-## Tests & Quality
+**Testing:**
+- `just test` - Backend tests
+- `just test-e2e` - E2E tests  
+- `just test-all-local` - All tests locally (faster)
 
-### Container Testing (Default - Guaranteed Portability)
-- `just test` - Backend tests in container
-- `just test-cov` - Backend tests with coverage in container  
-- `just test-e2e` - E2E tests in container
-- `just test-all` - All tests in containers (CI equivalent)
-
-### Local Testing (Optional - Faster Development)
-- `just test-local` - Backend tests locally (requires: uv sync)
-- `just test-cov-local` - Backend coverage locally
-- `just test-local-single TEST` - Run single test locally
-- `just test-e2e-local` - E2E tests locally (requires: npm ci, playwright install)
-- `just test-all-local` - All tests locally
-
-### Setup Commands
-- `./backend/setup-dev.sh` - Setup backend for local testing
-- `just setup-e2e-local` - Install Playwright browsers locally
-
-### Code Quality
-- `just check` - Lint (ruff) and type check (mypy) backend
-- `just format` - Format backend code with ruff
-- `cd frontend && npm run lint` - Lint frontend TypeScript
-- `just build` - Build frontend production bundle
-- `just seed` - Seed a fresh SQLite database
+**URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
 
 ## Architecture
-FastAPI (Python 3.13+) backend with React TypeScript frontend. SQLite database with Alembic migrations. Docker containerized with development hot-reload. Backend serves API at :8001, frontend at :3001. Uses uv for Python deps, npm for Node deps.
+FastAPI (Python 3.13+) + React TypeScript. SQLite + Alembic. Docker with hot-reload.
 
 ## Code Style
-**Backend**: Python type hints everywhere, SQLModel for DB models, Pydantic schemas for validation, HTTPException for errors, async/await patterns, dependency injection with Depends()
-**Frontend**: Functional React components with TypeScript interfaces, Chakra UI styling, Context API state management, Formik forms with Yup validation, Framer Motion animations, arrow functions
+**Backend:** Type hints, SQLModel, Pydantic, HTTPException, async/await, Depends()  
+**Frontend:** Functional components, TypeScript interfaces, Chakra UI, Context API, Formik+Yup
