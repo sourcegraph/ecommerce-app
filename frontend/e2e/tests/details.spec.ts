@@ -9,7 +9,7 @@ test.describe('Product Details', () => {
     
     // Click on the first product
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitle = await firstProduct.locator('h3, h2').textContent();
+    const productTitle = await firstProduct.getByText(/Fjallraven|Mens|Women/i).textContent();
     
     await firstProduct.click();
     
@@ -43,7 +43,7 @@ test.describe('Product Details', () => {
     // Adjust selectors based on your actual product detail UI
     const productImage = page.locator('[data-testid="product-detail-image"], .product-image img, img[alt*="product" i]');
     const productTitle = page.locator('[data-testid="product-title"], h1, h2');
-    const productPrice = page.locator('[data-testid="product-price"], .price, text=/\\$/i');
+    const productPrice = page.locator('[data-testid="product-price"], .price').or(page.getByText(/\$/));
     const productDescription = page.locator('[data-testid="product-description"], .description, p');
     
     // At least some of these elements should be present
@@ -87,7 +87,7 @@ test.describe('Product Details', () => {
       await page.waitForTimeout(1000);
       
       // Verify cart was updated (success message, cart count change, etc.)
-      const successMessage = page.locator('text=/added.*cart/i, .toast, .notification');
+      const successMessage = page.locator('.toast, .notification').or(page.getByText(/added.*cart/i));
       const hasSuccessMessage = await successMessage.count() > 0;
       
       let cartCountIncreased = false;

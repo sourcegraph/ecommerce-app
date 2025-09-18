@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
+from tests.factories import create_test_category, create_test_product
 
 def test_get_categories(client: TestClient):
     """Test getting all categories"""
@@ -83,3 +84,43 @@ def test_category_with_products(client: TestClient):
             break
     else:
         pytest.skip("No categories with products found for testing")
+
+
+def test_create_category_duplicate_name(client: TestClient):
+    """Test creating category with duplicate name returns 400"""
+    category_data = {"name": "Electronics"}
+    
+    # First creation should succeed
+    response1 = client.post("/categories", json=category_data)
+    assert response1.status_code == 200
+    
+    # Duplicate should fail
+    response2 = client.post("/categories", json=category_data)
+    assert response2.status_code == 400
+    assert "already exists" in response2.json()["detail"].lower()
+
+
+def test_create_category_empty_name(client: TestClient):
+    """Test creating category with empty/whitespace name fails"""
+    test_cases = [
+        {"name": ""},
+        {"name": "   "},
+        {"name": None}
+    ]
+    
+    for category_data in test_cases:
+        response = client.post("/categories", json=category_data)
+        assert response.status_code == 422  # Validation error
+
+
+def test_get_category_with_products_includes_image_urls(client: TestClient, session: Session):
+    """Test that category endpoint includes image URLs for products"""
+    category = create_test_category(session)
+    product = create_test_product(session, category.id, with_image=True)
+    
+    response = client.get(f"/categories/{category.id}")
+    assert response.status_code == 200
+    
+    category_data = response.json()
+    assert len(category_data["products"]) == 1
+    assert category_data["products"][0]["image_url"] == f"/products/{product.id}/image"

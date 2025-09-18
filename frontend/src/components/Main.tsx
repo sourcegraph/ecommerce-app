@@ -91,7 +91,7 @@ const Main = ({ children }: Props) => {
                 Show All
               </Tab>
               <Tab mediaQuery={isLargerThan567} navigatePath="/saved">
-                <MUIBadge badgeContent={savedItemsCount}>Saved</MUIBadge>
+                <MUIBadge badgeContent={savedItemsCount} testId="saved-count">Saved</MUIBadge>
               </Tab>
               <Tab mediaQuery={isLargerThan567} navigatePath="/cart">
                 Buy now

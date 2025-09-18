@@ -51,5 +51,20 @@ services:
       retries: 3
       start_period: 40s
 
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.55.0-noble
+    volumes:
+      - ./frontend:/app
+      - ./e2e-reports:/app/test-results
+    working_dir: /app
+    environment:
+      - VITE_API_URL=http://backend:8001
+      - CI=true
+    depends_on:
+      - backend
+      - frontend
+    profiles: ["test"]
+    command: ["npx", "playwright", "test", "--config=playwright.config.ci.ts"]
+
 # ───── named volumes ─────────────────────────────────────────────────
 volumes: {}

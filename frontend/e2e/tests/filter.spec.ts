@@ -39,11 +39,11 @@ test.describe('Product Filtering', () => {
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     // Look for search input
-    const searchInput = page.locator('[data-testid="search-input"], input[type="search"], input[placeholder*="search" i]');
+    const searchInput = page.locator('input[placeholder*="Search Items"]').first();
     
     if (await searchInput.count() > 0) {
       // Get the name of the first product
-      const firstProductTitle = await page.locator('[data-testid="product-card"] h3, [data-testid="product-card"] h2').first().textContent();
+      const firstProductTitle = await page.locator('[data-testid="product-card"]').first().getByText(/\w+/).first().textContent();
       
       if (firstProductTitle) {
         // Search for part of the product name
@@ -55,7 +55,7 @@ test.describe('Product Filtering', () => {
         await page.waitForTimeout(1000);
         
         // Verify search results contain the search term
-        const resultTitles = await page.locator('[data-testid="product-card"] h3, [data-testid="product-card"] h2').allTextContents();
+        const resultTitles = await page.locator('[data-testid="product-card"] a').allTextContents();
         const hasMatchingResults = resultTitles.some(title => 
           title.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -73,7 +73,7 @@ test.describe('Product Filtering', () => {
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     // Look for search input
-    const searchInput = page.locator('[data-testid="search-input"], input[type="search"], input[placeholder*="search" i]');
+    const searchInput = page.locator('input[placeholder*="Search Items"]').first();
     
     if (await searchInput.count() > 0) {
       // Search for something that definitely won't exist
@@ -84,7 +84,7 @@ test.describe('Product Filtering', () => {
       await page.waitForTimeout(1000);
       
       // Should show no results message or empty state
-      const noResultsMessage = page.locator('text=/no.*results/i, text=/not found/i, [data-testid="no-results"]');
+      const noResultsMessage = page.locator('[data-testid="no-results"]').or(page.getByText(/no.*results/i)).or(page.getByText(/not found/i));
       
       // Either no results message appears, or no product cards are shown
       const hasNoResultsMessage = await noResultsMessage.count() > 0;

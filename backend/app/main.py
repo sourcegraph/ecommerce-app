@@ -50,6 +50,14 @@ def create_category(
     category: CategoryCreate,
     session: Session = Depends(get_session)
 ):
+    # Check if category already exists
+    existing_category = crud.get_category_by_name(session, category.name)
+    if existing_category:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Category with name '{category.name}' already exists"
+        )
+    
     return crud.create_category(session, category)
 
 @app.get("/categories", response_model=List[CategoryRead])
@@ -65,12 +73,29 @@ def get_category(
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     
-    # Add image URLs to products
+    # Convert to response format with image URLs
+    products_with_images = []
     for product in category.products:
-        if product.image_data:
-            product.image_url = f"/products/{product.id}/image"
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+        }
+        products_with_images.append(product_dict)
     
-    return category
+    return {
+        "id": category.id,
+        "name": category.name,
+        "created_at": category.created_at,
+        "updated_at": category.updated_at,
+        "products": products_with_images
+    }
 
 # Product endpoints
 @app.post("/products", response_model=ProductRead)

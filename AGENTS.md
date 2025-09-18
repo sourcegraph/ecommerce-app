@@ -16,11 +16,25 @@
 **URLs:** Frontend http://localhost:3001, Backend http://localhost:8001, Docs http://localhost:8001/docs
 
 ## Tests & Quality
-- `just test` - Run backend tests (pytest in container)
-- `just test-cov` - Run backend tests with coverage report  
-- `just test-e2e` - Run E2E tests with Playwright
-- `just test-all` - Run all backend + E2E tests
-- `cd backend && pytest tests/api/test_products.py::test_get_products` - Single test (local)
+
+### Container Testing (Default - Guaranteed Portability)
+- `just test` - Backend tests in container
+- `just test-cov` - Backend tests with coverage in container  
+- `just test-e2e` - E2E tests in container
+- `just test-all` - All tests in containers (CI equivalent)
+
+### Local Testing (Optional - Faster Development)
+- `just test-local` - Backend tests locally (requires: uv sync)
+- `just test-cov-local` - Backend coverage locally
+- `just test-local-single TEST` - Run single test locally
+- `just test-e2e-local` - E2E tests locally (requires: npm ci, playwright install)
+- `just test-all-local` - All tests locally
+
+### Setup Commands
+- `./backend/setup-dev.sh` - Setup backend for local testing
+- `just setup-e2e-local` - Install Playwright browsers locally
+
+### Code Quality
 - `just check` - Lint (ruff) and type check (mypy) backend
 - `just format` - Format backend code with ruff
 - `cd frontend && npm run lint` - Lint frontend TypeScript
