@@ -16,13 +16,14 @@ Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 Demonstrate how you can Amp to Issue implement a new feature from issue to PR in one prompt
 **Steps:**
 - The landing page is pretty barebones. We want to create a carousel to highlight products and make it more interactive adn responsive
-- In VS Code or Terminal type ```Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes. Then create a pull request```
+- In VS Code or Terminal type
+```
+Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes. Then create a pull request
+```
 - While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-38dc99a9-55cf-412a-a21d-e9df22a3f49d) that was run to for the feature. Or you can switch to [landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch which has changes commited. 
 - The end result is a new landing pag with a nice carousel as per screenshot below:
+<img width="1500" height="1100" alt="Screenshot 2025-09-18 at 14 38 26" src="https://github.com/user-attachments/assets/fbb85ed2-f1f5-4cb7-b646-dfe9100eb1b8" />
 
-<img width="1743" height="1313" alt="Screenshot 2025-09-18 at 14 38 26" src="https://github.com/user-attachments/assets/fbb85ed2-f1f5-4cb7-b646-dfe9100eb1b8" />
-
-  
 ## PR review bot
 **Purpose**
 Demostrate Amp Github code review feature. 
@@ -34,7 +35,7 @@ Demostrate Amp Github code review feature.
 ## Small change - Amp demo in <2 mins 
 If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
 - Start the website using the command 'just up'. Show that website on localhost:3001 has a white background and you will change it to light blue.
-- Run this prompt 'Make the backgound light blue instead of white' and Amp will upgrade the CSS to make background light blue.
+- Run this prompt ```Make the backgound light blue instead of white``` and Amp will upgrade the CSS to make background light blue.
 - Restart the website; execute 'just down' then 'just up'.
 
 # Complex subagent change with Oracle
