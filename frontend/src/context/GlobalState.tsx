@@ -196,7 +196,7 @@ export const Provider: FC<Props> = ({ children }) => {
       const updatedProducts = prevProducts.map(prevProduct => {
         if (prevProduct.id === id) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { quantity, ...productWithoutQuantity } = prevProduct as ProductInCart;
+          const { quantity: _, ...productWithoutQuantity } = prevProduct as ProductInCart;
           return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
         }
         return prevProduct;
