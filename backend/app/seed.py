@@ -3,13 +3,12 @@
 Database seeding script to import products from the frontend's products.json file
 """
 import json
-import os
 import sys
 from pathlib import Path
 from sqlmodel import Session
 
 from .db import engine, create_db_and_tables
-from .models import Product, Category
+from .models import Product
 from .crud import get_category_by_name, create_category, download_and_store_image
 from .schemas import CategoryCreate
 
@@ -27,7 +26,7 @@ def load_products_json():
             with open(products_path, 'r') as f:
                 return json.load(f)
     
-    print(f"❌ Products file not found in any of these locations:")
+    print("❌ Products file not found in any of these locations:")
     for path in possible_paths:
         print(f"   - {path}")
     sys.exit(1)
@@ -105,13 +104,13 @@ def seed_database(custom_engine=None):
     
     with Session(db_engine) as session:
         # Seed categories
-        print(f"\n📂 Creating categories...")
+        print("\n📂 Creating categories...")
         category_map = seed_categories(session, products)
         
         # Seed products
         seed_products(session, products, category_map)
     
-    print(f"\n🎉 Database seeding completed!")
+    print("\n🎉 Database seeding completed!")
     print(f"   - Categories: {len(category_map)}")
     print(f"   - Products: {len(products)}")
     print("   - All product images downloaded and stored as BLOBs")

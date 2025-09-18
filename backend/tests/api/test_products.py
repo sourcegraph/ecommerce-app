@@ -287,9 +287,9 @@ def test_product_search_functionality(client: TestClient, session: Session):
     category = create_test_category(session)
     
     # Create products with searchable terms
-    product1 = create_test_product(session, category.id, "Unique Widget Alpha", 10.0)
-    product2 = create_test_product(session, category.id, "Special Widget Beta", 20.0)
-    product3 = create_test_product(session, category.id, "Different Gadget", 30.0)
+    create_test_product(session, category.id, "Unique Widget Alpha", 10.0)
+    create_test_product(session, category.id, "Special Widget Beta", 20.0)
+    create_test_product(session, category.id, "Different Gadget", 30.0)
     
     # Test search by title (if search parameter exists)
     search_response = client.get("/products?search=widget")

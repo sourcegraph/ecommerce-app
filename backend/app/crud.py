@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from typing import List, Optional
+from typing import List, Optional, Union
 from .models import Product, Category
 from .schemas import ProductCreate, ProductUpdate, CategoryCreate
 import requests
@@ -19,7 +19,7 @@ def get_category_by_name(session: Session, name: str) -> Optional[Category]:
 
 def get_categories(session: Session) -> List[Category]:
     statement = select(Category)
-    return session.exec(statement).all()
+    return list(session.exec(statement).all())
 
 def get_category(session: Session, category_id: int) -> Optional[Category]:
     return session.get(Category, category_id)
@@ -36,12 +36,14 @@ def get_products(session: Session, category_id: Optional[int] = None) -> List[Pr
     statement = select(Product).join(Category)
     if category_id:
         statement = statement.where(Product.category_id == category_id)
-    return session.exec(statement).all()
+    return list(session.exec(statement).all())
 
 def get_product(session: Session, product_id: int) -> Optional[Product]:
     return session.get(Product, product_id)
 
 def update_product(session: Session, product_id: int, product_update: ProductUpdate) -> Optional[Product]:
+    from datetime import datetime
+    
     db_product = session.get(Product, product_id)
     if not db_product:
         return None
@@ -49,6 +51,9 @@ def update_product(session: Session, product_id: int, product_update: ProductUpd
     update_data = product_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_product, field, value)
+    
+    # Update the timestamp
+    db_product.updated_at = datetime.utcnow()
     
     session.add(db_product)
     session.commit()
@@ -82,8 +87,8 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         
         # Try to use a font, fallback to default if not available
         try:
-            font = ImageFont.truetype("Arial", 16)
-        except:
+            font: Union[ImageFont.FreeTypeFont, ImageFont.ImageFont] = ImageFont.truetype("Arial", 16)
+        except OSError:
             font = ImageFont.load_default()
         
         # Calculate text position (center it)
@@ -133,7 +138,7 @@ def download_and_store_image(session: Session, product: Product, image_url: str)
         response.raise_for_status()
         
         # Open image with PIL to validate and get format
-        image = Image.open(io.BytesIO(response.content))
+        image: Image.Image = Image.open(io.BytesIO(response.content))
         
         # Convert to RGB if necessary (for JPEG compatibility)
         if image.mode in ('RGBA', 'P'):
