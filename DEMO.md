@@ -27,11 +27,41 @@ Demostrate Amp Github code review feature.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo and show the Github PR bot working automatically.
 - Example PR https://github.com/sourcegraph/amp-demo/pull/7 (Note, this isn't working atm. working on getting it fixed).
 
-#### Sub agents
 
-### Oracle planning (human in the loop)
+### Complex subagent chang with Oracle
+**Purpose**
+Demostrate Amp's advanced capability of Amp leveraging Oracle and subagents. Right now the web app only displays one currency. We will instruct Amp to:
+- Use Oracle to analyse what changes needs to be made to add support for multiple currencies
+- Use subasgents to run multiple changes simultaneously; Amp will make the backend and frontend changes in parallel, in addition to adding a new currency conversion service which comnprises of a caching layers which refreshes currency in realtime (every 1 hour).
+**Steps**
+- Start a new thread and invoke Oracle with the following prompt:
+```
+Use Oracle to evaluate how to add the following feature:
+
+Add currency localisation for international customer, the current default is USD $. 
+
+Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct currency conversion based on latest FX rates.
+```
+- Once Amp evaluates the changes execute the following prompt
+```
+ Implement multi currency support using Oracle's suggestion using sub agents
+```
+- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-e46bc945-46ab-427d-bffc-082763f201cc) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
+- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/amp-demo/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
+<img width="1736" height="587" alt="Screenshot 2025-09-18 at 12 56 46" src="https://github.com/user-attachments/assets/9a4ee0b6-6f27-4f6d-a81f-4f7b9985bc73" />
+
+#### Oracle Planning prompts
 
 To demonstrate Oracle using this repo, run any of the provided prompts for the given use case.
+**Think hard:**  Make it clear to the end user that Amp will increase token allocation for the Oracle tool whenever this term appears in the prompt
+Feature Implementation
+```
+Use Oracle to evaluate how to add the following feature:
+Add currency localisation for international customer, the current default is USD $. 
+Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct currency conversion based on latest FX rates.
+```
+
+
 Architecture Review:
 ```
 Review the current API architecture in the backend and suggest improvements for scalability. Focus on the database models, endpoint design, and error handling patterns.
