@@ -1,7 +1,7 @@
 name: CI
 on: [push, pull_request]
 jobs:
-  test:
+  lint-backend-types:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,6 +14,101 @@ jobs:
 
       - name: Set up Python
         run: uv python install
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install backend deps
+        run: |
+          cd backend && uv sync --locked
+
+      - name: Backend lint & types
+        run: just check
+
+  lint-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install frontend deps
+        run: |
+          cd frontend && npm ci
+
+      - name: Frontend lint
+        run: cd frontend && npm run lint
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        run: uv python install
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install backend deps
+        run: |
+          cd backend && uv sync --locked
+
+      - name: Backend tests
+        run: just test-local
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install frontend deps
+        run: |
+          cd frontend && npm ci
+
+      - name: Build frontend
+        run: just build
+
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+
+  e2e:
+    needs: [lint-backend-types, lint-frontend, backend-tests, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python
+        run: uv python install
+
+      - uses: extractions/setup-just@v3
 
       - name: Install backend deps
         run: |
@@ -28,6 +123,12 @@ jobs:
       - name: Install frontend deps
         run: |
           cd frontend && npm ci
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
 
       - name: Get installed Playwright version
         id: playwright-version
@@ -44,18 +145,6 @@ jobs:
       - name: Install Playwright Browsers
         run: cd frontend && npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Backend lint & types
-        run: just check
-
-      - name: Frontend lint
-        run: cd frontend && npm run lint
-
-      - name: Unit tests
-        run: just test-local
-
-      - name: Build frontend
-        run: just build
 
       - name: E2E tests
         run: just test-e2e
