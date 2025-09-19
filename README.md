@@ -13,21 +13,29 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 
 ```
 .
-├── backend/           # FastAPI backend
-│   ├── app/          # Application source code
-│   ├── tests/        # Backend tests
-│   ├── alembic/      # Database migrations (only needed if changes to database are made)
-│   ├── pyproject.toml # Python dependencies (managed by uv)
-│   └── pytest.ini    # Test configuration
-├── frontend/          # React frontend (TypeScript/Vite)
-│   ├── src/          # React components and pages
-│   ├── e2e/          # Playwright E2E tests
-│   ├── public/       # Static assets
-│   └── package.json  # Node.js dependencies
-├── compose.yml        # Docker Compose configuration
-├── justfile          # Development automation commands
-├── AGENTS.md         # Agent documentation
-└── README.md
+├── .github/            # GitHub workflows and CI configuration
+├── backend/            # FastAPI backend
+│   ├── app/            # Application source code
+│   ├── tests/          # Backend tests
+│   ├── alembic/        # Database migrations
+│   ├── pyproject.toml  # Python dependencies (managed by uv)
+│   ├── pytest.ini      # Test configuration
+│   ├── main.py         # FastAPI entry point
+│   ├── AGENTS.md       # Agent documentation for backend
+│   └── store.db        # SQLite database file
+├── frontend/           # React frontend (TypeScript/Vite)
+│   ├── src/            # React components and pages
+│   ├── e2e/            # Playwright E2E tests
+│   ├── public/         # Static assets
+│   ├── package.json    # Node.js dependencies
+│   ├── vite.config.ts  # Vite configuration
+│   ├── AGENTS.md       # Agent documentation for frontend
+│   └── playwright.config.ts # Playwright test configuration
+├── justfile            # Development automation commands
+├── package.json        # Root package.json for shared dependencies
+├── AGENTS.md           # Agent documentation for overall project
+├── DEMO.md             # Demo usage guide
+└── README.md           # README
 ```
 
 ## Prerequisites
@@ -35,26 +43,36 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 ### Mandatory
 
 - [Just](https://github.com/casey/just) - Command runner (`brew install just`)
-- [Docker/Podman](https://podman.io/) - Container runtime (recommend podman)
-
-### Locally Outside Containers Only
-
-- [Node.js](https://nodejs.org/) - For frontend development
-- [uv](https://docs.astral.sh/uv/) - Python package manager (backend uses Python 3.13+)
+- [Python 3.13+](https://www.python.org/) - Python runtime
+- [uv](https://docs.astral.sh/uv/) - Python package manager
+- [Node.js 20+](https://nodejs.org/) - JavaScript runtime
+- [npm](https://www.npmjs.com/) - Package manager (ships with Node.js)
 
 ## Quick Start
 
-Clone the project:
+Clone the project and verify prerequisites:
 
 ```bash
 git clone https://github.com/sourcegraph/amp-demo.git
 cd amp-demo
+
+# Verify you have required tools
+just --version
+python --version
+uv --version
+node --version 
 ```
 
-Run with Docker/Podman (recommended):
+Install dependencies and setup testing:
 
 ```bash
-just up          # Start both services with hot-reload
+just install-all      # Install all dependencies (backend, frontend, E2E browsers)
+```
+
+Run the application:
+
+```bash
+just dev             # Start both services with native hot-reload using concurrently
 ```
 
 Access the application:
@@ -67,10 +85,9 @@ Access the application:
 ### Lifecycle Commands
 
 ```bash
-just up               # Start both services
-just backend          # Start only backend
-just frontend         # Start only frontend
-just down             # Stop all containers
+just dev              # Start both services (native hot-reload)
+just dev-backend      # Start only backend
+just dev-frontend     # Start only frontend
 ```
 
 ### Seed Database
@@ -79,55 +96,69 @@ just down             # Stop all containers
 just seed             # Populate database with sample data (only needed if database changes)
 ```
 
-### Local Development (without containers)
+### Manual Development (individual services)
 
-Install dependencies:
+Install dependencies (if not already done):
 ```bash
-just install          # Backend dependencies (uv)
-just install-frontend # Frontend dependencies (npm)
+just install-all      # All dependencies (backend, frontend, E2E browsers)
 ```
 
-Run services locally:
+Run services individually (if needed):
 ```bash
-# Backend
-cd backend && uv run uvicorn main:app --reload
-
-# Frontend
-cd frontend && npm run dev
+just dev-backend      # Start only backend
+just dev-frontend     # Start only frontend
 ```
 
 ### Testing & Quality
 
-#### Container Testing (Recommended - Guaranteed Portability)
+#### Setup E2E Testing (Required First Time)
 ```bash
-just test             # Backend tests in container
-just test-cov         # Backend tests with coverage in container
-just test-e2e         # E2E tests in container (headless)
-just test-e2e-headed  # E2E tests in container (headed - for debugging)
-just test-all         # All tests in containers (CI equivalent)
+just setup-e2e        # Install Playwright browsers
 ```
 
-#### Local Testing (Optional - Faster Development)
+#### Running Tests
 ```bash
-# Setup local environment first
-./backend/setup-dev.sh                 # Setup backend for local testing
-just setup-e2e-local                   # Setup E2E testing locally
+# Backend tests (native)
+just test-local                        # Backend tests
+just test-cov-local                    # Backend tests with coverage
+just test-local-single TEST            # Run single test
 
-# Run tests locally
-just test-local                        # Backend tests locally
-just test-cov-local                    # Backend coverage locally  
-just test-local-single TEST            # Run single test locally
-just test-e2e-local                    # E2E tests locally (headless)
-just test-e2e-local-headed             # E2E tests locally (headed - for debugging)
-just test-all-local                    # All tests locally
+# E2E tests
+just test-e2e         # E2E tests (headless)
+just test-e2e-headed  # E2E tests (headed - for debugging)
+
+# Combined test suites
+just test-all-local   # All tests (backend + E2E)
 ```
 
 #### Code Quality
 ```bash
+# backend
 just check            # Run linting (ruff) and type checking (mypy)
 just format           # Format backend code
-cd frontend && npm run lint            # Lint frontend TypeScript
+
+# frontend
+just lint             # Lint frontend TypeScript
 ```
+
+#### Pre-Push Validation (Recommended)
+
+Before pushing to CI, ensure all checks pass locally to avoid CI failures:
+
+```bash
+# One-time setup (if not done already)
+just install-all      # Install all dependencies
+
+# Run complete CI pipeline locally
+just ci               # Runs: lint, tests, build, e2e (mirrors CI exactly)
+```
+
+`just ci` runs the exact same checks as the GitHub Actions CI pipeline:
+
+1. **Backend Quality**: Ruff linting + MyPy type checking
+2. **Backend Tests**: Full test suite with coverage
+3. **Frontend Quality**: ESLint + TypeScript build
+4. **E2E Tests**: End-to-end Playwright tests
 
 ### Build & Deployment
 
@@ -150,9 +181,8 @@ just migrate-down     # Rollback migration
 
 ```bash
 just health           # Check service health
-
-just logs [service]   # View recent logs (default: backend)
-just logs-follow [service]  # Follow live logs
+just logs             # View last 100 lines from backend and frontend logs
+just logs-follow      # Follow both logs live (Ctrl+C to exit)
 ```
 
 ### Source
