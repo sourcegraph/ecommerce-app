@@ -3,34 +3,37 @@
 ## Project Overview
 **Purpose:** Full-stack e-commerce demo showcasing modern development practices with TDD  
 **Architecture:** FastAPI (Python 3.13+) backend + React TypeScript frontend  
-**Stack:** SQLite + Alembic, Docker with hot-reload, E2E testing with Playwright  
+**Stack:** SQLite + Alembic, Native hot-reload, E2E testing with Playwright  
 **URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
 
 ## Essential Commands
 
 **Pass CI:** `just ci` (runs lint, tests, build, e2e)  
-**Run app:** `just up` (ports 3001/8001)  
-**Run tests:** `just test-all` (backend + e2e in containers)  
-**Stop:** `just down`
+**Run app:** `just dev` (ports 3001/8001)  
+**Run tests:** `just test-all-local` (backend + e2e tests)
 
 ## Development Commands
 
 **Quick start:**
-- `just up` - Start both services (hot-reload)
-- `just seed` - Add sample data
+- `just dev-headless` - Start both services in background (detached for agentic tools, always use this to start the services for testing)
+- `just stop` - Stop both services (always do this when you are done)
+- `just logs` - View last 100 lines from both service logs (use for troubleshooting)
+- `just logs-follow` - Follow both logs live (Ctrl+C to exit)
+- `just seed` - Add sample data to the sqlite database
 - `just check` - Lint & type check backend
-- `cd frontend && npm run lint` - Lint frontend
+- `just lint` - Lint frontend
 
 **Testing Commands:**
 - `just test` - Backend tests only
-- `just test-e2e` - End-to-end tests in containers
-- `just test-all` - Backend + E2E tests (containers)
-- `just test-all-local` - All tests locally (faster development)
+- `just test-e2e` - End-to-end tests (native Playwright)
+- `just test-e2e-headed` - E2E tests with browser UI for debugging
+- `just setup-e2e` - Install Playwright browsers
+- `just test-all` - Backend + E2E tests (native)
+- `just test-all-local` - All tests locally (same as test-all now)
 
 **Error Handling:**
-- If build fails, ensure Docker is running and ports 3001/8001 are available
-- For test failures, check `e2e-reports/` directory for detailed logs
-- Use `just down && just up` to reset containers if issues persist
+- If build fails, ensure ports 3001/8001 are available
+- For test failures, check `frontend/test-results/` directory for detailed logs
 
 
 ## Testing Guidelines
@@ -179,7 +182,7 @@ def process_payment(payment_data: dict) -> Result:
 ### Pre-commit Checklist
 1. All tests pass (`just test-all-local`)
 2. Code follows TDD process (tests written first)
-3. Linting passes (`just check` + `cd frontend && npm run lint`)
+3. Linting passes (`just check` + `just lint`)
 4. No type errors in TypeScript
 5. Factory functions used for all test data
 6. Business behavior documented through tests

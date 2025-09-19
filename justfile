@@ -2,7 +2,11 @@
 # Install 'just' via: brew install just (macOS) or cargo install just
 
 # ─── variables ──────────────────────────────────────────────
-CM := "podman-compose"
+LOG_DIR := "logs"
+
+# Internal helper to ensure logs directory exists
+_ensure-logs-dir:
+    @mkdir -p {{LOG_DIR}}
 
 # Default recipe to display available commands
 default:
@@ -21,44 +25,70 @@ install-e2e:
     cd frontend && npm install --save-dev @playwright/test
     cd frontend && npx playwright install --with-deps
 
-# ─── containers (hot-reload, canonical ports) ─────────────
-# Start both services with hot-reload
-up:
-    @echo "Starting dev containers on 3001/8001..."
-    {{CM}} up --build -d
+# Install ALL project deps (Python, Node, Playwright browsers)
+install-all:
+    just install
+    just install-frontend
+    just install-e2e
 
-# Stop all containers
-down:
-    @echo "Stopping and cleaning up containers..."
-    -{{CM}} down --remove-orphans 2>/dev/null || true
-    @echo "Force removing any remaining containers and networks..."
-    -podman container stop $(podman ps -aq) 2>/dev/null || true
-    -podman container rm -f $(podman ps -aq) 2>/dev/null || true  
-    -podman pod rm -f $(podman pod ls -q) 2>/dev/null || true
-    -podman network rm $(podman network ls --filter "name=amp-demo" -q) 2>/dev/null || true
-    @echo "Cleanup complete"
+# ─── native dev workflow ────────────────────────────────────────
+# Run backend + frontend concurrently (hot-reload)
+dev:
+    @echo "Starting native dev servers on 3001/8001 ..."
+    cd frontend && npx concurrently \
+      --names "backend,frontend" \
+      --prefix-colors "blue,green" \
+      "cd ../backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001" \
+      "npm run dev -- --host 0.0.0.0 --port 3001"
 
-# Run backend only
-backend:
-    {{CM}} up backend --build -d
+# Run backend + frontend in background (detached for agentic tools)
+dev-headless: _ensure-logs-dir
+    @echo "Starting headless dev servers on 3001/8001 ..."
+    # truncate old logs so each run starts fresh
+    > {{LOG_DIR}}/backend.log
+    > {{LOG_DIR}}/frontend.log
+    # backend
+    cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
+    # frontend
+    cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 &
+    @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
-# Run frontend only
-frontend:
-    {{CM}} up frontend --build -d
+# Stop headless dev servers
+stop:
+    @echo "Stopping headless dev servers..."
+    @pkill -f "uvicorn.*--port 8001" || echo "Backend was not running"
+    @pkill -f "vite.*--port 3001" || echo "Frontend was not running"
+    @echo "Services stopped."
+
+# Independent servers (sometimes handy)
+dev-backend:
+    cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+
+dev-frontend:
+    cd frontend && npm run dev -- --host 0.0.0.0 --port 3001
+
+# Show the last 100 lines of each log
+logs:
+    @echo "─── Backend (last 100 lines) ───"
+    @tail -n 100 {{LOG_DIR}}/backend.log || echo "No backend log yet."
+    @echo
+    @echo "─── Frontend (last 100 lines) ───"
+    @tail -n 100 {{LOG_DIR}}/frontend.log || echo "No frontend log yet."
+
+# Follow both logs live (Ctrl-C to quit)
+logs-follow:
+    @echo "Tailing backend & frontend logs (Ctrl+C to exit)..."
+    @tail -F {{LOG_DIR}}/backend.log {{LOG_DIR}}/frontend.log
+
+
 
 # Seed the database with products and images
 seed:
     cd backend && uv run python -m app.seed
 
-# Run backend tests
-test:
-    {{CM}} run --rm backend pytest
 
-# Run backend tests with coverage
-test-cov:
-    {{CM}} run --rm backend pytest --cov=app --cov-report=html
 
-# ─── local testing (faster development) ──────────────────────
+# ─── testing ──────────────────────
 # Run backend tests locally (requires: uv sync)
 test-local:
     cd backend && uv run pytest
@@ -71,61 +101,36 @@ test-cov-local:
 test-local-single TEST:
     cd backend && uv run pytest {{TEST}}
 
-# Run E2E tests in containers (headless - default)
+# Run E2E tests natively (headless - default)
 test-e2e:
-    @echo "Running E2E tests in containers (headless)..."
-    {{CM}} --profile test up -d backend frontend
-    @sleep 5
-    {{CM}} --profile test run --rm -e HEADED=0 e2e
-    {{CM}} --profile test down
+    @echo "Running E2E tests natively (headless)..."
+    cd frontend && npx playwright test
 
-# Run E2E tests in containers (headed mode for debugging)
+# Run E2E tests natively (headed mode for debugging)
 test-e2e-headed:
-    @echo "Running E2E tests in containers (headed)..."
-    {{CM}} --profile test up -d backend frontend
-    @sleep 5
-    {{CM}} --profile test run --rm -e HEADED=1 e2e
-    {{CM}} --profile test down
-
-# Run E2E tests locally (headless - default)
-test-e2e-local:
-    cd frontend && HEADED=0 npx playwright test
-
-# Run E2E tests locally (headed mode for debugging)
-test-e2e-local-headed:
+    @echo "Running E2E tests natively (headed)..."
     cd frontend && HEADED=1 npx playwright test
 
-# Setup E2E testing locally
-setup-e2e-local:
-    cd frontend && npx playwright install --with-deps
+# Setup E2E testing (install browsers)
+setup-e2e:
+    cd frontend && npx playwright install --with-deps chromium
 
-# Run all tests (backend + E2E) - containers
-test-all:
-    @just test
-    @just test-e2e
-
-# Run all tests locally (backend + E2E) - faster development
+# Run all tests (backend + E2E)
 test-all-local:
     @just test-local
-    @just test-e2e-local
+    @just test-e2e
 
 # Run CI checks locally (mirrors CI pipeline)
 ci:
     @echo "Running full CI pipeline locally..."
     @just check
-    @just test-cov
+    @just test-cov-local
     cd frontend && npm run lint
     @just build
     @just test-e2e
     @echo "All CI checks passed!"
 
-# View recent logs for a specific service (default: backend)
-logs SERVICE="backend":
-    {{CM}} logs --tail=50 {{SERVICE}}
 
-# Follow logs for a specific service (default: backend) 
-logs-follow SERVICE="backend":
-    {{CM}} logs -f {{SERVICE}}
 
 # Check backend code quality
 check:
@@ -135,6 +140,9 @@ check:
 # Format backend code
 format:
     cd backend && uv run ruff format .
+
+lint:
+    cd frontend && npm run lint
 
 # Build frontend for production
 build:
@@ -152,17 +160,17 @@ health:
 
 # Run database shell (SQLite CLI)
 db-shell:
-    {{CM}} exec backend sqlite3 store.db
+    cd backend && sqlite3 store.db
 
 # Database migration commands
 migrate-create MESSAGE:
-    {{CM}} exec backend alembic revision --autogenerate -m "{{MESSAGE}}"
+    cd backend && uv run alembic revision --autogenerate -m "{{MESSAGE}}"
 
 migrate-up:
-    {{CM}} exec backend alembic upgrade head
+    cd backend && uv run alembic upgrade head
 
 migrate-down:
-    {{CM}} exec backend alembic downgrade -1
+    cd backend && uv run alembic downgrade -1
 
 migrate-history:
-    {{CM}} exec backend alembic history
+    cd backend && uv run alembic history

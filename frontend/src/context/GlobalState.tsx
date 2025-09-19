@@ -26,7 +26,7 @@ export type ProductType = ProductInCart | ProductNotInCart;
 // Helper function to get image URL
 export const getImageUrl = (product: ProductType): string => {
   if (product.image_url) {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+    const API_BASE_URL = "http://localhost:8001";
     // If it's already a full URL, return as is, otherwise prepend the API base URL
     if (product.image_url.startsWith('http')) {
       return product.image_url;
@@ -99,7 +99,7 @@ export const Provider: FC<Props> = ({ children }) => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+      const API_BASE_URL = "http://localhost:8001";
       const response = await fetch(`${API_BASE_URL}/products`);
       
       if (!response.ok) {
