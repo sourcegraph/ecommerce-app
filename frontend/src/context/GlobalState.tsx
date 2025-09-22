@@ -36,11 +36,19 @@ export const getImageUrl = (product: ProductType): string => {
   return "";
 };
 
+type FilterState = {
+  category: string;
+  shipping: string;
+  delivery: string;
+};
+
 type ContextType = {
   products: ProductType[];
+  filteredProducts: ProductType[];
   cartItemCount: number;
   totalPrice: number;
   savedItemsCount: number;
+  filters: FilterState;
   addToCart: (product: ProductType) => void;
   deleteFromCart: (id: number | string) => void;
   setQuantity: (qty: string, id: number | string) => void;
@@ -48,6 +56,7 @@ type ContextType = {
   incrementQty: (id: number | string) => void;
   toggleSaved: (id: number | string) => void;
   fetchProducts: () => Promise<void>;
+  setFilter: (filterType: keyof FilterState, value: string) => void;
   isLoading: boolean;
 };
 
@@ -61,10 +70,16 @@ export const GlobalContext = createContext<ContextType | null>(null);
 export const Provider: FC<Props> = ({ children }) => {
   const toast = useToast();
   const [products, setProducts] = useState<ProductType[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
   const [savedItemsCount, setSavedItemsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterState>({
+    category: '',
+    shipping: '',
+    delivery: ''
+  });
 
   // Load cart state from localStorage
   const loadCartState = () => {
@@ -123,6 +138,7 @@ export const Provider: FC<Props> = ({ children }) => {
       });
       
       setProducts(formattedProducts);
+      setFilteredProducts(formattedProducts);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       // Fallback to seed data if API is not available
@@ -140,6 +156,7 @@ export const Provider: FC<Props> = ({ children }) => {
         };
       });
       setProducts(products);
+      setFilteredProducts(products);
     } finally {
       setIsLoading(false);
     }
@@ -242,13 +259,78 @@ export const Provider: FC<Props> = ({ children }) => {
     });
   };
 
+  // Filter function
+  const applyFilters = (products: ProductType[], filters: FilterState): ProductType[] => {
+    return products.filter(product => {
+      // Category filter
+      if (filters.category && filters.category !== 'all') {
+        let categoryName = '';
+        if (typeof product.category === 'string') {
+          categoryName = product.category;
+        } else if (typeof product.category === 'object' && product.category && 'name' in product.category) {
+          categoryName = (product.category as { name: string }).name;
+        }
+        
+        if (categoryName && categoryName.toLowerCase() !== filters.category.toLowerCase()) {
+          return false;
+        }
+      }
+      
+      // For shipping and delivery options, we'll simulate these based on product properties
+      // Since the mock data doesn't have these fields, we'll create some logic based on price/category
+      
+      // Shipping filter (simulated based on price)
+      if (filters.shipping && filters.shipping !== 'all') {
+        const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+        if (filters.shipping === 'free' && price < 50) return false;
+        if (filters.shipping === 'express' && price < 100) return false;
+        if (filters.shipping === 'standard' && price >= 100) return false;
+      }
+      
+      // Delivery filter (simulated based on category)
+      if (filters.delivery && filters.delivery !== 'all') {
+        let categoryName = '';
+        if (typeof product.category === 'string') {
+          categoryName = product.category;
+        } else if (typeof product.category === 'object' && product.category && 'name' in product.category) {
+          categoryName = (product.category as { name: string }).name;
+        }
+        
+        if (filters.delivery === 'same-day' && !['electronics', 'clothing'].includes(categoryName.toLowerCase())) return false;
+        if (filters.delivery === 'next-day' && categoryName.toLowerCase() === 'books') return false;
+        if (filters.delivery === '3-5-days' && categoryName.toLowerCase() === 'electronics') return false;
+      }
+      
+      return true;
+    });
+  };
+
+  // Set filter function
+  const setFilter = (filterType: keyof FilterState, value: string) => {
+    setFilters(prevFilters => {
+      const newFilters = { ...prevFilters, [filterType]: value };
+      // Apply filters immediately when they change
+      const filtered = applyFilters(products, newFilters);
+      setFilteredProducts(filtered);
+      return newFilters;
+    });
+  };
+
+  // Update filtered products when products change
+  useEffect(() => {
+    const filtered = applyFilters(products, filters);
+    setFilteredProducts(filtered);
+  }, [products]);
+
   return (
     <GlobalContext.Provider
       value={{
         products,
+        filteredProducts,
         cartItemCount,
         totalPrice,
         savedItemsCount,
+        filters,
         addToCart,
         deleteFromCart,
         setQuantity,
@@ -256,6 +338,7 @@ export const Provider: FC<Props> = ({ children }) => {
         decrementQty,
         toggleSaved,
         fetchProducts,
+        setFilter,
         isLoading,
       }}
     >

@@ -20,7 +20,7 @@ type Props = {
 };
 
 const Main = ({ children }: Props) => {
-  const { savedItemsCount } = useGlobalContext();
+  const { savedItemsCount, filters, setFilter } = useGlobalContext();
   const [isLargerThan567] = useMediaQuery("(min-width: 567px)");
   const location = useLocation();
 
@@ -46,8 +46,15 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.500"
               cursor="pointer"
+              value={filters.category}
+              onChange={(e) => setFilter('category', e.target.value)}
+              data-testid="category-filter"
             >
-              <option value="option1">Category</option>
+              <option value="">All Categories</option>
+              <option value="electronics">Electronics</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books</option>
+              <option value="home">Home</option>
             </Select>
           </FormControl>
           <FormControl w="fit-content">
@@ -57,8 +64,14 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.400"
               cursor="pointer"
+              value={filters.shipping}
+              onChange={(e) => setFilter('shipping', e.target.value)}
+              data-testid="shipping-filter"
             >
-              <option value="option1">Shipping</option>
+              <option value="">All Shipping</option>
+              <option value="free">Free Shipping ($50+)</option>
+              <option value="express">Express ($100+)</option>
+              <option value="standard">Standard (Under $100)</option>
             </Select>
           </FormControl>
           <FormControl w="fit-content">
@@ -68,8 +81,14 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.400"
               cursor="pointer"
+              value={filters.delivery}
+              onChange={(e) => setFilter('delivery', e.target.value)}
+              data-testid="delivery-filter"
             >
-              <option value="option1">Delivery options</option>
+              <option value="">All Delivery</option>
+              <option value="same-day">Same Day</option>
+              <option value="next-day">Next Day</option>
+              <option value="3-5-days">3-5 Days</option>
             </Select>
           </FormControl>
         </HStack>
