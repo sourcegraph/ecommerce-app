@@ -72,3 +72,5 @@ class DeliveryOption(SQLModel, table=True):
         back_populates="delivery_options", 
         link_model=ProductDeliveryLink
     )
+
+

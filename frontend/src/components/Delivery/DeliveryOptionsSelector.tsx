@@ -29,7 +29,7 @@ const formatEta = (min: number, max: number): string => {
 
 export const DeliveryOptionsSelector = ({
   options,
-  productPrice,
+  productPrice: _productPrice, // eslint-disable-line @typescript-eslint/no-unused-vars
   value,
   onChange,
 }: DeliveryOptionsSelectorProps) => {

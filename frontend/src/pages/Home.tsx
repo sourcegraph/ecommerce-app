@@ -5,11 +5,9 @@ import ProductCard from "../components/ProductCard";
 import ProductsGrid from "../components/ProductsGrid";
 import { useGlobalContext } from "../context/useGlobalContext";
 import { searchTags } from "../mockDB/db";
-import { useFilteredProducts } from "../hooks/useFilteredProducts";
 
 const Home = () => {
-  const { isLoading: globalLoading } = useGlobalContext();
-  const { products, loading: filterLoading } = useFilteredProducts();
+  const { products, isLoading } = useGlobalContext();
   
   return (
     <Main>
@@ -24,7 +22,7 @@ const Home = () => {
         ))}
       </HStack>
       <ProductsGrid>
-        {filterLoading
+        {isLoading
           ? Array(20)
               .fill("")
               .map((_, i) => <LoadingProduct key={i} />)

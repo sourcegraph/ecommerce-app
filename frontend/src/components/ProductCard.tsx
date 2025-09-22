@@ -19,22 +19,11 @@ import MUIRating from "./MUI/MUIRating";
 import MotionBox from "./MotionBox";
 import { DeliveryOptionsSummary } from "./Delivery";
 import { useState } from "react";
-import { Product } from "../api/types";
+import { ProductType, getImageUrl } from "../context/GlobalState";
 
 type Props = {
-  product: Product;
+  product: ProductType;
   className?: string;
-};
-
-const getImageUrl = (product: Product): string => {
-  if (product.image_url) {
-    const API_BASE_URL = "http://localhost:8001";
-    if (product.image_url.startsWith('http')) {
-      return product.image_url;
-    }
-    return `${API_BASE_URL}${product.image_url}`;
-  }
-  return "";
 };
 
 const ProductCard = ({ product }: Props) => {
@@ -147,7 +136,7 @@ const ProductCard = ({ product }: Props) => {
               </Text>
             </Flex>
             <Button
-              opacity={product.is_saved ? 1 : { base: 1, sm: 0 }}
+              opacity={product.isSaved ? 1 : { base: 1, sm: 0 }}
               className="btn"
               data-testid="save-button"
               colorScheme="appBlue"
@@ -158,10 +147,10 @@ const ProductCard = ({ product }: Props) => {
               fontSize="lg"
               px={2}
               borderRadius="full"
-              border={product.is_saved ? "none" : "1px solid"}
+              border={product.isSaved ? "none" : "1px solid"}
               onClick={() => {
                 toast({
-                  title: product.is_saved
+                  title: product.isSaved
                     ? "Product successfully removed from your saved items"
                     : "Product successfully added to your saved items",
                   status: "success",
@@ -171,7 +160,7 @@ const ProductCard = ({ product }: Props) => {
                 toggleSaved(product.id);
               }}
             >
-              {product.is_saved ? <HeartIconFill /> : <HeartIcon />}
+              {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
             </Button>
           </Flex>
         </Box>
@@ -186,10 +175,10 @@ const ProductCard = ({ product }: Props) => {
           onClick={() => {
             addToCart(product);
           }}
-          isDisabled={product.inCart ? true : false}
+          isDisabled={product.inCart === true}
         >
           <Icon as={FaShoppingCart} mr={4} />
-          {product.inCart ? "Added to Cart" : "Add to Cart"}
+          {product.inCart === true ? "Added to Cart" : "Add to Cart"}
         </Button>
       </MotionBox>
     </MotionBox>

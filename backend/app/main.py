@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
-from sqlalchemy import and_, desc, asc
-from typing import List, Optional
+from typing import List, Optional, cast, Any
+from sqlalchemy.sql.elements import ColumnElement
 import io
 
 from .db import get_session, create_db_and_tables
@@ -138,8 +138,8 @@ def get_delivery_options_for_filter(session: Session = Depends(get_session)):
     """Get active delivery options for dropdown filtering"""
     stmt = (
         select(DeliveryOption)
-        .where(DeliveryOption.is_active == True)
-        .order_by(DeliveryOption.estimated_days_min, DeliveryOption.price)
+        .where(DeliveryOption.is_active)
+        .order_by(cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(), cast(ColumnElement[float], DeliveryOption.price).asc())
     )
     return session.exec(stmt).all()
 
@@ -181,7 +181,7 @@ def get_products_api(
     session: Session = Depends(get_session)
 ):
     """Get products with filtering and sorting for the frontend dropdown functionality"""
-    stmt = select(Product).join(Product.category)
+    stmt = select(Product).join(Category)
     
     # Apply category filter
     if categoryId:
@@ -192,8 +192,8 @@ def get_products_api(
         stmt = stmt.join(ProductDeliveryLink).where(ProductDeliveryLink.delivery_option_id == deliveryOptionId)
     
     # Always load delivery options for sorting and summary
-    stmt = stmt.options(selectinload(Product.delivery_options))
-    stmt = stmt.options(selectinload(Product.category))
+    stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
+    stmt = stmt.options(selectinload(cast(Any, Product.category)))
     
     if sort == "delivery_fastest":
         if deliveryOptionId:
@@ -201,28 +201,28 @@ def get_products_api(
             delivery_option = session.exec(delivery_stmt).first()
             if delivery_option:
                 if delivery_option.speed.value == "express":
-                    stmt = stmt.join(DeliveryOption, Product.delivery_options).order_by(
-                        DeliveryOption.estimated_days_min.asc(),
-                        Product.price.asc()
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                        cast(ColumnElement[float], Product.price).asc()
                     )
                 else:
-                    stmt = stmt.join(DeliveryOption, Product.delivery_options).order_by(
-                        DeliveryOption.estimated_days_min.asc(),
-                        Product.price.asc()
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                        cast(ColumnElement[float], Product.price).asc()
                     )
             else:
-                stmt = stmt.order_by(Product.created_at.desc())
+                stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
         else:
-            stmt = stmt.join(DeliveryOption, Product.delivery_options).order_by(
-                DeliveryOption.estimated_days_min.asc(),
-                Product.price.asc()
+            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                cast(ColumnElement[float], Product.price).asc()
             )
     elif sort == "price_asc":
-        stmt = stmt.order_by(Product.price.asc())
+        stmt = stmt.order_by(cast(ColumnElement[float], Product.price).asc())
     elif sort == "price_desc":
-        stmt = stmt.order_by(Product.price.desc())
+        stmt = stmt.order_by(cast(ColumnElement[float], Product.price).desc())
     else:  # created_desc (default)
-        stmt = stmt.order_by(Product.created_at.desc())
+        stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
     
     products = session.exec(stmt).all()
     
@@ -263,14 +263,14 @@ def get_products(
     include_delivery_summary: bool = Query(False),
     session: Session = Depends(get_session)
 ):
-    stmt = select(Product).join(Product.category)
+    stmt = select(Product).join(Category)
     if category_id:
         stmt = stmt.where(Product.category_id == category_id)
     
     if include_delivery_summary:
-        stmt = stmt.options(selectinload(Product.delivery_options))
+        stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
     
-    stmt = stmt.options(selectinload(Product.category))
+    stmt = stmt.options(selectinload(cast(Any, Product.category)))
     products = session.exec(stmt).all()
     
     # Convert to response format with image URLs
@@ -312,8 +312,8 @@ def get_product(
     stmt = (
         select(Product)
         .where(Product.id == product_id)
-        .options(selectinload(Product.delivery_options))
-        .options(selectinload(Product.category))
+        .options(selectinload(cast(Any, Product.delivery_options)))
+        .options(selectinload(cast(Any, Product.category)))
     )
     product = session.exec(stmt).first()
     if not product:

@@ -79,7 +79,7 @@ const Main = ({ children }: Props) => {
               cursor="pointer"
               value={selectedCat}
               onChange={(e) => {
-                const next = new URLSearchParams(searchParams);
+                const next = new globalThis.URLSearchParams(searchParams);
                 const v = e.target.value;
                 if (v) {
                   next.set("cat", v);
@@ -107,7 +107,7 @@ const Main = ({ children }: Props) => {
               cursor="pointer"
               value={selectedDeliv}
               onChange={(e) => {
-                const next = new URLSearchParams(searchParams);
+                const next = new globalThis.URLSearchParams(searchParams);
                 const v = e.target.value;
                 if (v) {
                   next.set("deliv", v);
@@ -135,7 +135,7 @@ const Main = ({ children }: Props) => {
               cursor="pointer"
               value={sort}
               onChange={(e) => {
-                const next = new URLSearchParams(searchParams);
+                const next = new globalThis.URLSearchParams(searchParams);
                 const v = e.target.value;
                 if (v) {
                   next.set("sort", v);
