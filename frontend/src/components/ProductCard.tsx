@@ -14,11 +14,12 @@ import {
 import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
-import { ProductType, getImageUrl } from "../context/GlobalState";
 import { useGlobalContext } from "../context/useGlobalContext";
 import MUIRating from "./MUI/MUIRating";
 import MotionBox from "./MotionBox";
+import { DeliveryOptionsSummary } from "./Delivery";
 import { useState } from "react";
+import { ProductType, getImageUrl } from "../context/GlobalState";
 
 type Props = {
   product: ProductType;
@@ -118,8 +119,8 @@ const ProductCard = ({ product }: Props) => {
               {isWithinRange(+product.id) ? "-50%" : null}
             </Badge>
           </Flex>
-          <Flex align="center" h="18px">
-            <Text fontSize="xs">Eligible for free shipping</Text>
+          <Flex align="center" minH="18px">
+            <DeliveryOptionsSummary summary={product.delivery_summary} />
           </Flex>
           <Flex mt={1} align="center" justify="space-between" flexWrap="wrap">
             <Flex align="center">
@@ -174,10 +175,10 @@ const ProductCard = ({ product }: Props) => {
           onClick={() => {
             addToCart(product);
           }}
-          isDisabled={product.inCart ? true : false}
+          isDisabled={product.inCart === true}
         >
           <Icon as={FaShoppingCart} mr={4} />
-          {product.inCart ? "Added to Cart" : "Add to Cart"}
+          {product.inCart === true ? "Added to Cart" : "Add to Cart"}
         </Button>
       </MotionBox>
     </MotionBox>
