@@ -323,4 +323,65 @@ test.describe('Cart Functionality', () => {
       test.skip('No add to cart functionality found');
     }
   });
+
+  test('should allow adding product to cart with delivery option selected', async ({ page }) => {
+    // Wait for products to load and click on first product
+    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
+    await page.locator('[data-testid="product-card"]').first().click();
+    
+    // Wait for product detail page to load
+    await page.waitForTimeout(1000);
+    
+    // Check if delivery options are present
+    const deliverySection = page.getByText('Delivery Options');
+    
+    if (await deliverySection.count() > 0) {
+      // Select a delivery option (if multiple are available)
+      const radioButtons = page.locator('input[type="radio"]');
+      const radioCount = await radioButtons.count();
+      
+      if (radioCount >= 2) {
+        // Select the second option (first might be default)
+        const secondRadio = radioButtons.nth(1);
+        if (await secondRadio.isEnabled()) {
+          const radioContainer = secondRadio.locator('..').locator('..');
+          await radioContainer.click();
+          await expect(secondRadio).toBeChecked();
+        }
+      }
+      
+      // Get initial cart count
+      const cartBadge = page.locator('[data-testid="cart-count"], .cart-badge, .cart-count');
+      let initialCount = 0;
+      
+      if (await cartBadge.count() > 0) {
+        const initialCountText = await cartBadge.textContent();
+        initialCount = parseInt(initialCountText || '0') || 0;
+      }
+      
+      // Add to cart
+      const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")');
+      
+      if (await addToCartButton.count() > 0) {
+        await addToCartButton.click();
+        await page.waitForTimeout(1000);
+        
+        // Verify cart was updated
+        if (await cartBadge.count() > 0) {
+          const newCountText = await cartBadge.textContent();
+          const newCount = parseInt(newCountText || '0') || 0;
+          expect(newCount).toBeGreaterThan(initialCount);
+        }
+        
+        // Verify success message or button state change
+        const successMessage = page.locator('text=/added.*cart|successfully added/i');
+        const addedToCartButton = page.locator('button:has-text("Added to Cart")');
+        
+        const hasSuccessMessage = await successMessage.count() > 0;
+        const hasButtonStateChange = await addedToCartButton.count() > 0;
+        
+        expect(hasSuccessMessage || hasButtonStateChange).toBeTruthy();
+      }
+    }
+  });
 });

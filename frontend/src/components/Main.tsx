@@ -9,11 +9,13 @@ import {
   Tabs,
   useMediaQuery,
 } from "@chakra-ui/react";
-import { ReactNode } from "react";
-import { useLocation } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useGlobalContext } from "../context/useGlobalContext";
 import MUIBadge from "./MUI/MUIBadge";
 import Tab from "./Tab";
+import { api } from "../api/client";
+import { Category, DeliveryOption } from "../api/types";
 
 type Props = {
   children: ReactNode;
@@ -23,6 +25,35 @@ const Main = ({ children }: Props) => {
   const { savedItemsCount } = useGlobalContext();
   const [isLargerThan567] = useMediaQuery("(min-width: 567px)");
   const location = useLocation();
+  
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedCat = searchParams.get("cat") || "";
+  const selectedDeliv = searchParams.get("deliv") || "";
+  const sort = searchParams.get("sort") || "";
+
+  // Load categories and delivery options
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const [cats, delivs] = await Promise.all([
+          api.getCategories(),
+          api.getDeliveryOptions()
+        ]);
+        if (!mounted) return;
+        setCategories(cats);
+        setDeliveryOptions(delivs);
+      } catch (error) {
+        console.error("Failed to load filter options:", error);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+
 
   return (
     <Box
@@ -46,10 +77,27 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.500"
               cursor="pointer"
+              value={selectedCat}
+              onChange={(e) => {
+                const next = new URLSearchParams(searchParams);
+                const v = e.target.value;
+                if (v) {
+                  next.set("cat", v);
+                } else {
+                  next.delete("cat");
+                }
+                setSearchParams(next);
+              }}
             >
-              <option value="option1">Category</option>
+              <option value="">All</option>
+              {categories.map((c) => (
+                <option key={c.id} value={String(c.id)}>
+                  {c.name}
+                </option>
+              ))}
             </Select>
           </FormControl>
+
           <FormControl w="fit-content">
             <Select
               minW="fit-content"
@@ -57,10 +105,27 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.400"
               cursor="pointer"
+              value={selectedDeliv}
+              onChange={(e) => {
+                const next = new URLSearchParams(searchParams);
+                const v = e.target.value;
+                if (v) {
+                  next.set("deliv", v);
+                } else {
+                  next.delete("deliv");
+                }
+                setSearchParams(next);
+              }}
             >
-              <option value="option1">Shipping</option>
+              <option value="">All</option>
+              {deliveryOptions.map((d) => (
+                <option key={d.id} value={String(d.id)}>
+                  {d.name}
+                </option>
+              ))}
             </Select>
           </FormControl>
+
           <FormControl w="fit-content">
             <Select
               minW="fit-content"
@@ -68,8 +133,22 @@ const Main = ({ children }: Props) => {
               rounded="base"
               borderColor="gray.400"
               cursor="pointer"
+              value={sort}
+              onChange={(e) => {
+                const next = new URLSearchParams(searchParams);
+                const v = e.target.value;
+                if (v) {
+                  next.set("sort", v);
+                } else {
+                  next.delete("sort");
+                }
+                setSearchParams(next);
+              }}
             >
-              <option value="option1">Delivery options</option>
+              <option value="created_desc">Best selling</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="delivery_fastest">Fastest Delivery</option>
             </Select>
           </FormControl>
         </HStack>

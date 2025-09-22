@@ -14,15 +14,27 @@ import {
 import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
-import { ProductType, getImageUrl } from "../context/GlobalState";
 import { useGlobalContext } from "../context/useGlobalContext";
 import MUIRating from "./MUI/MUIRating";
 import MotionBox from "./MotionBox";
+import { DeliveryOptionsSummary } from "./Delivery";
 import { useState } from "react";
+import { Product } from "../api/types";
 
 type Props = {
-  product: ProductType;
+  product: Product;
   className?: string;
+};
+
+const getImageUrl = (product: Product): string => {
+  if (product.image_url) {
+    const API_BASE_URL = "http://localhost:8001";
+    if (product.image_url.startsWith('http')) {
+      return product.image_url;
+    }
+    return `${API_BASE_URL}${product.image_url}`;
+  }
+  return "";
 };
 
 const ProductCard = ({ product }: Props) => {
@@ -118,8 +130,8 @@ const ProductCard = ({ product }: Props) => {
               {isWithinRange(+product.id) ? "-50%" : null}
             </Badge>
           </Flex>
-          <Flex align="center" h="18px">
-            <Text fontSize="xs">Eligible for free shipping</Text>
+          <Flex align="center" minH="18px">
+            <DeliveryOptionsSummary summary={product.delivery_summary} />
           </Flex>
           <Flex mt={1} align="center" justify="space-between" flexWrap="wrap">
             <Flex align="center">
@@ -135,7 +147,7 @@ const ProductCard = ({ product }: Props) => {
               </Text>
             </Flex>
             <Button
-              opacity={product.isSaved ? 1 : { base: 1, sm: 0 }}
+              opacity={product.is_saved ? 1 : { base: 1, sm: 0 }}
               className="btn"
               data-testid="save-button"
               colorScheme="appBlue"
@@ -146,10 +158,10 @@ const ProductCard = ({ product }: Props) => {
               fontSize="lg"
               px={2}
               borderRadius="full"
-              border={product.isSaved ? "none" : "1px solid"}
+              border={product.is_saved ? "none" : "1px solid"}
               onClick={() => {
                 toast({
-                  title: product.isSaved
+                  title: product.is_saved
                     ? "Product successfully removed from your saved items"
                     : "Product successfully added to your saved items",
                   status: "success",
@@ -159,7 +171,7 @@ const ProductCard = ({ product }: Props) => {
                 toggleSaved(product.id);
               }}
             >
-              {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
+              {product.is_saved ? <HeartIconFill /> : <HeartIcon />}
             </Button>
           </Flex>
         </Box>
