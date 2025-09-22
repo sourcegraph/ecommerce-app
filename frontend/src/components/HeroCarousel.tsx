@@ -25,11 +25,11 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ products, onProductClick })
   useEffect(() => {
     if (products.length === 0) return
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % products.length)
     }, 6000)
 
-    return () => clearInterval(interval)
+    return () => window.clearInterval(interval)
   }, [products.length])
 
   const goToPrevious = () => {

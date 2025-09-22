@@ -417,7 +417,7 @@ def get_featured_products(
     """Get featured products for carousel"""
     stmt = (
         select(Product)
-        .where(Product.featured == True)
+        .where(Product.featured)
         .options(selectinload(cast(Any, Product.category)))
         .options(selectinload(cast(Any, Product.delivery_options)))
         .order_by(cast(ColumnElement, Product.created_at).desc())
