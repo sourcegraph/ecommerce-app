@@ -4,7 +4,10 @@ test.describe('Product Browsing', () => {
   test('should display products on homepage', async ({ page }) => {
     await page.goto('/');
     
-    // Wait for products to load
+    // Wait for the landing page to load with hero carousel
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
+    
+    // Wait for products to load in the Popular Items section
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     // Check that multiple products are displayed
@@ -13,8 +16,8 @@ test.describe('Product Browsing', () => {
     
     // Check product card content
     const firstProduct = productCards.first();
-    // Check that product title and price are visible
-    await expect(firstProduct.getByText(/Fjallraven|Mens|Women/i)).toBeVisible(); // Product title
+    // Check that product title and price are visible - use more specific selectors
+    await expect(firstProduct.locator('.product-title').first()).toBeVisible(); // Product title
     await expect(firstProduct.locator('text=/\\$/i')).toBeVisible(); // Price
   });
 
@@ -34,6 +37,9 @@ test.describe('Product Browsing', () => {
 
   test('should display product images from backend', async ({ page }) => {
     await page.goto('/');
+    
+    // Wait for the landing page to load
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });

@@ -4,12 +4,17 @@ test.describe('Product Details', () => {
   test('should navigate to product detail page', async ({ page }) => {
     await page.goto('/');
     
+    // Wait for the landing page to load
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
+    
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     // Click on the first product
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitle = await firstProduct.getByText(/Fjallraven|Mens|Women/i).textContent();
+    const productTitleElement = firstProduct.locator('.product-title').first();
+    await productTitleElement.waitFor({ timeout: 5000 });
+    const productTitle = await productTitleElement.textContent();
     
     await firstProduct.click();
     
@@ -23,12 +28,15 @@ test.describe('Product Details', () => {
     
     // Verify product details are displayed
     if (productTitle) {
-      await expect(page.locator(`text="${productTitle}"`)).toBeVisible();
+      await expect(page.locator(`text="${productTitle}"`).or(page.getByText(productTitle))).toBeVisible();
     }
   });
 
   test('should display product information correctly', async ({ page }) => {
     await page.goto('/');
+    
+    // Wait for the landing page to load
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -57,6 +65,9 @@ test.describe('Product Details', () => {
 
   test('should allow adding product to cart from details', async ({ page }) => {
     await page.goto('/');
+    
+    // Wait for the landing page to load
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -105,6 +116,9 @@ test.describe('Product Details', () => {
 
   test('should close product details when clicking outside/back', async ({ page }) => {
     await page.goto('/');
+    
+    // Wait for the landing page to load
+    await expect(page.locator('text=Popular Items')).toBeVisible({ timeout: 10000 });
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
