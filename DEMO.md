@@ -21,12 +21,12 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 
 **Steps:**  
-- The filtering on the landing page doesn't work, show this in the UI by going to [http://localhost:3001](http://localhost:3001) and tell the a audience that you will now ask Amp to fix this Github issue.
-- In VS Code or Terminal type ```Fix bug https://github.com/sourcegraph/amp-demo/issues/5 in a new branch, test and validate changes. Then create a pull request```
-- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-3eaabc98-69dd-4896-8616-13b51c5f8320) that was run to fix this issue. Or you can switch to [_fix-sort-filters_](https://github.com/sourcegraph/amp-demo/tree/fix-sort-filters) branch locally and run this branch, which has the fix in case something goes wrong. 
+- There is a bug when sorting by "Fastest Delivery", duplicate items show up. Show this in the UI by going to [http://localhost:3001](http://localhost:3001) and tell the a audience that you will now ask Amp to fix this Github issue.
+- In VS Code or Terminal type ```Fix bug https://github.com/sourcegraph/amp-demo/issues/16 in a new branch, test and validate changes, make sure all ci checks pass. Then create a pull request```
+- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-eb803356-f4a3-48f5-a7a7-5843a909a68d) that was run to fix this issue. Or you can switch to [_fix/duplicate-items-fastest-delivery_](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery) branch locally and run this branch, which has the fix in case something goes wrong. 
 - One its fixed the dropdown for category, shipping and sort by will be populated. And the the product list will change based on what is selected.
 
-<img width="360" height="180" alt="Screenshot 2025-09-18 at 12 18 34" src="https://github.com/user-attachments/assets/c85c7734-3454-452f-9ee7-91229f4bc143" />
+<img width="352" height="76" alt="image" src="https://github.com/user-attachments/assets/097fa678-d58a-4fb4-bedf-c3e3d6f4e44e" />
 
 ### Implementing a new feature
 
