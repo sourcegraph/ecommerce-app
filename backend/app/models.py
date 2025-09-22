@@ -27,6 +27,7 @@ class Product(SQLModel, table=True):
     title: str
     description: str
     price: float
+    featured: bool = Field(default=False, index=True)  # For carousel and featured products
     
     # BLOB storage for images with explicit LargeBinary column
     image_data: Optional[bytes] = Field(

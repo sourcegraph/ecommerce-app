@@ -5,6 +5,9 @@ import ProgressLine from "./components/Loading/ProgressLine";
 import { Provider } from "./context/GlobalState";
 import Saved from "./pages/Saved";
 
+const Landing = loadable(() => import("./pages/Landing"), {
+  fallback: <ProgressLine />,
+});
 const Home = loadable(() => import("./pages/Home"), {
   fallback: <ProgressLine />,
 });
@@ -30,7 +33,8 @@ const App = () => {
       <Router>
         <Container>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/browse" element={<Home />} />
             <Route path="/products/:id" element={<Product />} />
             <Route path="/saved" element={<Saved />} />
             <Route path="/search/:name" element={<SearchResults />} />

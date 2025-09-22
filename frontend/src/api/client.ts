@@ -42,6 +42,14 @@ class ApiClient {
     
     return this.request<Product[]>(`/api/products?${searchParams.toString()}`)
   }
+
+  async getFeaturedProducts(limit: number = 5): Promise<Product[]> {
+    return this.request<Product[]>(`/api/products/featured?limit=${limit}`)
+  }
+
+  async getPopularProducts(limit: number = 10): Promise<Product[]> {
+    return this.request<Product[]>(`/api/products/popular?limit=${limit}`)
+  }
 }
 
 export const api = new ApiClient()

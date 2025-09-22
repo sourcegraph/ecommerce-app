@@ -18,6 +18,7 @@ from .schemas import (
 )
 from . import crud
 from .models import Product, DeliveryOption, Category, ProductDeliveryLink
+from sqlalchemy import func
 
 def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Optional[DeliverySummary]:
     """Calculate delivery summary from a list of delivery options"""
@@ -116,6 +117,7 @@ def get_category(
             "title": product.title,
             "description": product.description,
             "price": product.price,
+            "featured": product.featured,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
             "created_at": product.created_at,
@@ -162,6 +164,7 @@ def create_product(
         "title": created_product.title,
         "description": created_product.description,
         "price": created_product.price,
+        "featured": created_product.featured,
         "category_id": created_product.category_id,
         "is_saved": created_product.is_saved,
         "created_at": created_product.created_at,
@@ -234,6 +237,7 @@ def get_products_api(
             "title": product.title,
             "description": product.description,
             "price": product.price,
+            "featured": product.featured,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
             "created_at": product.created_at,
@@ -281,6 +285,7 @@ def get_products(
             "title": product.title,
             "description": product.description,
             "price": product.price,
+            "featured": product.featured,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
             "created_at": product.created_at,
@@ -330,6 +335,7 @@ def get_product(
         "title": product.title,
         "description": product.description,
         "price": product.price,
+        "featured": product.featured,
         "category_id": product.category_id,
         "is_saved": product.is_saved,
         "created_at": product.created_at,
@@ -383,6 +389,7 @@ def update_product(
         "title": updated_product.title,
         "description": updated_product.description,
         "price": updated_product.price,
+        "featured": updated_product.featured,
         "category_id": updated_product.category_id,
         "is_saved": updated_product.is_saved,
         "created_at": updated_product.created_at,
@@ -401,6 +408,114 @@ def delete_product(
         raise HTTPException(status_code=404, detail="Product not found")
     
     return {"message": "Product deleted successfully"}
+
+@app.get("/api/products/featured", response_model=List[ProductRead])
+def get_featured_products(
+    limit: int = Query(5, ge=1, le=10),
+    session: Session = Depends(get_session)
+):
+    """Get featured products for carousel"""
+    stmt = (
+        select(Product)
+        .where(Product.featured == True)
+        .options(selectinload(cast(Any, Product.category)))
+        .options(selectinload(cast(Any, Product.delivery_options)))
+        .order_by(cast(ColumnElement, Product.created_at).desc())
+        .limit(limit)
+    )
+    
+    featured_products = session.exec(stmt).all()
+    
+    # If no featured products, fall back to newest products
+    if not featured_products:
+        stmt = (
+            select(Product)
+            .options(selectinload(cast(Any, Product.category)))
+            .options(selectinload(cast(Any, Product.delivery_options)))
+            .order_by(cast(ColumnElement, Product.created_at).desc())
+            .limit(limit)
+        )
+        featured_products = session.exec(stmt).all()
+    
+    # Convert to response format
+    result = []
+    for product in featured_products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "featured": product.featured,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        
+        if hasattr(product, 'delivery_options'):
+            summary = calculate_delivery_summary(product.delivery_options)
+            if summary:
+                product_dict["delivery_summary"] = summary.model_dump()
+        
+        result.append(product_dict)
+    
+    return result
+
+@app.get("/api/products/popular", response_model=List[ProductRead])
+def get_popular_products(
+    limit: int = Query(10, ge=1, le=20),
+    session: Session = Depends(get_session)
+):
+    """Get popular products based on random selection for now (could be based on sales/views later)"""
+    stmt = (
+        select(Product)
+        .options(selectinload(cast(Any, Product.category)))
+        .options(selectinload(cast(Any, Product.delivery_options)))
+        .order_by(func.random())
+        .limit(limit)
+    )
+    
+    products = session.exec(stmt).all()
+    
+    # Convert to response format
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "featured": product.featured,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        
+        if hasattr(product, 'delivery_options'):
+            summary = calculate_delivery_summary(product.delivery_options)
+            if summary:
+                product_dict["delivery_summary"] = summary.model_dump()
+        
+        result.append(product_dict)
+    
+    return result
 
 @app.get("/products/{product_id}/image")
 def get_product_image(

@@ -24,6 +24,7 @@ export interface Product {
   title: string
   description: string
   price: number
+  featured: boolean
   category_id: number
   is_saved: boolean
   created_at: string
