@@ -15,7 +15,7 @@ import { useGlobalContext } from "../context/useGlobalContext";
 import MUIBadge from "./MUI/MUIBadge";
 import Tab from "./Tab";
 import { api } from "../api/client";
-import { Category, DeliveryOption } from "../api/types";
+import { Category } from "../api/types";
 
 type Props = {
   children: ReactNode;
@@ -27,27 +27,21 @@ const Main = ({ children }: Props) => {
   const location = useLocation();
   
   const [categories, setCategories] = useState<Category[]>([]);
-  const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOption[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedCat = searchParams.get("cat") || "";
-  const selectedDeliv = searchParams.get("deliv") || "";
   const sort = searchParams.get("sort") || "";
 
-  // Load categories and delivery options
+  // Load categories
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [cats, delivs] = await Promise.all([
-          api.getCategories(),
-          api.getDeliveryOptions()
-        ]);
+        const cats = await api.getCategories();
         if (!mounted) return;
         setCategories(cats);
-        setDeliveryOptions(delivs);
       } catch (error) {
-        console.error("Failed to load filter options:", error);
+        console.error("Failed to load categories:", error);
       }
     })();
     return () => { mounted = false; };
@@ -89,7 +83,7 @@ const Main = ({ children }: Props) => {
                 setSearchParams(next);
               }}
             >
-              <option value="">All</option>
+              <option value="">All Categories</option>
               {categories.map((c) => (
                 <option key={c.id} value={String(c.id)}>
                   {c.name}
@@ -98,33 +92,7 @@ const Main = ({ children }: Props) => {
             </Select>
           </FormControl>
 
-          <FormControl w="fit-content">
-            <Select
-              minW="fit-content"
-              size={isLargerThan567 ? "sm" : "xs"}
-              rounded="base"
-              borderColor="gray.400"
-              cursor="pointer"
-              value={selectedDeliv}
-              onChange={(e) => {
-                const next = new globalThis.URLSearchParams(searchParams);
-                const v = e.target.value;
-                if (v) {
-                  next.set("deliv", v);
-                } else {
-                  next.delete("deliv");
-                }
-                setSearchParams(next);
-              }}
-            >
-              <option value="">All</option>
-              {deliveryOptions.map((d) => (
-                <option key={d.id} value={String(d.id)}>
-                  {d.name}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
+
 
           <FormControl w="fit-content">
             <Select
