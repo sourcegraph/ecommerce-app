@@ -143,7 +143,11 @@ Having hierarchial AGENTS.md structure is important for large monorepos, you can
 
 ### MCP and tool calling
 
-Amp can integrate with various MCP servers (remote and local), and leverage tool calling to execute commands. Amp ships with Playwright which lets it take screenshots of your browser. In the Issue to PR demo block above. Amp will validate changes using playwright. 
+Amp can integrate with various MCP servers (remote and local), and leverage tool calling to execute commands. Amp ships with Playwright which lets it take screenshots of your browser. In the Issue to PR demo block above. Amp will validate changes using playwright and use Github CLI tool to create a pull request.
+
+#### Users can add MCP servers in VS Code or the Amp CLI. 
+- VS Code Amp plugin - to add/enable MCP servers, go to Amp settings in the IDE and enable Playwright. You can also add additional MCP servers via the settings page.
+- Amp CLI - Use the example [settings.json file](../settings.json) 
 
 Additionally, install the Github CLI from [here](https://cli.github.com) and set it up using your personal Github account. So that Amp can use tool calling ability to fetch Github issues, pull your code changes and create Pull Request on Github.
 
