@@ -3,7 +3,8 @@
 Below is a menu of demo blocks that you can run to show Amp in actions. Make sure you have followed [quick start instructions](README.md#quick-start) before running any of the demos.
 
 **Table of Contents**  
-- [Issue to PR](#issue-to-pr)
+VS Code
+- [VS Code](#VS-Code)
 - [Implementing a new feature](#implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
@@ -11,7 +12,9 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 - [IDE diagnostics](#ide-diagnostics)
 - [AGENTS.md / Multiple AGENTS.md](#agentsmd--multiple-agentsmd)
 - [MCP and tool calling](#mcp-and-tool-calling)
-- [Terminal workflows](#terminal-workflows)
+[Amp CLI in Terminal](#Amp-CLI-in-Terminal)
+
+# VS Code
 
 ## Issue to PR
 
@@ -153,9 +156,38 @@ Additionally, install the Github CLI from [here](https://cli.github.com) and set
 
 // TODO update this section to use with Sourcegraph MCP to demo Amp + Sourcegraph search
 
-## Terminal workflows
+# Amp CLI in Terminal 
 
-- CLI -x and piping -> Git history, analyze files
-- Custom slash commands
+Amp can be executed in interactive mode by typing ```amp``` in terminal, or in non-interactive mode using -x command flag or piping output. 
+
+## Amp in non-interactive mode
+Execute the following commands, to advise the audience that you can invoke Amp to run programatically or in a script. 
+```
+# Explain that we will cat package.json file and pipe the output to Amp and Amp will figure out which packages to update
+cat package.json | amp -x "What dependencies need updating and why?"
+```
+## Amp in interactive mode
+Before you start, copy [settings.json file](../settings.json) to ~/.config/amp/settings.json
+
+Start amp and execute the following prompt:
+```Review the authentication system and refactor it to follow better security practices, ensuring all tests still pass```
+Explain that  we are going to refactore the authentication system in the Amp CLI GUI. Amp will figure out vulnerabilities, consult Oracle on how to fix and refactor code (as per screenshot). 
+<img width="700" height="400" alt="Screenshot 2025-09-23 at 17 00 50" src="https://github.com/user-attachments/assets/671e0bb6-3709-41aa-909c-0b2fe20346c8" />
+[thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3)
+This takes a while to execute so go to this [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3) and walk the audience through the execution. 
+## Thread management
+While the thread is executing the the background, explain that users can manage multiple thread via CLI. Type ```amp threads``` to show all threads, then type ```amp --help``` to show the different thread subcommands:
+```
+  threads      [alias: t] Manage threads
+    new        [alias: n] Create a new thread
+    continue   [alias: c] Continue an existing thread
+    fork       [alias: f] Fork an existing thread
+    list       [alias: l] List all threads
+    share      [alias: s] Share a thread
+    compact    [alias: co] Compact a thread
+```
+Explain tthe different options, 
+
 - Agent shell
-- Thread management
+
+##  Custom slash commands
