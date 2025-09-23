@@ -48,6 +48,7 @@ const CartItem = ({ product }: Props) => {
         rounded="base"
         // animation
         exit={{ opacity: 0 }}
+        data-testid="cart-item"
       >
         <Flex
           as={LinkBox}
@@ -116,6 +117,7 @@ const CartItem = ({ product }: Props) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => deleteFromCart(product.id)}
+                data-testid="remove-item"
               >
                 Remove Item
               </Button>
@@ -139,6 +141,7 @@ const CartItem = ({ product }: Props) => {
             onChange={(e: ChangeEvent<HTMLSelectElement>) =>
               setQuantity(e.target.value, product.id)
             }
+            data-testid="quantity-select"
           >
             {Array(10)
               .fill("")

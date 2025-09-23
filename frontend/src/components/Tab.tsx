@@ -6,8 +6,9 @@ type Props = {
   mediaQuery: boolean;
   children: ReactNode;
   navigatePath: string;
+  testId?: string;
 };
-export default function TabComponent({ mediaQuery, children, navigatePath }: Props) {
+export default function TabComponent({ mediaQuery, children, navigatePath, testId }: Props) {
   const navigate = useNavigate();
   return (
     <Tab
@@ -21,6 +22,7 @@ export default function TabComponent({ mediaQuery, children, navigatePath }: Pro
       onClick={() => {
         navigate(navigatePath);
       }}
+      data-testid={testId}
     >
       {children}
     </Tab>
