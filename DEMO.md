@@ -3,8 +3,8 @@
 Below is a menu of demo blocks that you can run to show Amp in actions. Make sure you have followed [quick start instructions](README.md#quick-start) before running any of the demos.
 
 **Table of Contents**  
-VS Code
-- [VS Code](#VS-Code)
+[VS Code](#VS-Code)
+- [Issue to PR](#Issue-to-PR)
 - [Implementing a new feature](#implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
