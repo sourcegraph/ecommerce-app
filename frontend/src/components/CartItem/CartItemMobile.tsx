@@ -63,6 +63,7 @@ const CartItemMobile = ({ product }: Props) => {
         rounded="base"
         // animation
         exit={{ opacity: 0 }}
+        data-testid="cart-item"
       >
         <Flex
           as={LinkBox}
@@ -138,6 +139,7 @@ const CartItemMobile = ({ product }: Props) => {
             size="md"
             px={2}
             onClick={() => deleteFromCart(product.id)}
+            data-testid="remove-item"
           >
             <TrashIcon mr={1} sx={{ "@media(max-width:365px)": { marginRight: 0 } }} />
             <Box
@@ -157,6 +159,7 @@ const CartItemMobile = ({ product }: Props) => {
               disabled={+product.quantity === 1}
               onClick={() => decrementQty(product.id)}
               w="17.5%"
+              data-testid="decrement-qty"
             >
               <MinusIcon />
             </Button>
@@ -179,6 +182,7 @@ const CartItemMobile = ({ product }: Props) => {
               disabled={+product.quantity === 10}
               onClick={() => incrementQty(product.id)}
               w="17.5%"
+              data-testid="increment-qty"
             >
               <AddIcon />
             </Button>

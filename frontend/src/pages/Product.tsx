@@ -101,8 +101,10 @@ const Product = () => {
   }, [isLoading, fetchProducts]);
   
   const product = products.find(product => product.id.toString() === id);
-  // Use the product with delivery options if available, otherwise fallback to product from context
-  const displayProduct = productWithDelivery || product;
+  // Use the product with delivery options if available, but merge with cart state from context
+  const displayProduct = productWithDelivery 
+    ? { ...productWithDelivery, inCart: product?.inCart, quantity: product?.inCart ? product.quantity : undefined }
+    : product;
 
   return isLoading || isLoadingProduct ? (
     <ProgressLine />
@@ -143,10 +145,11 @@ const Product = () => {
                 bg="white" 
                 borderRadius="md"
                 style={{ backgroundColor: 'white' }} 
+                data-testid="product-detail-image"
               />
             </Flex>
             <Box>
-              <Heading fontSize="2xl" mb={4}>
+              <Heading fontSize="2xl" mb={4} data-testid="product-title">
                 {displayProduct.title}
               </Heading>
               <Flex align="center" mb={3}>
@@ -187,7 +190,7 @@ const Product = () => {
                 </Tag>
               </Flex>
               <Flex align="center" mb={3}>
-                <Text fontSize="2xl" fontWeight="bold">
+                <Text fontSize="2xl" fontWeight="bold" data-testid="product-price">
                   ${displayProduct.price}{" "}
                   <Box
                     as="span"
@@ -225,7 +228,7 @@ const Product = () => {
               </Flex>
               {/* Delivery Options */}
               {productWithDelivery?.delivery_options && productWithDelivery.delivery_options.length > 0 && (
-                <Box mb={4}>
+                <Box mb={4} data-testid="delivery-section">
                   <DeliveryOptionsSelector
                     options={productWithDelivery.delivery_options}
                     productPrice={+displayProduct.price}
@@ -244,6 +247,7 @@ const Product = () => {
                     addToCart(cartProduct as ProductType);
                   }}
                   isDisabled={displayProduct.inCart ? true : false}
+                  data-testid="add-to-cart"
                 >
                   <Icon as={FaShoppingCart} mr={3} />
                   {displayProduct.inCart ? "Added to Cart" : "Add to Cart"}
@@ -269,6 +273,9 @@ const Product = () => {
                     });
                     toggleSaved(displayProduct.id);
                   }}
+                  data-testid="save-button"
+                  aria-pressed={displayProduct.isSaved}
+                  aria-label={displayProduct.isSaved ? "Unsave" : "Save"}
                 >
                   {displayProduct.isSaved ? <HeartIconFill /> : <HeartIcon />}
                 </Button>
@@ -285,7 +292,7 @@ const Product = () => {
             <Heading as="h3" fontSize="2xl" mb={2}>
               Description
             </Heading>
-            <Text>{displayProduct.description}</Text>
+            <Text data-testid="product-description">{displayProduct.description}</Text>
           </Box>
         </Box>
       ) : (

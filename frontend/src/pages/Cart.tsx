@@ -67,7 +67,7 @@ const Cart = () => {
             <Text fontSize="lg" fontWeight="semibold">
               Total:
             </Text>
-            <Box as="span" fontWeight="bold" color="appBlue.600" fontSize="xl">
+            <Box as="span" fontWeight="bold" color="appBlue.600" fontSize="xl" data-testid="cart-total">
               ${totalPrice.toFixed(2)}
             </Box>
           </Flex>
@@ -92,6 +92,7 @@ const Cart = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
+          data-testid="empty-cart"
         >
           <Text mb={4}>No Items in your cart</Text>
           <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>

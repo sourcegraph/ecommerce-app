@@ -139,6 +139,8 @@ const ProductCard = ({ product }: Props) => {
               opacity={product.isSaved ? 1 : { base: 1, sm: 0 }}
               className="btn"
               data-testid="save-button"
+              aria-pressed={product.isSaved}
+              aria-label={product.isSaved ? "Unsave" : "Save"}
               colorScheme="appBlue"
               variant="outline"
               height={9}
