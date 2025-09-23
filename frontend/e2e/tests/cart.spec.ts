@@ -294,31 +294,32 @@ test.describe('Cart Functionality', () => {
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")').first();
-    const cartBadge = page.locator('[data-testid="cart-count"], .cart-badge, .cart-count');
     
     if (await addToCartButton.count() > 0) {
       await addToCartButton.click();
+      await page.waitForTimeout(1500); // Give more time for state to update
+      
+      // Wait for cart button to change state to indicate item was added
+      await expect(page.locator('[data-testid="add-to-cart"]:has-text("Added to Cart"), button:has-text("Added to Cart")').first())
+        .toBeVisible({ timeout: 5000 });
+      
+      // Navigate to home page to ensure we have a clean state
+      await page.goto('/');
       await page.waitForTimeout(1000);
       
-      // Get cart count after adding
-      let cartCount = 0;
-      if (await cartBadge.count() > 0) {
-        const countText = await cartBadge.textContent();
-        cartCount = parseInt(countText || '0') || 0;
-      }
+      // Go back to products page to check if cart state persists
+      await page.goto('/products');
+      await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
       
-      if (cartCount > 0) {
-        // Refresh the page
-        await page.reload();
-        await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-        
-        // Cart count should persist
-        if (await cartBadge.count() > 0) {
-          const persistedCountText = await cartBadge.textContent();
-          const persistedCount = parseInt(persistedCountText || '0') || 0;
-          expect(persistedCount).toBe(cartCount);
-        }
-      }
+      // Wait a bit for the cart state to load
+      await page.waitForTimeout(1500);
+      
+      // Check if the button still shows "Added to Cart"
+      const addedButtons = page.locator('[data-testid="add-to-cart"]:has-text("Added to Cart"), button:has-text("Added to Cart")');
+      const addedButtonCount = await addedButtons.count();
+      
+      // Should have at least one "Added to Cart" button indicating persistence
+      expect(addedButtonCount).toBeGreaterThan(0);
     } else {
       test.skip('No add to cart functionality found');
     }

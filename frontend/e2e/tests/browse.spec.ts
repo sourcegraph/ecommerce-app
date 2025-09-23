@@ -56,16 +56,29 @@ test.describe('Product Browsing', () => {
   });
 
   test('should handle API errors gracefully', async ({ page }) => {
-    // Intercept API calls and simulate failure
-    await page.route('**/products', route => route.abort());
+    // Intercept only the main products API call (not featured/popular) and simulate failure
+    await page.route('**/api/products?**', route => route.abort());
     
     await page.goto('/products');
     
-    // Should either show error message or fallback content
-    // Adjust based on your error handling implementation
-    await page.waitForTimeout(2000);
+    // Wait for the page to attempt to load
+    await page.waitForTimeout(3000);
     
     // Check that the page doesn't crash
     await expect(page.locator('body')).toBeVisible();
+    
+    // When API fails, the app should either show:
+    // 1. Loading indicators (skeleton states)
+    // 2. Empty state (no products)
+    // 3. Error message
+    const loadingIndicators = await page.locator('[class*="skeleton"], [class*="loading"]').count();
+    const productCards = await page.locator('[data-testid="product-card"]').count();
+    const hasRelatedTags = await page.locator('text="Related"').count() > 0;
+    
+    // The page should render the basic structure but with either loading states or no products
+    expect(hasRelatedTags).toBeTruthy(); // Basic page structure should load
+    
+    // Should have either loading indicators or no product cards (graceful degradation)
+    expect(loadingIndicators > 0 || productCards === 0).toBeTruthy();
   });
 });
