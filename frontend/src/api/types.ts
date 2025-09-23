@@ -10,7 +10,8 @@ export interface DeliveryOption {
   name: string
   description: string
   speed: "standard" | "express" | "next_day" | "same_day"
-  price: number
+  price: number // deprecated, use money field
+  money?: Money // new currency-aware pricing
   min_order_amount?: number
   estimated_days_min: number
   estimated_days_max: number
@@ -23,7 +24,8 @@ export interface Product {
   id: number
   title: string
   description: string
-  price: number
+  price: number // deprecated, use money field
+  money?: Money // new currency-aware pricing
   category_id: number
   is_saved: boolean
   created_at: string
@@ -49,4 +51,12 @@ export interface ApiResponse<T> {
 export interface ApiError {
   error: string
   code: string
+}
+
+// Currency support types
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'JPY'
+
+export interface Money {
+  readonly amountMinor: number // amount in smallest currency unit (e.g., cents for USD)
+  readonly currency: CurrencyCode
 }

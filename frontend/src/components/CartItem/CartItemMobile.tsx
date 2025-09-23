@@ -19,6 +19,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
 import MUISkeleton from "../MUI/MUISkeleton";
+import MoneyDisplay from "../MoneyDisplay";
 import MotionBox from "../MotionBox";
 
 type Props = {
@@ -106,7 +107,14 @@ const CartItemMobile = ({ product }: Props) => {
               </LinkOverlay>
             </Box>
             <Box mt={2} fontWeight="bold" fontSize="lg" color="appBlue.600">
-              ${subTotal.toFixed(2)}
+              <MoneyDisplay
+                money={product.money ? {
+                  amountMinor: product.money.amountMinor * +product.quantity,
+                  currency: product.money.currency
+                } : undefined}
+                fallbackAmount={subTotal}
+                color="appBlue.600"
+              />
             </Box>
           </Flex>
         </Flex>

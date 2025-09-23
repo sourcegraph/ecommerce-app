@@ -18,6 +18,7 @@ import { useGlobalContext } from "../context/useGlobalContext";
 import MUIRating from "./MUI/MUIRating";
 import MotionBox from "./MotionBox";
 import { DeliveryOptionsSummary } from "./Delivery";
+import MoneyDisplay from "./MoneyDisplay";
 import { useState } from "react";
 import { ProductType, getImageUrl } from "../context/GlobalState";
 
@@ -104,17 +105,13 @@ const ProductCard = ({ product }: Props) => {
         </LinkOverlay>
         <Box>
           <Flex align="center" justify="space-between" h="38px">
-            <Text fontSize="xl" fontWeight="bold" color="appBlue.600">
-              ${product.price}{" "}
-              <Box
-                as="span"
-                textDecoration="line-through"
-                color="blackAlpha.500"
-                fontSize="md"
-              >
-                {isWithinRange(+product.id) ? +product.price * 2 : null}
-              </Box>
-            </Text>
+            <MoneyDisplay
+              money={product.money}
+              fallbackAmount={+product.price}
+              fontSize="xl"
+              fontWeight="bold"
+              color="appBlue.600"
+            />
             <Badge colorScheme="green">
               {isWithinRange(+product.id) ? "-50%" : null}
             </Badge>

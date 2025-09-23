@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
+from decimal import Decimal
 from app.models import DeliverySpeed
+from app.money import Currency
 
 class CategoryBase(BaseModel):
     name: str = Field(..., min_length=1)
@@ -123,3 +125,114 @@ class DeliverySummary(BaseModel):
 
 class ProductReadWithDeliveryOptions(ProductRead):
     delivery_options: List[DeliveryOptionRead] = []
+
+# Multi-currency schemas
+class MoneySchema(BaseModel):
+    """Schema for Money representation"""
+    amount_minor: int = Field(..., description="Amount in minor units (e.g., cents)")
+    currency: Currency = Field(default=Currency.USD)
+
+class UserBase(BaseModel):
+    email: str = Field(..., pattern=r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+    first_name: str = Field(..., min_length=1)
+    last_name: str = Field(..., min_length=1)
+
+class UserCreate(UserBase):
+    pass
+
+class UserRead(UserBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+class OrderBase(BaseModel):
+    user_id: int
+    currency: str = Field(default="USD", pattern=r'^[A-Z]{3}$')
+    total_amount_minor: int = Field(..., ge=0)
+
+class OrderCreate(OrderBase):
+    pass
+
+class OrderRead(OrderBase):
+    id: int
+    total_usd_minor: int
+    fx_rate_decimal: Optional[float] = None
+    fx_provider: Optional[str] = None
+    fx_timestamp: Optional[str] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+class OrderItemBase(BaseModel):
+    product_id: int
+    quantity: int = Field(..., gt=0)
+    unit_price_amount_minor: int = Field(..., ge=0)
+    unit_price_currency: str = Field(..., pattern=r'^[A-Z]{3}$')
+
+class OrderItemCreate(OrderItemBase):
+    pass
+
+class OrderItemRead(OrderItemBase):
+    id: int
+    order_id: int
+    subtotal_amount_minor: int
+    created_at: datetime
+    updated_at: datetime
+
+# Currency API schemas
+class CurrencyInfo(BaseModel):
+    """Currency configuration info"""
+    code: str = Field(..., description="ISO 4217 currency code")
+    name: str = Field(..., description="Human-readable currency name")
+    symbol: str = Field(..., description="Currency symbol")
+    decimal_places: int = Field(..., description="Number of decimal places")
+
+class SupportedCurrenciesResponse(BaseModel):
+    """Response for GET /config/currencies"""
+    base_currency: str = Field(..., description="Base currency for the system")
+    supported_currencies: List[CurrencyInfo] = Field(..., description="List of supported currencies")
+
+class PriceInfo(BaseModel):
+    """Price information in a specific currency"""
+    amount: float = Field(..., description="Price in major units (e.g., dollars)")
+    amount_minor: int = Field(..., description="Price in minor units (e.g., cents)")
+    currency: str = Field(..., description="ISO 4217 currency code")
+
+# Updated ProductRead with currency support
+class ProductReadWithCurrency(ProductBase):
+    id: int
+    category_id: int
+    image_url: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    category: Optional[CategoryRead] = None
+    delivery_summary: Optional[DeliverySummary] = None
+    # New currency fields
+    price_money: Optional[PriceInfo] = Field(None, description="Price in requested currency")
+    base_price_money: Optional[PriceInfo] = Field(None, description="Price in base currency")
+
+class FXMetadata(BaseModel):
+    """Foreign exchange metadata"""
+    rate: Decimal = Field(..., description="Exchange rate used")
+    provider: str = Field(..., description="FX rate provider")
+    timestamp: str = Field(..., description="ISO timestamp when rate was fetched")
+
+class CartTotals(BaseModel):
+    """Cart totals in requested currency"""
+    subtotal: PriceInfo = Field(..., description="Subtotal before delivery")
+    delivery_cost: PriceInfo = Field(..., description="Delivery cost")
+    total: PriceInfo = Field(..., description="Total amount")
+    fx_metadata: Optional[FXMetadata] = Field(None, description="FX conversion metadata if currency != base")
+
+class CheckoutTotals(BaseModel):
+    """Checkout totals with FX metadata"""
+    currency: str = Field(..., description="Currency for the checkout")
+    subtotal: PriceInfo = Field(..., description="Subtotal before delivery and taxes")
+    delivery_cost: PriceInfo = Field(..., description="Delivery cost")
+    tax: PriceInfo = Field(..., description="Tax amount")
+    total: PriceInfo = Field(..., description="Total amount")
+    fx_metadata: Optional[FXMetadata] = Field(None, description="FX conversion metadata if currency != base")
+
+class OrderTotalsWithSnapshot(CheckoutTotals):
+    """Order totals with FX rate snapshot"""
+    fx_rates_snapshot: Dict[str, Any] = Field(..., description="Complete FX rates snapshot at order time")

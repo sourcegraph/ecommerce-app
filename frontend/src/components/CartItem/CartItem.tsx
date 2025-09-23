@@ -16,6 +16,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
 import MUISkeleton from "../MUI/MUISkeleton";
+import MoneyDisplay from "../MoneyDisplay";
 import MotionBox from "../MotionBox";
 
 type Props = {
@@ -161,7 +162,10 @@ const CartItem = ({ product }: Props) => {
           justify="center"
           align="center"
         >
-          ${product.price}
+          <MoneyDisplay
+            money={product.money}
+            fallbackAmount={+product.price}
+          />
         </Flex>
         <Flex
           w="30%"
@@ -171,7 +175,14 @@ const CartItem = ({ product }: Props) => {
           align="center"
           color="appBlue.600"
         >
-          ${subTotal.toFixed(2)}
+          <MoneyDisplay
+            money={product.money ? {
+              amountMinor: product.money.amountMinor * +product.quantity,
+              currency: product.money.currency
+            } : undefined}
+            fallbackAmount={subTotal}
+            color="appBlue.600"
+          />
         </Flex>
       </MotionBox>
     </MotionBox>

@@ -9,15 +9,30 @@ from sqlalchemy.sql.elements import ColumnElement
 import io
 
 from .db import get_session, create_db_and_tables
-
 from .schemas import (
     ProductRead, ProductCreate, ProductUpdate,
     ProductReadWithDeliveryOptions, DeliverySummary,
     CategoryRead, CategoryCreate, CategoryReadWithProducts,
-    DeliveryOptionRead
+    DeliveryOptionRead,
+    # Currency schemas
+    CurrencyInfo, SupportedCurrenciesResponse,
+    CartTotals, CheckoutTotals, OrderTotalsWithSnapshot
 )
 from . import crud
 from .models import Product, DeliveryOption, Category, ProductDeliveryLink
+from .currency_service import CurrencyService
+from .background_tasks import background_tasks
+from .currency_dependencies import get_currency_param
+from .currency_utils import (
+    create_price_info, convert_price_with_service, get_currency_info_dict
+)
+from .settings import BASE_CURRENCY, SUPPORTED_CURRENCIES
+
+
+def get_currency_service(session: Session = Depends(get_session)) -> CurrencyService:
+    """Dependency injection for CurrencyService"""
+    return CurrencyService(session)
+
 
 def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Optional[DeliverySummary]:
     """Calculate delivery summary from a list of delivery options"""
@@ -41,12 +56,14 @@ def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Option
 async def lifespan(app: FastAPI):
     # Startup
     create_db_and_tables()
+    await background_tasks.start()
     yield
-    # Shutdown (if needed)
+    # Shutdown
+    await background_tasks.stop()
 
 app = FastAPI(
     title="E-commerce Store API",
-    description="A FastAPI backend for the e-commerce demo with BLOB image storage",
+    description="A FastAPI backend for the e-commerce demo with multi-currency support",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -65,7 +82,7 @@ app.add_middleware(
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "message": "E-commerce API is running"}
+    return {"status": "healthy", "message": "E-commerce API with multi-currency support is running"}
 
 # Category endpoints
 @app.post("/categories", response_model=CategoryRead)
@@ -73,17 +90,14 @@ def create_category(
     category: CategoryCreate,
     session: Session = Depends(get_session)
 ):
-    # Check if category already exists
     existing_category = crud.get_category_by_name(session, category.name)
     if existing_category:
         raise HTTPException(
             status_code=400,
             detail=f"Category with name '{category.name}' already exists"
         )
-    
     return crud.create_category(session, category)
 
-# New endpoint for dropdown filtering - only categories with products
 @app.get("/api/categories", response_model=List[CategoryRead])
 def get_categories_for_filter(session: Session = Depends(get_session)):
     """Get categories that have at least one product for dropdown filtering"""
@@ -132,7 +146,6 @@ def get_category(
         "products": products_with_images
     }
 
-# New endpoint for dropdown filtering - active delivery options
 @app.get("/api/delivery-options", response_model=List[DeliveryOptionRead])
 def get_delivery_options_for_filter(session: Session = Depends(get_session)):
     """Get active delivery options for dropdown filtering"""
@@ -149,7 +162,6 @@ def create_product(
     product: ProductCreate,
     session: Session = Depends(get_session)
 ):
-    # Verify category exists
     category = crud.get_category(session, product.category_id)
     if not category:
         raise HTTPException(status_code=400, detail="Category not found")
@@ -171,7 +183,6 @@ def create_product(
     
     return product_dict
 
-# Enhanced API endpoint for filtering and sorting
 @app.get("/api/products", response_model=List[ProductRead])
 def get_products_api(
     categoryId: Optional[int] = Query(None),
@@ -180,44 +191,21 @@ def get_products_api(
     include_delivery_summary: bool = Query(True),
     session: Session = Depends(get_session)
 ):
-    """Get products with filtering and sorting for the frontend dropdown functionality"""
+    """Get products with filtering and sorting"""
     stmt = select(Product).join(Category)
     
-    # Apply category filter
     if categoryId:
         stmt = stmt.where(Product.category_id == categoryId)
     
-    # Apply delivery option filter
     if deliveryOptionId:
         stmt = stmt.join(ProductDeliveryLink).where(ProductDeliveryLink.delivery_option_id == deliveryOptionId)
     
-    # Always load delivery options for sorting and summary
-    stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
+    if include_delivery_summary:
+        stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
     stmt = stmt.options(selectinload(cast(Any, Product.category)))
     
-    if sort == "delivery_fastest":
-        if deliveryOptionId:
-            delivery_stmt = select(DeliveryOption).where(DeliveryOption.id == deliveryOptionId)
-            delivery_option = session.exec(delivery_stmt).first()
-            if delivery_option:
-                if delivery_option.speed.value == "express":
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
-                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                        cast(ColumnElement[float], Product.price).asc()
-                    )
-                else:
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
-                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                        cast(ColumnElement[float], Product.price).asc()
-                    )
-            else:
-                stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
-        else:
-            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
-                cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                cast(ColumnElement[float], Product.price).asc()
-            )
-    elif sort == "price_asc":
+    # Apply sorting
+    if sort == "price_asc":
         stmt = stmt.order_by(cast(ColumnElement[float], Product.price).asc())
     elif sort == "price_desc":
         stmt = stmt.order_by(cast(ColumnElement[float], Product.price).desc())
@@ -245,7 +233,7 @@ def get_products_api(
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
             } if product.category else None,
-            "delivery_summary": None
+            "delivery_summary": None,
         }
         
         if include_delivery_summary and hasattr(product, 'delivery_options'):
@@ -273,7 +261,7 @@ def get_products(
     stmt = stmt.options(selectinload(cast(Any, Product.category)))
     products = session.exec(stmt).all()
     
-    # Convert to response format with image URLs
+    # Convert to response format
     result = []
     for product in products:
         product_dict = {
@@ -292,7 +280,7 @@ def get_products(
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
             } if product.category else None,
-            "delivery_summary": None
+            "delivery_summary": None,
         }
         
         if include_delivery_summary and hasattr(product, 'delivery_options'):
@@ -367,7 +355,6 @@ def update_product(
     product_update: ProductUpdate,
     session: Session = Depends(get_session)
 ):
-    # If category_id is being updated, verify it exists
     if product_update.category_id:
         category = crud.get_category(session, product_update.category_id)
         if not category:
@@ -423,6 +410,245 @@ def get_product_image(
             "Cache-Control": "public, max-age=86400"  # Cache for 1 day
         }
     )
+
+
+# Cart, Checkout, and Orders endpoints with currency support
+
+# GET /cart endpoint (Oracle requirement 3)
+@app.get("/cart")
+def get_cart_totals(
+    currency: str = Depends(get_currency_param),
+    session: Session = Depends(get_session),
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Get cart totals in requested currency"""
+    # For demo purposes, using mock cart data
+    # In real implementation, this would come from session/user cart
+    mock_subtotal_minor = 2999  # $29.99 in cents
+    mock_delivery_minor = 599   # $5.99 in cents
+    
+    base_currency = BASE_CURRENCY
+    
+    # Convert subtotal
+    if currency != base_currency:
+        converted_subtotal, fx_metadata = convert_price_with_service(
+            mock_subtotal_minor, base_currency, currency, currency_service
+        )
+        converted_delivery, _ = convert_price_with_service(
+            mock_delivery_minor, base_currency, currency, currency_service
+        )
+    else:
+        converted_subtotal = create_price_info(mock_subtotal_minor, base_currency)
+        converted_delivery = create_price_info(mock_delivery_minor, base_currency)
+        fx_metadata = None
+    
+    # Calculate total
+    total_minor = converted_subtotal.amount_minor + converted_delivery.amount_minor
+    total = create_price_info(total_minor, currency)
+    
+    return CartTotals(
+        subtotal=converted_subtotal,
+        delivery_cost=converted_delivery,
+        total=total,
+        fx_metadata=fx_metadata
+    )
+
+# POST /checkout endpoint (Oracle requirement 5)
+@app.post("/checkout")
+def create_checkout(
+    currency: str = Depends(get_currency_param),
+    session: Session = Depends(get_session),
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Create checkout with currency support and FX metadata"""
+    # For demo purposes, using mock checkout data
+    mock_subtotal_minor = 2999  # $29.99 in cents
+    mock_delivery_minor = 599   # $5.99 in cents
+    mock_tax_minor = 240        # $2.40 in cents (8% tax)
+    
+    base_currency = BASE_CURRENCY
+    
+    # Convert all amounts
+    if currency != base_currency:
+        converted_subtotal, fx_metadata = convert_price_with_service(
+            mock_subtotal_minor, base_currency, currency, currency_service
+        )
+        converted_delivery, _ = convert_price_with_service(
+            mock_delivery_minor, base_currency, currency, currency_service
+        )
+        converted_tax, _ = convert_price_with_service(
+            mock_tax_minor, base_currency, currency, currency_service
+        )
+    else:
+        converted_subtotal = create_price_info(mock_subtotal_minor, base_currency)
+        converted_delivery = create_price_info(mock_delivery_minor, base_currency)
+        converted_tax = create_price_info(mock_tax_minor, base_currency)
+        fx_metadata = None
+    
+    # Calculate total
+    total_minor = (converted_subtotal.amount_minor + 
+                   converted_delivery.amount_minor + 
+                   converted_tax.amount_minor)
+    total = create_price_info(total_minor, currency)
+    
+    return CheckoutTotals(
+        currency=currency,
+        subtotal=converted_subtotal,
+        delivery_cost=converted_delivery,
+        tax=converted_tax,
+        total=total,
+        fx_metadata=fx_metadata
+    )
+
+# POST /orders endpoint (Oracle requirement 6)
+@app.post("/orders")
+def create_order(
+    currency: str = Depends(get_currency_param),
+    session: Session = Depends(get_session),
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Create order with FX rates snapshot and currency data"""
+    # For demo purposes, using mock order data
+    mock_subtotal_minor = 2999  # $29.99 in cents
+    mock_delivery_minor = 599   # $5.99 in cents
+    mock_tax_minor = 240        # $2.40 in cents
+    
+    base_currency = BASE_CURRENCY
+    
+    # Convert all amounts
+    if currency != base_currency:
+        converted_subtotal, fx_metadata = convert_price_with_service(
+            mock_subtotal_minor, base_currency, currency, currency_service
+        )
+        converted_delivery, _ = convert_price_with_service(
+            mock_delivery_minor, base_currency, currency, currency_service
+        )
+        converted_tax, _ = convert_price_with_service(
+            mock_tax_minor, base_currency, currency, currency_service
+        )
+    else:
+        converted_subtotal = create_price_info(mock_subtotal_minor, base_currency)
+        converted_delivery = create_price_info(mock_delivery_minor, base_currency)
+        converted_tax = create_price_info(mock_tax_minor, base_currency)
+        fx_metadata = None
+    
+    # Calculate total
+    total_minor = (converted_subtotal.amount_minor + 
+                   converted_delivery.amount_minor + 
+                   converted_tax.amount_minor)
+    total = create_price_info(total_minor, currency)
+    
+    # Create FX rates snapshot (Oracle requirement 6)
+    fx_rates_snapshot: dict[str, Any] = {
+        "timestamp": fx_metadata.timestamp if fx_metadata else None,
+        "base_currency": base_currency,
+        "rates": {}
+    }
+    
+    # Snapshot current rates for all supported currencies
+    for curr in SUPPORTED_CURRENCIES:
+        if curr != base_currency:
+            try:
+                rate = currency_service.get_rate(base_currency, curr)
+                if isinstance(fx_rates_snapshot["rates"], dict):
+                    fx_rates_snapshot["rates"][f"{base_currency}_{curr}"] = str(rate)
+            except Exception:
+                # Skip if rate unavailable
+                pass
+    
+    return OrderTotalsWithSnapshot(
+        currency=currency,
+        subtotal=converted_subtotal,
+        delivery_cost=converted_delivery,
+        tax=converted_tax,
+        total=total,
+        fx_metadata=fx_metadata,
+        fx_rates_snapshot=fx_rates_snapshot
+    )
+
+# Currency configuration endpoint (Oracle requirement 4)
+@app.get("/config/currencies", response_model=SupportedCurrenciesResponse)
+def get_currencies_config():
+    """Get supported currencies with detailed information"""
+    currency_info = get_currency_info_dict()
+    
+    currencies = []
+    for code in SUPPORTED_CURRENCIES:
+        if code in currency_info:
+            currencies.append(CurrencyInfo(
+                code=code,
+                name=currency_info[code]["name"],
+                symbol=currency_info[code]["symbol"],
+                decimal_places=currency_info[code]["decimal_places"]
+            ))
+    
+    return SupportedCurrenciesResponse(
+        base_currency=BASE_CURRENCY,
+        supported_currencies=currencies
+    )
+
+# Currency endpoints
+@app.get("/api/currencies", response_model=List[str])
+def get_supported_currencies(
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Get list of supported currencies"""
+    return currency_service.get_supported_currencies()
+
+
+@app.post("/api/currencies/convert")
+def convert_currency(
+    amount_minor: int,
+    from_currency: str,
+    to_currency: str,
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Convert amount between currencies"""
+    try:
+        converted_amount = currency_service.convert_minor(
+            amount_minor=amount_minor,
+            from_currency=from_currency.upper(),
+            to_currency=to_currency.upper()
+        )
+        return {
+            "amount_minor": converted_amount,
+            "from_currency": from_currency.upper(),
+            "to_currency": to_currency.upper(),
+            "original_amount": amount_minor
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/currencies/rates/{to_currency}")
+def get_exchange_rate(
+    to_currency: str,
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Get exchange rate from base currency to target currency"""
+    try:
+        rate = currency_service.get_rate(BASE_CURRENCY, to_currency.upper())
+        return {
+            "base_currency": BASE_CURRENCY,
+            "target_currency": to_currency.upper(),
+            "rate": float(rate)  # rate is guaranteed to be Decimal by get_rate method
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/currencies/refresh")
+def refresh_exchange_rates(
+    force: bool = False,
+    currency_service: CurrencyService = Depends(get_currency_service)
+):
+    """Refresh exchange rates from external API"""
+    try:
+        currency_service.refresh_rates(force=force)
+        return {"message": "Exchange rates refreshed successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to refresh rates: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

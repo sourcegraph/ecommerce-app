@@ -1,5 +1,8 @@
 import { useToast } from "@chakra-ui/react";
 import { FC, ReactNode, createContext, useEffect, useState } from "react";
+import { useCurrency } from "./CurrencyContext";
+import useCurrencySync from "../hooks/useCurrencySync";
+import { Money } from "../api/types";
 import seed from "./products.json";
 
 type DeliverySpeed = "standard" | "express" | "next_day" | "same_day";
@@ -31,6 +34,7 @@ type Product = {
   title: string;
   description: string;
   price: string | number;
+  money?: Money; // Currency-aware pricing
   image_url?: string;  // Changed from 'image' to 'image_url'
   category: string;
   isSaved?: boolean;
@@ -86,6 +90,8 @@ export const GlobalContext = createContext<ContextType | null>(null);
 // Provider component
 export const Provider: FC<Props> = ({ children }) => {
   const toast = useToast();
+  const { currency } = useCurrency();
+  useCurrencySync(); // Sync currency with API client
   const [products, setProducts] = useState<ProductType[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -202,6 +208,13 @@ export const Provider: FC<Props> = ({ children }) => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Refetch products when currency changes
+  useEffect(() => {
+    if (products.length > 0) {
+      fetchProducts();
+    }
+  }, [currency]);
 
   useEffect(() => {
     // Get products in cart
