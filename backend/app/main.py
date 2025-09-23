@@ -171,6 +171,83 @@ def create_product(
     
     return product_dict
 
+# Featured products endpoint for landing page carousel
+@app.get("/api/products/featured", response_model=List[ProductRead])
+def get_featured_products(session: Session = Depends(get_session)):
+    """Get featured products for the landing page carousel"""
+    stmt = (
+        select(Product)
+        .join(Category)
+        .where(Product.featured)
+        .options(selectinload(cast(Any, Product.category)))
+        .order_by(cast(ColumnElement, Product.created_at).desc())
+        .limit(5)
+    )
+    products = session.exec(stmt).all()
+    
+    # Convert to response format with image URLs
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        result.append(product_dict)
+    
+    return result
+
+# Popular products endpoint (based on newest products as fallback)
+@app.get("/api/products/popular", response_model=List[ProductRead])
+def get_popular_products(session: Session = Depends(get_session)):
+    """Get popular products - uses newest products as fallback implementation"""
+    stmt = (
+        select(Product)
+        .join(Category)
+        .options(selectinload(cast(Any, Product.category)))
+        .order_by(cast(ColumnElement, Product.created_at).desc())
+        .limit(8)
+    )
+    products = session.exec(stmt).all()
+    
+    # Convert to response format with image URLs
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        result.append(product_dict)
+    
+    return result
+
 # Enhanced API endpoint for filtering and sorting
 @app.get("/api/products", response_model=List[ProductRead])
 def get_products_api(

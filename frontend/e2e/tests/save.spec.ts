@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Save/Wishlist Functionality', () => {
   test('should allow saving/unsaving products', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -42,7 +42,7 @@ test.describe('Save/Wishlist Functionality', () => {
   });
 
   test('should show saved items count if available', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -60,7 +60,7 @@ test.describe('Save/Wishlist Functionality', () => {
   });
 
   test('should persist saved state across navigation', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -101,7 +101,7 @@ test.describe('Save/Wishlist Functionality', () => {
   });
 
   test('should navigate to saved/wishlist page if available', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Look for wishlist/saved items navigation
     const wishlistLink = page.locator('[data-testid="wishlist-link"], a:has-text("Wishlist"), a:has-text("Saved"), nav a:has-text("Heart")');

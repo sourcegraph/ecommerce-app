@@ -36,6 +36,7 @@ class Product(SQLModel, table=True):
     image_mime_type: Optional[str] = Field(default=None)  # e.g., "image/jpeg"
     image_filename: Optional[str] = Field(default=None)   # Original filename
     is_saved: bool = Field(default=False)
+    featured: bool = Field(default=False)  # Whether product is featured on landing page
     
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Product Browsing', () => {
   test('should display products on homepage', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -19,7 +19,7 @@ test.describe('Product Browsing', () => {
   });
 
   test('should show loading state initially', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Check for loading indicator or skeleton
     // Adjust selector based on your actual loading UI
@@ -33,7 +33,7 @@ test.describe('Product Browsing', () => {
   });
 
   test('should display product images from backend', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -59,7 +59,7 @@ test.describe('Product Browsing', () => {
     // Intercept API calls and simulate failure
     await page.route('**/products', route => route.abort());
     
-    await page.goto('/');
+    await page.goto('/products');
     
     // Should either show error message or fallback content
     // Adjust based on your error handling implementation

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Delivery Options', () => {
   test('should display delivery summary on product cards', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -26,7 +26,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should show different delivery times for different products', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -54,7 +54,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should display full delivery options on product detail page', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load and click on first product
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -85,7 +85,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should allow selecting different delivery options', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load and click on first product
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -125,7 +125,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should not show minimum order restrictions on product pages', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Find a low-priced product to verify restrictions are not shown
     const productCards = page.locator('[data-testid="product-card"]');
@@ -173,7 +173,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should display delivery icons for different speeds', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load and click on first product
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -193,7 +193,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should auto-select appropriate default delivery option', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load and click on first product
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -214,7 +214,7 @@ test.describe('Delivery Options', () => {
   });
 
   test('should persist delivery selection when navigating', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load and click on first product
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });

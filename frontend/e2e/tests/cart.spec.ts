@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Cart Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to homepage before each test
-    await page.goto('/');
+    await page.goto('/products');
     await page.waitForTimeout(2000); // Allow time for initial load
   });
 
@@ -64,7 +64,7 @@ test.describe('Cart Functionality', () => {
         
         // Navigate to another page and back
         await page.goto('/about');  // Or any other page
-        await page.goto('/');
+        await page.goto('/products');
         
         // Cart count should persist
         await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -82,7 +82,7 @@ test.describe('Cart Functionality', () => {
 
   test('should display cart contents and allow quantity changes', async ({ page }) => {
     // Add item to cart first
-    await page.goto('/');
+    await page.goto('/products');
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")').first();
@@ -118,7 +118,7 @@ test.describe('Cart Functionality', () => {
 
   test('should allow removing items from cart', async ({ page }) => {
     // Add item to cart first
-    await page.goto('/');
+    await page.goto('/products');
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")').first();
@@ -169,7 +169,7 @@ test.describe('Cart Functionality', () => {
 
   test('should update cart total when quantities change', async ({ page }) => {
     // Add item to cart first
-    await page.goto('/');
+    await page.goto('/products');
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")').first();
@@ -219,7 +219,7 @@ test.describe('Cart Functionality', () => {
   });
 
   test('should handle adding multiple different products to cart', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButtons = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")');
@@ -290,7 +290,7 @@ test.describe('Cart Functionality', () => {
 
   test('should maintain cart state during page refresh', async ({ page }) => {
     // Add item to cart
-    await page.goto('/');
+    await page.goto('/products');
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
     
     const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart")').first();
