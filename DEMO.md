@@ -4,7 +4,7 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 
 **Table of Contents**  
 [VS Code](#VS-Code)
-- [Issue to PR](#Issue-to-PR) - Bugfix and new feature
+- [Issue to PR](#Issue-to-PR) - [Bugfix](#Fixing-Github-Issue-Bug) and [New feature](Implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
@@ -13,6 +13,13 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 - [MCP and tool calling](#mcp-and-tool-calling)
   
 [Amp CLI in Terminal](#Amp-CLI-in-Terminal)
+- [Amp in non-interactive mode](#Amp-in-non-interactive-mode)
+- [Amp in interactive mode](#Amp-in-interactive-mode)
+- [Thread management](#Thread-management)
+- [Slash commands](#Slash-commands)
+- [Amp shell](#Amp-shell)
+
+
 
 # VS Code
 
@@ -161,21 +168,24 @@ Additionally, install the Github CLI from [here](https://cli.github.com) and set
 Amp can be executed in interactive mode by typing ```amp``` in terminal, or in non-interactive mode using -x command flag or piping output. 
 
 ## Amp in non-interactive mode
+
 Execute the following commands, to advise the audience that you can invoke Amp to run programatically or in a script. 
 ```
 # Explain that we will cat package.json file and pipe the output to Amp and Amp will figure out which packages to update
 cat package.json | amp -x "What dependencies need updating and why?"
 ```
 ## Amp in interactive mode
+
 Before you start, copy [settings.json file](../settings.json) to ~/.config/amp/settings.json
 
 Start amp and execute the following prompt:
 ```Review the authentication system and refactor it to follow better security practices, ensuring all tests still pass```
-Explain that  we are going to refactore the authentication system in the Amp CLI GUI. Amp will figure out vulnerabilities, consult Oracle on how to fix and refactor code (as per screenshot). 
+Explain that we are going to refactor the authentication system in the Amp CLI GUI. Amp will figure out vulnerabilities, consult Oracle on how to fix and refactor code (as per screenshot). 
 <img width="700" height="400" alt="Screenshot 2025-09-23 at 17 00 50" src="https://github.com/user-attachments/assets/671e0bb6-3709-41aa-909c-0b2fe20346c8" />
 [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3)
 This takes a while to execute so go to this [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3) and walk the audience through the execution. 
-## Thread management
+
+### Thread management
 While the thread is executing the the background, explain that users can manage multiple thread via CLI. Type ```amp threads``` to show all threads, then type ```amp --help``` to show the different thread subcommands:
 ```
   threads      [alias: t] Manage threads
@@ -186,8 +196,25 @@ While the thread is executing the the background, explain that users can manage 
     share      [alias: s] Share a thread
     compact    [alias: co] Compact a thread
 ```
-Explain tthe different options, 
+Explain tthe different options, talk about:
+- How you can continue an old thread ```amp t c <thread_ID>```
+- Fork an existing thread and this will let you try out different approaches with Amp
+- Compact a really large thread
+- Set thread visibility. All threads are public by default unless 
 
-- Agent shell
+### Slash commands
+Type / command and talk the audience through different slash commands, put specail emphasis on /continue (resume old threads) and /queue (queue messages while a thread is executing).
 
-##  Custom slash commands
+**Custom /slash commands** 
+
+Within the repo, there are a few custom slash commands execute any one of these custom commands in <repo>.agents/commands/ directory.. 
+
+Hopefully, the thread we kicked off earlier would have finished executing by now. You can choose to execute either one of the custom commands to show how users can configure their own custom commands. Type ```amp``` in terminal to go into interactive mode and type ```/``` to invoke slash commands.
+- ```/clean```: Command will clean up code base. Update deprecated usage, find dead code, improve code quality and etc. Explain that the command can be invoked to clean up code base on regular basis to avoid tech debt. See prior [thread execution here](https://ampcode.com/threads/T-55c288eb-319d-44dd-ab89-400e79a0bce4).
+- ```/code-review-local```:  Command will do a local code review. A dev can execute this command before pushing changes upstream. See prior [thread execution here](https://ampcode.com/threads/T-0bceb27f-07f4-4032-ab75-6a3557ae049b)
+- ```/code-review```: Example code review command that could be executed on a PR in Github/Gitlab CI action.
+
+### Amp shell
+Amp shell is [ability](https://ampcode.com/news/through-the-agent-into-the-shell) to execute a command in interactive GUI.
+1) Type amp and execute ```$just test local```
+2) There may be test failures, in which case ask Amp to fix test failures. See this [thread for reference](https://ampcode.com/threads/T-ee9a2da8-0048-479d-8ecb-19edd94739cf).
