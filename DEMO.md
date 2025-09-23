@@ -22,7 +22,10 @@ Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 
 **Steps:**  
 - There is a bug when sorting by "Fastest Delivery", duplicate items show up. Show this in the UI by going to [http://localhost:3001](http://localhost:3001) and tell the a audience that you will now ask Amp to fix this Github issue.
-- In VS Code or Terminal type ```Fix bug https://github.com/sourcegraph/amp-demo/issues/16 in a new branch, test and validate changes, make sure all ci checks pass. Then create a pull request```
+- In VS Code or Terminal type
+```
+Fix bug https://github.com/sourcegraph/amp-demo/issues/16 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request
+```
 - While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-eb803356-f4a3-48f5-a7a7-5843a909a68d) that was run to fix this issue. Or you can switch to [_fix/duplicate-items-fastest-delivery_](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery) branch locally and run this branch, which has the fix in case something goes wrong. 
 - One its fixed the dropdown for category, shipping and sort by will be populated. And the the product list will change based on what is selected.
 
@@ -37,11 +40,11 @@ Demonstrate how you can Amp to Issue implement a new feature from issue to PR in
 - The landing page is pretty bare bones. We want to create a carousel to highlight products and make it more interactive and responsive
 - In VS Code or Terminal type
 ```
-Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes. Then create a pull request
+Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request
 ```
-- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-38dc99a9-55cf-412a-a21d-e9df22a3f49d) that was run to for the feature. Or you can switch to [landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch which has changes committed. 
+- While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-d37dc873-6b2d-4afe-b0be-a75b18a26aa5) that was run to for the feature. Or you can switch to [feature/landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch which has changes committed. 
 - The end result is a new landing pag with a nice carousel as per screenshot below:
-<img width="400" height="250" alt="Screenshot 2025-09-18 at 14 38 26" src="https://github.com/user-attachments/assets/fbb85ed2-f1f5-4cb7-b646-dfe9100eb1b8" />
+<img width="1661" height="1007" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
 
 ### PR review bot
 
