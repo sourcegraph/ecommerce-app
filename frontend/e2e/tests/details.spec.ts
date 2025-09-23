@@ -9,7 +9,8 @@ test.describe('Product Details', () => {
     
     // Click on the first product
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitle = await firstProduct.getByText(/Fjallraven|Mens|Women/i).textContent();
+    const productTitleElement = firstProduct.locator('[class*="product-title"], a, h1, h2, h3, h4, p').first();
+    const productTitle = await productTitleElement.textContent();
     
     await firstProduct.click();
     
