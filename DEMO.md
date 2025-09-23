@@ -81,32 +81,32 @@ To demonstrate Oracle using this repo, run any of the provided prompts for the g
 
 Architecture Review:
 ```
-Review the current API architecture in the backend and suggest improvements for scalability. Focus on the database models, endpoint design, and error handling patterns.
+Consult the oracle and think hard to review the current API architecture in the backend and suggest improvements for scalability. Focus on the database models, endpoint design, and error handling patterns.
 ```
 
 Security Analysis:
 ```
-Analyze the authentication and authorization patterns in this e-commerce platform. Identify potential security vulnerabilities and recommend best practices for handling user data and payment processing.
+Consult the oracle and think hard to analyze the authentication and authorization patterns in this e-commerce platform. Identify potential security vulnerabilities and recommend best practices for handling user data and payment processing.
 ```
 
 Performance Planning:
 ```
-Plan an optimization strategy for this e-commerce platform to handle 10,000+ concurrent users. Consider database indexing, caching layers, and frontend performance.
+Consult the oracle and think hard to plan an optimization strategy for this e-commerce platform to handle 10,000+ concurrent users. Consider database indexing, caching layers, and frontend performance.
 ```
 
 Feature Planning:
 ```
-Plan the implementation of a real-time inventory management system that updates stock levels across the platform instantly when purchases are made.
+Consult the oracle and think hard to plan the implementation of a real-time inventory management system that updates stock levels across the platform instantly when purchases are made.
 ```
 
 Code Quality Review:
 ```
-Review the current testing strategy across backend and frontend. Analyze test coverage gaps and suggest improvements for better reliability.
+Consult the oracle and think hard to review the current testing strategy across backend and frontend. Analyze test coverage gaps and suggest improvements for better reliability.
 ```
 
 Debugging Complex Issue:
 ```
-There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Help debug and plan a solution.
+There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Consult the oracle and think hard to debug and plan a solution.
 ```
 
 
