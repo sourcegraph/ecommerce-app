@@ -1,18 +1,41 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from sqlmodel import Session
-from typing import List, Optional
+from sqlmodel import Session, select
+from sqlalchemy.orm import selectinload
+from typing import List, Optional, cast, Any
+from sqlalchemy.sql.elements import ColumnElement
 import io
 
 from .db import get_session, create_db_and_tables
 
 from .schemas import (
-    ProductRead, ProductCreate, ProductUpdate, ProductReadWithCategory,
-    CategoryRead, CategoryCreate, CategoryReadWithProducts
+    ProductRead, ProductCreate, ProductUpdate,
+    ProductReadWithDeliveryOptions, DeliverySummary,
+    CategoryRead, CategoryCreate, CategoryReadWithProducts,
+    DeliveryOptionRead
 )
 from . import crud
+from .models import Product, DeliveryOption, Category, ProductDeliveryLink
+
+def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Optional[DeliverySummary]:
+    """Calculate delivery summary from a list of delivery options"""
+    active_options = [opt for opt in delivery_options if opt.is_active]
+    if not active_options:
+        return None
+    
+    cheapest = min(active_options, key=lambda o: o.price)
+    fastest_min = min(opt.estimated_days_min for opt in active_options)
+    fastest_max = min(opt.estimated_days_max for opt in active_options if opt.estimated_days_min == fastest_min)
+    
+    return DeliverySummary(
+        has_free=any(opt.price == 0 for opt in active_options),
+        cheapest_price=cheapest.price,
+        fastest_days_min=fastest_min,
+        fastest_days_max=fastest_max,
+        options_count=len(active_options)
+    )
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -60,6 +83,18 @@ def create_category(
     
     return crud.create_category(session, category)
 
+# New endpoint for dropdown filtering - only categories with products
+@app.get("/api/categories", response_model=List[CategoryRead])
+def get_categories_for_filter(session: Session = Depends(get_session)):
+    """Get categories that have at least one product for dropdown filtering"""
+    stmt = (
+        select(Category)
+        .join(Product)
+        .distinct()
+        .order_by(Category.name)
+    )
+    return session.exec(stmt).all()
+
 @app.get("/categories", response_model=List[CategoryRead])
 def get_categories(session: Session = Depends(get_session)):
     return crud.get_categories(session)
@@ -97,6 +132,17 @@ def get_category(
         "products": products_with_images
     }
 
+# New endpoint for dropdown filtering - active delivery options
+@app.get("/api/delivery-options", response_model=List[DeliveryOptionRead])
+def get_delivery_options_for_filter(session: Session = Depends(get_session)):
+    """Get active delivery options for dropdown filtering"""
+    stmt = (
+        select(DeliveryOption)
+        .where(DeliveryOption.is_active)
+        .order_by(cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(), cast(ColumnElement[float], DeliveryOption.price).asc())
+    )
+    return session.exec(stmt).all()
+
 # Product endpoints
 @app.post("/products", response_model=ProductRead)
 def create_product(
@@ -125,12 +171,107 @@ def create_product(
     
     return product_dict
 
+# Enhanced API endpoint for filtering and sorting
+@app.get("/api/products", response_model=List[ProductRead])
+def get_products_api(
+    categoryId: Optional[int] = Query(None),
+    deliveryOptionId: Optional[int] = Query(None),
+    sort: str = Query("created_desc"),
+    include_delivery_summary: bool = Query(True),
+    session: Session = Depends(get_session)
+):
+    """Get products with filtering and sorting for the frontend dropdown functionality"""
+    stmt = select(Product).join(Category)
+    
+    # Apply category filter
+    if categoryId:
+        stmt = stmt.where(Product.category_id == categoryId)
+    
+    # Apply delivery option filter
+    if deliveryOptionId:
+        stmt = stmt.join(ProductDeliveryLink).where(ProductDeliveryLink.delivery_option_id == deliveryOptionId)
+    
+    # Always load delivery options for sorting and summary
+    stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
+    stmt = stmt.options(selectinload(cast(Any, Product.category)))
+    
+    if sort == "delivery_fastest":
+        if deliveryOptionId:
+            delivery_stmt = select(DeliveryOption).where(DeliveryOption.id == deliveryOptionId)
+            delivery_option = session.exec(delivery_stmt).first()
+            if delivery_option:
+                if delivery_option.speed.value == "express":
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                        cast(ColumnElement[float], Product.price).asc()
+                    )
+                else:
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                        cast(ColumnElement[float], Product.price).asc()
+                    )
+            else:
+                stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
+        else:
+            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                cast(ColumnElement[float], Product.price).asc()
+            )
+    elif sort == "price_asc":
+        stmt = stmt.order_by(cast(ColumnElement[float], Product.price).asc())
+    elif sort == "price_desc":
+        stmt = stmt.order_by(cast(ColumnElement[float], Product.price).desc())
+    else:  # created_desc (default)
+        stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
+    
+    products = session.exec(stmt).all()
+    
+    # Convert to response format
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        
+        if include_delivery_summary and hasattr(product, 'delivery_options'):
+            summary = calculate_delivery_summary(product.delivery_options)
+            if summary:
+                product_dict["delivery_summary"] = summary.model_dump()
+        
+        result.append(product_dict)
+    
+    return result
+
 @app.get("/products", response_model=List[ProductRead])
 def get_products(
     category_id: Optional[int] = None,
+    include_delivery_summary: bool = Query(False),
     session: Session = Depends(get_session)
 ):
-    products = crud.get_products(session, category_id)
+    stmt = select(Product).join(Category)
+    if category_id:
+        stmt = stmt.where(Product.category_id == category_id)
+    
+    if include_delivery_summary:
+        stmt = stmt.options(selectinload(cast(Any, Product.delivery_options)))
+    
+    stmt = stmt.options(selectinload(cast(Any, Product.category)))
+    products = session.exec(stmt).all()
     
     # Convert to response format with image URLs
     result = []
@@ -150,20 +291,38 @@ def get_products(
                 "name": product.category.name,
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
-            } if product.category else None
+            } if product.category else None,
+            "delivery_summary": None
         }
+        
+        if include_delivery_summary and hasattr(product, 'delivery_options'):
+            summary = calculate_delivery_summary(product.delivery_options)
+            if summary:
+                product_dict["delivery_summary"] = summary.model_dump()
+        
         result.append(product_dict)
     
     return result
 
-@app.get("/products/{product_id}", response_model=ProductReadWithCategory)
+@app.get("/products/{product_id}", response_model=ProductReadWithDeliveryOptions)
 def get_product(
     product_id: int,
     session: Session = Depends(get_session)
 ):
-    product = crud.get_product(session, product_id)
+    stmt = (
+        select(Product)
+        .where(Product.id == product_id)
+        .options(selectinload(cast(Any, Product.delivery_options)))
+        .options(selectinload(cast(Any, Product.category)))
+    )
+    product = session.exec(stmt).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Filter active options and sort them
+    active_options = [opt for opt in product.delivery_options if opt.is_active]
+    speed_order = {"standard": 0, "express": 1, "next_day": 2, "same_day": 3}
+    active_options_sorted = sorted(active_options, key=lambda o: (o.price, speed_order.get(o.speed.value, 999)))
     
     # Convert to response format with image URL
     product_dict = {
@@ -181,7 +340,23 @@ def get_product(
             "name": product.category.name,
             "created_at": product.category.created_at,
             "updated_at": product.category.updated_at,
-        } if product.category else None
+        } if product.category else None,
+        "delivery_options": [
+            {
+                "id": opt.id,
+                "name": opt.name,
+                "description": opt.description,
+                "speed": opt.speed,
+                "price": opt.price,
+                "min_order_amount": opt.min_order_amount,
+                "estimated_days_min": opt.estimated_days_min,
+                "estimated_days_max": opt.estimated_days_max,
+                "is_active": opt.is_active,
+                "created_at": opt.created_at,
+                "updated_at": opt.updated_at,
+            }
+            for opt in active_options_sorted
+        ]
     }
     
     return product_dict

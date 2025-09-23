@@ -42,7 +42,7 @@ def get_product(session: Session, product_id: int) -> Optional[Product]:
     return session.get(Product, product_id)
 
 def update_product(session: Session, product_id: int, product_update: ProductUpdate) -> Optional[Product]:
-    from datetime import datetime
+    from datetime import datetime, timezone
     
     db_product = session.get(Product, product_id)
     if not db_product:
@@ -53,7 +53,7 @@ def update_product(session: Session, product_id: int, product_update: ProductUpd
         setattr(db_product, field, value)
     
     # Update the timestamp
-    db_product.updated_at = datetime.utcnow()
+    db_product.updated_at = datetime.now(timezone.utc)
     
     session.add(db_product)
     session.commit()
@@ -125,6 +125,31 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         print(f"Error creating placeholder image for product {product.id}: {e}")
         return False
 
+def _remove_transparency(img: Image.Image, bg_colour: tuple[int, int, int] = (255, 255, 255)) -> Image.Image:
+    """
+    Returns an RGB image with transparency removed (flattened on bg_colour).
+    Works for RGBA, LA, P and RGB+tRNS PNGs.
+    """
+    # Check for transparency in any form
+    if (img.mode in ('RGBA', 'LA') or 
+        (img.mode == 'P' and 'transparency' in img.info) or 
+        ('transparency' in img.info)):  # RGB + tRNS
+        
+        alpha = None
+        if img.mode in ('RGBA', 'LA'):
+            alpha = img.split()[-1]
+            img = img.convert('RGBA')  # ensure 4-channel
+        else:
+            img = img.convert('RGBA')  # adds alpha from tRNS/palette
+            alpha = img.split()[-1]
+
+        background = Image.new('RGB', img.size, bg_colour)
+        background.paste(img, mask=alpha)
+        return background
+
+    # No transparency – just ensure RGB
+    return img.convert('RGB')
+
 def download_and_store_image(session: Session, product: Product, image_url: str) -> bool:
     """Download image from URL and store as BLOB in database. Fallback to placeholder if failed."""
     try:
@@ -138,15 +163,14 @@ def download_and_store_image(session: Session, product: Product, image_url: str)
         response.raise_for_status()
         
         # Open image with PIL to validate and get format
-        image: Image.Image = Image.open(io.BytesIO(response.content))
+        raw_image: Image.Image = Image.open(io.BytesIO(response.content))
         
-        # Convert to RGB if necessary (for JPEG compatibility)
-        if image.mode in ('RGBA', 'P'):
-            image = image.convert('RGB')
+        # Handle all transparency cases and ensure RGB output
+        processed_image = _remove_transparency(raw_image)
         
         # Save image to bytes buffer
         img_buffer = io.BytesIO()
-        image.save(img_buffer, format='JPEG', quality=85)
+        processed_image.save(img_buffer, format='JPEG', quality=85, optimize=True)
         img_buffer.seek(0)
         
         # Store in database

@@ -2,6 +2,30 @@ import { useToast } from "@chakra-ui/react";
 import { FC, ReactNode, createContext, useEffect, useState } from "react";
 import seed from "./products.json";
 
+type DeliverySpeed = "standard" | "express" | "next_day" | "same_day";
+
+export interface DeliveryOption {
+  id: number;
+  name: string;
+  description: string;
+  speed: DeliverySpeed;
+  price: number;
+  min_order_amount?: number | null;
+  estimated_days_min: number;
+  estimated_days_max: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DeliverySummary {
+  has_free: boolean;
+  cheapest_price: number;
+  fastest_days_min: number;
+  fastest_days_max: number;
+  options_count: number;
+}
+
 type Product = {
   id: string | number;
   title: string;
@@ -10,6 +34,8 @@ type Product = {
   image_url?: string;  // Changed from 'image' to 'image_url'
   category: string;
   isSaved?: boolean;
+  delivery_summary?: DeliverySummary | null;
+  delivery_options?: DeliveryOption[];
 };
 
 export type ProductInCart = Product & {
@@ -26,7 +52,7 @@ export type ProductType = ProductInCart | ProductNotInCart;
 // Helper function to get image URL
 export const getImageUrl = (product: ProductType): string => {
   if (product.image_url) {
-    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+    const API_BASE_URL = "http://localhost:8001";
     // If it's already a full URL, return as is, otherwise prepend the API base URL
     if (product.image_url.startsWith('http')) {
       return product.image_url;
@@ -99,8 +125,8 @@ export const Provider: FC<Props> = ({ children }) => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
-      const response = await fetch(`${API_BASE_URL}/products`);
+      const API_BASE_URL = "http://localhost:8001";
+      const response = await fetch(`${API_BASE_URL}/products?include_delivery_summary=true`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -196,7 +222,7 @@ export const Provider: FC<Props> = ({ children }) => {
       const updatedProducts = prevProducts.map(prevProduct => {
         if (prevProduct.id === id) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { quantity, ...productWithoutQuantity } = prevProduct as ProductInCart;
+          const { quantity: _, ...productWithoutQuantity } = prevProduct as ProductInCart;
           return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
         }
         return prevProduct;

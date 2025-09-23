@@ -116,7 +116,7 @@ test.describe('Product Details', () => {
     await page.waitForTimeout(1000);
     
     // Look for close button or back navigation
-    const closeButton = page.locator('[data-testid="close-modal"], .close, button:has-text("✕"), button:has-text("Close")');
+    const closeButton = page.locator('[data-testid="close-modal"], .close, button:has-text("×"), button:has-text("Close")');
     
     if (await closeButton.count() > 0) {
       await closeButton.click();

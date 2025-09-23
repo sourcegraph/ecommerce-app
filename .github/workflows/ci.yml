@@ -1,187 +1,150 @@
 name: CI
-
-on:
-  pull_request:
-    paths-ignore:
-      - '**/*.md'
-      - 'DEMO.md'
-      - 'README.md'
-
-env:
-  PYTHON_VERSION: '3.13'
-  NODE_VERSION: '20'
-
+on: [pull_request]
 jobs:
-  backend:
-    name: Backend Quality Checks
+  lint-backend-types:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.13']
-      fail-fast: false
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
           cache-dependency-glob: "backend/uv.lock"
 
-      - name: Install dependencies
-        working-directory: backend
-        run: uv sync
+      - name: Set up Python
+        run: uv python install
 
-      - name: Run code quality checks
-        working-directory: backend
+      - uses: extractions/setup-just@v3
+
+      - name: Install backend deps
         run: |
-          # Map to existing justfile commands
-          uv run ruff check .
-          uv run mypy .
+          cd backend && uv sync --locked
 
-      - name: Run tests with coverage
-        working-directory: backend
-        run: |
-          uv run pytest --cov=app --cov-report=html
+      - name: Backend lint & types
+        run: just check
 
-      - name: Upload coverage HTML
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-backend-py${{ matrix.python-version }}
-          path: backend/htmlcov/
-          retention-days: 7
-
-  frontend:
-    name: Frontend Quality Checks
+  lint-frontend:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install frontend deps
+        run: |
+          cd frontend && npm ci
+
+      - name: Frontend lint
+        run: cd frontend && npm run lint
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
 
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
+      - name: Set up Python
+        run: uv python install
 
-      - name: Run ESLint
-        working-directory: frontend
-        run: npm run lint
+      - uses: extractions/setup-just@v3
 
-      - name: Type check and build
-        working-directory: frontend
-        run: npm run build
+      - name: Install backend deps
+        run: |
+          cd backend && uv sync --locked
 
-      - name: Upload build artifacts
+      - name: Backend tests
+        run: just test-local
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - uses: extractions/setup-just@v3
+
+      - name: Install frontend deps
+        run: |
+          cd frontend && npm ci
+
+      - name: Build frontend
+        run: just build
+
+      - name: Upload frontend build
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/dist/
-          retention-days: 7
+          path: frontend/dist
 
-  # e2e:
-  #   name: End-to-End Tests
-  #   needs: [backend, frontend]
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 10
-    
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  e2e:
+    needs: [lint-backend-types, lint-frontend, backend-tests, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
 
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #         cache: 'npm'
-  #         cache-dependency-path: frontend/package-lock.json
-  #     - uses: extractions/setup-just@v3
-  #     - name: Install uv
-  #       uses: astral-sh/setup-uv@v6
-  #       with:
-  #         enable-cache: true
-  #         cache-dependency-glob: "backend/uv.lock"
+      - name: Set up Python
+        run: uv python install
 
-  #     - name: Install Python dependencies
-  #       working-directory: backend
-  #       run: uv sync
+      - uses: extractions/setup-just@v3
 
-  #     - name: Install Node dependencies
-  #       working-directory: frontend
-  #       run: npm ci
+      - name: Install backend deps
+        run: |
+          cd backend && uv sync --locked
 
-  #     - name: Cache Playwright browsers
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.cache/ms-playwright
-  #         key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-playwright-
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
 
-  #     - name: Install Playwright browsers
-  #       working-directory: frontend
-  #       run: npx playwright install --with-deps chromium
+      - name: Install frontend deps
+        run: |
+          cd frontend && npm ci
 
-  #     - name: Start application services
-  #       run: |
-  #         just up
-  #         sleep 10
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
 
-  #     - name: Seed database
-  #       run: just seed
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(cd frontend && node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_OUTPUT
 
-  #     - name: Wait for services health
-  #       run: |
-  #         timeout 60 bash -c 'until curl -f http://localhost:8001/health; do sleep 2; done'
-  #         timeout 60 bash -c 'until curl -f http://localhost:3001; do sleep 2; done'
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
 
-  #     - name: Run E2E tests
-  #       run: just test-e2e
+      - name: Install Playwright Browsers
+        run: cd frontend && npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-  #     - name: Upload test results
-  #       uses: actions/upload-artifact@v4
-  #       if: failure()
-  #       with:
-  #         name: playwright-report
-  #         path: |
-  #           frontend/playwright-report/
-  #           frontend/test-results/
-  #         retention-days: 7
-
-  #     - name: Stop services
-  #       if: always()
-  #       run: just down
-
-  # summary:
-  #   name: CI Summary
-  #   needs: [backend, frontend, e2e]
-  #   runs-on: ubuntu-latest
-  #   if: always()
-    
-  #   steps:
-  #     - name: Check CI results
-  #       run: |
-  #         if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" || "${{ needs.e2e.result }}" == "failure" ]]; then
-  #           echo "❌ CI checks failed"
-  #           exit 1
-  #         else
-  #           echo "✅ All CI checks passed"
-  #         fi
+      - name: E2E tests
+        run: just test-e2e

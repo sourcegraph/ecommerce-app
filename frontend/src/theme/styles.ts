@@ -24,8 +24,6 @@ const styles = {
     // Product card hover style only on screens with pointer
     "@media (hover: hover) and (pointer: fine)": {
       ".product-card:hover": {
-        border: "1px solid",
-        borderColor: "gray.200",
         boxShadow: "lg",
         transform: "scale(1.01)",
       },

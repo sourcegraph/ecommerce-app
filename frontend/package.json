@@ -18,6 +18,7 @@
     "@chakra-ui/react": "^2.5.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@heroicons/react": "^2.2.0",
     "@loadable/component": "^5.15.3",
     "@mui/material": "^5.12.1",
     "focus-visible": "^5.2.0",
@@ -31,18 +32,19 @@
     "yup": "^1.1.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.47.0",
+    "@playwright/test": "^1.55.0",
     "@types/loadable__component": "^5.13.4",
     "@types/node": "^24.5.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
     "@vitejs/plugin-react": "^4.0.0-beta.0",
+    "concurrently": "^9.2.1",
     "cross-env": "^10.0.0",
     "csstype": "^3.1.2",
-    "eslint": "^8.57.1",
+    "eslint": "^9.35.0",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^7.1.6"
   }
 }

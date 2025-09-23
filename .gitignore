@@ -36,6 +36,8 @@ coverage.*
 # Intentionally keeping these commented so the project is easy to clone and get started with
 #*.sqlite3
 #*.db
+*.db-shm
+*.db-wal
 
 # Environment files
 .env
@@ -55,6 +57,8 @@ frontend/coverage/
 playwright-report/
 test-results/
 *.trace.zip
+test-results.xml
+test-results.json
 
 # Logs
 logs/
