@@ -129,9 +129,10 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct cur
 ```
  Implement multi currency support using Oracle's suggestion using sub agents
 ```
-- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-e46bc945-46ab-427d-bffc-082763f201cc) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
-- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/amp-demo/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
-<img width="1736" height="587" alt="Screenshot 2025-09-18 at 12 56 46" src="https://github.com/user-attachments/assets/9a4ee0b6-6f27-4f6d-a81f-4f7b9985bc73" />
+- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-5c2a0c8d-41cf-464f-9e33-acb0040634ec) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
+- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/ecommerce-app/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
+<img width="484" height="638" alt="image" src="https://github.com/user-attachments/assets/9dbfdfcf-be5d-4133-a5e3-33f1c42556ca" />
+
 
 ## IDE diagnostics
 Amp will automatically read IDE diagnostics while implementing a feature or fixing a bug, you don't need to do any configuration here. Just tell the user that Amp reads IDE diagnostics and fixes issues/autocorrect any problems as they appear
