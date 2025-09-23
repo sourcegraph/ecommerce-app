@@ -2,7 +2,8 @@
 
 Below is a menu of demo blocks that you can run to show Amp in actions. Make sure you have followed [quick start instructions](README.md#quick-start) before running any of the demos.
 
-**Table of Contents**  
+**Table of Contents**
+
 [VS Code](#VS-Code)
 - [Issue to PR](#Issue-to-PR) - [Bugfix](#Fixing-Github-Issue-Bug) and [New feature](Implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
@@ -213,7 +214,13 @@ Within the repo, there are a few custom slash commands execute any one of these 
 
 Hopefully, the thread we kicked off earlier would have finished executing by now. You can choose to execute either one of the custom commands to show how users can configure their own custom commands. Type ```amp``` in terminal to go into interactive mode and type ```/``` to invoke slash commands.
 - ```/clean```: Command will clean up code base. Update deprecated usage, find dead code, improve code quality and etc. Explain that the command can be invoked to clean up code base on regular basis to avoid tech debt. See prior [thread execution here](https://ampcode.com/threads/T-55c288eb-319d-44dd-ab89-400e79a0bce4).
-- ```/code-review-local```:  Command will do a local code review. A dev can execute this command before pushing changes upstream. See prior [thread execution here](https://ampcode.com/threads/T-0bceb27f-07f4-4032-ab75-6a3557ae049b)
+- ```/code-review-local```:  Command will do a local code review. A dev can execute this command before pushing changes upstream. See prior [thread here](https://ampcode.com/threads/T-e6546b2c-a8ae-489d-9132-3a7982fd4784).
+```bash
+# checkout the landing page carousel feature add and run a review on it
+git checkout feature/landing-page-carousel
+amp
+/code-review-local
+```
 - ```/code-review```: Example code review command that could be executed on a PR in Github/Gitlab CI action.
 
 ### Amp shell
