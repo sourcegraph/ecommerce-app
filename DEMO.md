@@ -4,14 +4,14 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 
 **Table of Contents**  
 [VS Code](#VS-Code)
-- [Issue to PR](#Issue-to-PR)
-- [Implementing a new feature](#implementing-a-new-feature)
+- [Issue to PR](#Issue-to-PR) - Bugfix and new feature
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
 - [IDE diagnostics](#ide-diagnostics)
 - [AGENTS.md / Multiple AGENTS.md](#agentsmd--multiple-agentsmd)
 - [MCP and tool calling](#mcp-and-tool-calling)
+  
 [Amp CLI in Terminal](#Amp-CLI-in-Terminal)
 
 # VS Code
