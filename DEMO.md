@@ -44,7 +44,7 @@ Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new bran
 ```
 - While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-d37dc873-6b2d-4afe-b0be-a75b18a26aa5) that was run to for the feature. Or you can switch to [feature/landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch which has changes committed. 
 - The end result is a new landing pag with a nice carousel as per screenshot below:
-<img width="1661" height="1007" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
+<img width="1000" height="600" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
 
 ### PR review bot
 
