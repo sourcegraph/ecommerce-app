@@ -76,37 +76,36 @@ If you want to quickly demo Amp in under 2 mins, you can make a small change lik
 
 ## Oracle planning prompts
 
-To demonstrate Oracle using this repo, run any of the provided prompts for the given use case.
-**Think hard or Think extremely hard:**  Make it clear to the end user that Amp will increase token allocation for the Oracle tool whenever this term appears in the prompt
+To demonstrate Oracle using this repo, run any of the provided prompts for the given use case. Make sure to mention the oracle to ensure o3 is reliably used.
 
 Architecture Review:
 ```
-Consult the oracle and think hard to review the current API architecture in the backend and suggest improvements for scalability. Focus on the database models, endpoint design, and error handling patterns.
+Consult the oracle to review the current API architecture in the backend and suggest improvements for scalability. Focus on the database models, endpoint design, and error handling patterns.
 ```
 
 Security Analysis:
 ```
-Consult the oracle and think hard to analyze the authentication and authorization patterns in this e-commerce platform. Identify potential security vulnerabilities and recommend best practices for handling user data and payment processing.
+Consult the oracle to analyze the authentication and authorization patterns in this e-commerce platform. Identify potential security vulnerabilities and recommend best practices for handling user data and payment processing.
 ```
 
 Performance Planning:
 ```
-Consult the oracle and think hard to plan an optimization strategy for this e-commerce platform to handle 10,000+ concurrent users. Consider database indexing, caching layers, and frontend performance.
+Consult the oracle to plan an optimization strategy for this e-commerce platform to handle 10,000+ concurrent users. Consider database indexing, caching layers, and frontend performance.
 ```
 
 Feature Planning:
 ```
-Consult the oracle and think hard to plan the implementation of a real-time inventory management system that updates stock levels across the platform instantly when purchases are made.
+Consult the oracle to plan the implementation of a real-time inventory management system that updates stock levels across the platform instantly when purchases are made.
 ```
 
 Code Quality Review:
 ```
-Consult the oracle and think hard to review the current testing strategy across backend and frontend. Analyze test coverage gaps and suggest improvements for better reliability.
+Consult the oracle to review the current testing strategy across backend and frontend. Analyze test coverage gaps and suggest improvements for better reliability.
 ```
 
 Debugging Complex Issue:
 ```
-There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Consult the oracle and think hard to debug and plan a solution.
+There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Consult the oracle to debug and plan a solution.
 ```
 
 
