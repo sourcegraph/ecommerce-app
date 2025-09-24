@@ -25,6 +25,7 @@ class ProductBase(BaseModel):
     description: str = Field(..., min_length=1)
     price: float = Field(..., gt=0)
     is_saved: bool = False
+    is_featured: bool = False
 
     @field_validator('title', 'description')
     def strings_must_not_be_empty_or_whitespace(cls, v):
@@ -49,6 +50,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     price: Optional[float] = None
     is_saved: Optional[bool] = None
+    is_featured: Optional[bool] = None
     category_id: Optional[int] = None
 
 class ProductRead(ProductBase):

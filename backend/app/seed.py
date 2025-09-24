@@ -63,14 +63,16 @@ def seed_products(session: Session, products: list, category_map: dict):
             print(f"Product '{product_data['title']}' already exists (ID: {product_data['id']})")
             continue
         
-        # Create new product
+        # Create new product - randomly mark some as featured (about 30% chance)
+        is_featured = random.random() < 0.3
         new_product = Product(
             id=product_data['id'],
             title=product_data['title'],
             description=product_data['description'],
             price=float(product_data['price']),
             category_id=category_map[product_data['category']],
-            is_saved=False
+            is_saved=False,
+            is_featured=is_featured
         )
         
         session.add(new_product)
