@@ -2,6 +2,12 @@
 
 Below is a menu of demo blocks that you can run to show Amp in actions. Make sure you have followed [quick start instructions](README.md#quick-start) before running any of the demos.
 
+To get setup to demo, do the following steps:
+1) Download [Github Desktop](https://desktop.github.com/download/) and clone this repository locally
+2) [Install](https://ampcode.com/manual#install) Amp in CLI and VS Code.
+3) Copy [settings.json file](../settings.json) file to ~/.config/amp/settings.json
+4) Download [Github CLI](https://cli.github.com) and [log into your Github account](https://cli.github.com/manual/gh_auth_login) by typing ```gh auth login``` in a terminal
+
 **Table of Contents**
 
 [VS Code](#VS-Code)
