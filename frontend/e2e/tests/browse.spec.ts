@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { waitForProductsLoaded } from './utils/waits';
 
 test.describe('Product Browsing', () => {
   test('should display products on homepage', async ({ page }) => {
     await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
+    await waitForProductsLoaded(page);
     
     // Check that multiple products are displayed
     const productCards = page.locator('[data-testid="product-card"]');
@@ -14,29 +13,27 @@ test.describe('Product Browsing', () => {
     // Check product card content
     const firstProduct = productCards.first();
     // Check that product title and price are visible
-    await expect(firstProduct.getByText(/Fjallraven|Mens|Women/i)).toBeVisible(); // Product title
-    await expect(firstProduct.locator('text=/\\$/i')).toBeVisible(); // Price
+    await expect(firstProduct.getByTestId('product-title')).toBeVisible();
+    await expect(firstProduct.getByTestId('product-price')).toBeVisible();
   });
 
   test('should show loading state initially', async ({ page }) => {
     await page.goto('/');
     
-    // Check for loading indicator or skeleton
-    // Adjust selector based on your actual loading UI
-    const loadingIndicator = page.locator('[data-testid="loading"], .loading, .spinner');
+    const loading = page.getByTestId('loading');
     
-    // Loading should appear and then disappear
-    if (await loadingIndicator.count() > 0) {
-      await expect(loadingIndicator).toBeVisible();
-      await expect(loadingIndicator).toHaveCount(0, { timeout: 10000 });
+    // If loading element exists, it should become hidden (not removed from DOM)
+    if (await loading.count() > 0) {
+      await expect(loading).toBeVisible();
+      await expect(loading).toBeHidden({ timeout: 10000 });
     }
+    
+    await waitForProductsLoaded(page);
   });
 
   test('should display product images from backend', async ({ page }) => {
     await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
+    await waitForProductsLoaded(page);
     
     // Check that images are loading from the backend
     const productImages = page.locator('[data-testid="product-card"] img');
@@ -62,10 +59,16 @@ test.describe('Product Browsing', () => {
     await page.goto('/');
     
     // Should either show error message or fallback content
-    // Adjust based on your error handling implementation
-    await page.waitForTimeout(2000);
+    // Wait for error state or fallback instead of arbitrary timeout
+    const errorState = page.locator('[data-testid="error-state"]');
+    const fallbackContent = page.locator('body');
     
-    // Check that the page doesn't crash
-    await expect(page.locator('body')).toBeVisible();
+    // Check that the page doesn't crash and shows some content
+    await expect(fallbackContent).toBeVisible();
+    
+    // If error state exists, it should be visible
+    if (await errorState.count() > 0) {
+      await expect(errorState).toBeVisible();
+    }
   });
 });
