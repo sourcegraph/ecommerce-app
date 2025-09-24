@@ -174,7 +174,29 @@ Amp can integrate with various MCP servers (remote and local), and leverage tool
 
 Additionally, install the Github CLI from [here](https://cli.github.com) and set it up using your personal Github account. So that Amp can use tool calling ability to fetch Github issues, pull your code changes and create Pull Request on Github.
 
-// TODO update this section to use with Sourcegraph MCP to demo Amp + Sourcegraph search
+##### Sourcegraph MCP
+
+Use the Sourcegraph MCP to provide Amp programmatic access to our demo.sourcegraph.com instance's code search, navigation, and analysis capabilities.
+
+Add the block below in your VS Code/CLI settings. Make sure to add a Sourcegraph access token in the header. In the Sourcegraph web UI you will need to go to your profile picture -> Site Admin -> [Access tokens](https://demo.sourcegraph.com/site-admin/tokens).
+
+```
+"sourcegraph": {
+    "url": "https://demo.sourcegraph.com/.api/mcp/v1",
+    "headers": {
+        "Authorization": "token sgp_your-token-here"
+    },
+    "transport": "http"
+}
+```
+
+Then you can ask cross repo questions and get code search based answers. For example here is a [thread searching for log4j](https://ampcode.com/threads/T-70ef55e4-d390-42b5-b611-ff2d298e5272) using this prompt:
+
+```
+Use the sourcegraph MCP to find everywhere log4j is used across our repos and identify ones susceptible to this vulnerability: https://logging.apache.org/security.html#CVE-2021-45105
+
+Once found, do not code but come up with a plan to remediate the issues.
+```
 
 # Amp CLI in Terminal 
 
