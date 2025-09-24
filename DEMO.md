@@ -245,4 +245,7 @@ Amp shell is [ability](https://ampcode.com/news/through-the-agent-into-the-shell
 # Intellij IDEA
 Amp provides an IntelliJ plugin. When you run Amp in a terminal inside IntelliJ, it automatically installs the plugin. This allows Amp to communicate with IntelliJ via MCP, enabling it to access diagnostics data, see which files are open, and identify highlighted lines in the IDE.
 
-Demonstrating IntelliJ is straightforward: start by running Amp in the terminal, then open the ecommerce-app project in IntelliJ. From there, you can showcase the integration. Highlight how Amp interacts with the IDE—and run any of the previously mentioned prompts to demonstrate Amp’s functionality within IntelliJ.
+Demonstrating IntelliJ is straightforward: start by running Amp in the terminal in Intellij, this will install the Amp plugin in In tellij
+Then open the ecommerce-app project in IntelliJ. From there, 
+- You can showcase the integration; highlight how Amp interacts with the IDE—and
+- Run any of the prompts on this page (bug fix or feature improvment) to demonstrate Amp’s functionality within IntelliJ.
