@@ -97,14 +97,14 @@ const ProductCard = ({ product }: Props) => {
           className="product-title"
         >
           <Flex direction="column" minH="84px" justify="center">
-            <Text mt={2} fontSize="sm" fontWeight="medium" lineHeight="short">
+            <Text mt={2} fontSize="sm" fontWeight="medium" lineHeight="short" data-testid="product-title">
               {product.title}
             </Text>
           </Flex>
         </LinkOverlay>
         <Box>
           <Flex align="center" justify="space-between" h="38px">
-            <Text fontSize="xl" fontWeight="bold" color="appBlue.600">
+            <Text fontSize="xl" fontWeight="bold" color="appBlue.600" data-testid="product-price">
               ${product.price}{" "}
               <Box
                 as="span"

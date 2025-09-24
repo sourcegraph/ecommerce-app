@@ -33,7 +33,8 @@ def test_db():
     
     yield engine
     
-    # Cleanup
+    # Cleanup - properly dispose of engine before file cleanup
+    engine.dispose()
     os.close(db_fd)
     os.unlink(db_path)
 
