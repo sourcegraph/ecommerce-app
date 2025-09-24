@@ -135,10 +135,14 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct cur
 <img width="240" height="316" alt="image" src="https://github.com/user-attachments/assets/9dbfdfcf-be5d-4133-a5e3-33f1c42556ca" />
 
 
-## IDE diagnostics
+## IDE diagnostics and testing
 Amp will automatically read IDE diagnostics while implementing a feature or fixing a bug, you don't need to do any configuration here. Just tell the user that Amp reads IDE diagnostics and fixes issues/autocorrect any problems as they appear
 
 <img width="648" height="529" alt="Screenshot 2025-09-18 at 11 56 52" src="https://github.com/user-attachments/assets/793c1008-41ac-43c4-a734-8124e565c153" />
+
+Similarly, Amp will do tests after making changest:
+- Run local tests as part of the feature implementation/bug fix
+- Do a screenshot via Playwright to validate changes and ensure that feature has been implemented as specified
 
 ## AGENTS.md / Multiple AGENTS.md
 
