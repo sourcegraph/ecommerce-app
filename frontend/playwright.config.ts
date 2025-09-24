@@ -45,7 +45,7 @@ export default defineConfig({
     {
       // Use preview in CI for stability, dev locally for faster iteration
       command: process.env.CI 
-        ? 'npm run build && npm run preview -- --host 0.0.0.0'
+        ? 'npm run build && npm run preview -- --host 0.0.0.0 --port 3001 --strictPort'
         : 'npm run dev',
       url: 'http://localhost:3001',
       reuseExistingServer: !process.env.CI,
