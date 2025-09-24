@@ -402,6 +402,95 @@ def delete_product(
     
     return {"message": "Product deleted successfully"}
 
+@app.get("/api/products/featured", response_model=List[ProductRead])
+def get_featured_products(
+    limit: int = Query(default=5, le=20),
+    session: Session = Depends(get_session)
+):
+    """Get featured products for carousel"""
+    stmt = (
+        select(Product)
+        .where(Product.is_featured)
+        .options(selectinload(cast(Any, Product.category)))
+        .order_by(cast(ColumnElement, Product.created_at).desc())
+        .limit(limit)
+    )
+    products = session.exec(stmt).all()
+    
+    # If no featured products, fallback to newest products
+    if not products:
+        stmt = (
+            select(Product)
+            .options(selectinload(cast(Any, Product.category)))
+            .order_by(cast(ColumnElement, Product.created_at).desc())
+            .limit(limit)
+        )
+        products = session.exec(stmt).all()
+    
+    # Convert to response format
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+        }
+        result.append(product_dict)
+    
+    return result
+
+@app.get("/api/products/popular", response_model=List[ProductRead])
+def get_popular_products(
+    limit: int = Query(default=8, le=20),
+    session: Session = Depends(get_session)
+):
+    """Get popular products based on created_at (simulating popularity)"""
+    stmt = (
+        select(Product)
+        .options(selectinload(cast(Any, Product.category)))
+        .order_by(cast(ColumnElement, Product.created_at).desc())
+        .limit(limit)
+    )
+    products = session.exec(stmt).all()
+    
+    # Convert to response format
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+        }
+        result.append(product_dict)
+    
+    return result
+
 @app.get("/products/{product_id}/image")
 def get_product_image(
     product_id: int,
