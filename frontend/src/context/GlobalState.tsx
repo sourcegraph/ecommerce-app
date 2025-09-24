@@ -103,6 +103,17 @@ export const Provider: FC<Props> = ({ children }) => {
     }
   };
 
+  // Load saved state from localStorage
+  const loadSavedState = () => {
+    try {
+      const savedState = localStorage.getItem('saved-state');
+      return savedState ? JSON.parse(savedState) : {};
+    } catch (error) {
+      console.error('Failed to load saved state:', error);
+      return {};
+    }
+  };
+
   // Save cart state to localStorage
   const saveCartState = (products: ProductType[]) => {
     try {
@@ -121,6 +132,21 @@ export const Provider: FC<Props> = ({ children }) => {
     }
   };
 
+  // Save saved state to localStorage
+  const saveSavedState = (products: ProductType[]) => {
+    try {
+      const savedState: { [key: string]: boolean } = {};
+      products.forEach(product => {
+        if (product.isSaved) {
+          savedState[product.id] = true;
+        }
+      });
+      localStorage.setItem('saved-state', JSON.stringify(savedState));
+    } catch (error) {
+      console.error('Failed to save saved state:', error);
+    }
+  };
+
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -136,12 +162,13 @@ export const Provider: FC<Props> = ({ children }) => {
       
       // Convert backend format to frontend format and apply saved cart state
       const savedCartState = loadCartState();
+      const savedState = loadSavedState();
       const formattedProducts = products.map(product => {
         const cartItem = savedCartState[product.id];
         return {
           ...product,
-          // Ensure isSaved is set to false if not provided
-          isSaved: product.isSaved || false,
+          // Apply saved state from localStorage
+          isSaved: savedState[product.id] || product.isSaved || false,
           // Apply saved cart state
           inCart: cartItem?.inCart || false,
           quantity: cartItem?.quantity || undefined,
@@ -154,12 +181,14 @@ export const Provider: FC<Props> = ({ children }) => {
       // Fallback to seed data if API is not available
       console.log("Using fallback seed data");
       const savedCartState = loadCartState();
+      const savedState = loadSavedState();
       const products: ProductType[] = seed.map(product => {
         const cartItem = savedCartState[product.id];
         return {
           ...product,
           image_url: product.image, // Convert old format
-          isSaved: false,
+          // Apply saved state from localStorage
+          isSaved: savedState[product.id] || false,
           // Apply saved cart state
           inCart: cartItem?.inCart || false,
           quantity: cartItem?.quantity || undefined,
@@ -190,13 +219,15 @@ export const Provider: FC<Props> = ({ children }) => {
   }, [products]);
 
   const toggleSaved = (id: string | number) => {
-    setProducts(prevProducts =>
-      prevProducts.map(prevProduct =>
+    setProducts(prevProducts => {
+      const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.id === id
           ? { ...prevProduct, isSaved: !prevProduct.isSaved }
           : prevProduct
-      )
-    );
+      );
+      saveSavedState(updatedProducts);
+      return updatedProducts;
+    });
   };
 
   const addToCart = (product: ProductType) => {

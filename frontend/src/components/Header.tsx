@@ -94,7 +94,7 @@ const Header = () => {
                   : undefined
               }
             >
-              <Link as={RouterLink} to="/cart" _hover={{ textDecoration: "none" }}>
+              <Link as={RouterLink} to="/cart" _hover={{ textDecoration: "none" }} data-testid="cart-link">
                 <MUIBadge badgeContent={cartItemCount}>
                   <Icon
                     as={FaShoppingCart}

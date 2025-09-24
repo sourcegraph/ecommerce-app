@@ -137,7 +137,7 @@ const Main = ({ children }: Props) => {
               <Tab mediaQuery={isLargerThan567} navigatePath="/">
                 Show All
               </Tab>
-              <Tab mediaQuery={isLargerThan567} navigatePath="/saved">
+              <Tab mediaQuery={isLargerThan567} navigatePath="/saved" testId="wishlist-link">
                 <MUIBadge badgeContent={savedItemsCount} testId="saved-count">Saved</MUIBadge>
               </Tab>
               <Tab mediaQuery={isLargerThan567} navigatePath="/cart">

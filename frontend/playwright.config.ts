@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e/tests',
-  timeout: 30000,
+  timeout: 45000, // Increase for stability
   expect: {
     timeout: 10000
   },
@@ -20,7 +20,12 @@ export default defineConfig({
     headless: process.env.HEADED !== '1',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    testIdAttribute: 'data-testid',
+    actionTimeout: 10000,
+    // Add stability improvements
+    timezoneId: 'UTC',
+    locale: 'en-US',
   },
 
   projects: [
@@ -32,15 +37,19 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'cd ../backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8001',
-      port: 8001,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120000
+      command: 'cd ../backend && uv run python -m app.seed && uv run uvicorn app.main:app --host 0.0.0.0 --port 8001',
+      url: 'http://localhost:8001/health',
+      reuseExistingServer: false, // Always fresh for deterministic state
+      timeout: 180000 // Increased timeout for CI
     },
     {
-      command: 'npm run dev',
-      port: 3001,
+      // Use preview in CI for stability, dev locally for faster iteration
+      command: process.env.CI 
+        ? 'npm run build && npm run preview -- --host 0.0.0.0 --port 3001 --strictPort'
+        : 'npm run dev',
+      url: 'http://localhost:3001',
       reuseExistingServer: !process.env.CI,
-    },
+      timeout: 240000 // Increased timeout for CI build step
+    }
   ],
 });

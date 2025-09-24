@@ -1,0 +1,102 @@
+{
+  "amp.notifications.enabled": true,
+  "amp.internal.oracleModel": "O3",
+  "amp.mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless",
+        "--isolated"
+      ],
+      "_target": "global"
+    },
+    "local-test": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/asridhar/Desktop"
+      ],
+      "env": {},
+      "_target": "global"
+    }
+  },
+  "amp.commands.allowlist": [
+    "git",
+    "glab",
+    "java",
+    "curl",
+    "chmod",
+    "cd",
+    "cp",
+    "~/gerrit_testsite/bin/gerrit.sh",
+    "pip3"
+  ],
+  "amp.permissions": [
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "git"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "glab"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "java"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "curl"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "chmod"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "cd"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "cp"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "~/gerrit_testsite/bin/gerrit.sh"
+      },
+      "action": "allow"
+    },
+    {
+      "tool": "Bash",
+      "matches": {
+        "cmd": "pip3"
+      },
+      "action": "allow"
+    }
+  ]
+}

@@ -1,93 +1,91 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Product Details', () => {
-  test('should navigate to product detail page', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
-    // Click on the first product
+  });
+
+  test('should navigate to product detail page', async ({ page }) => {
+    // Get product title before clicking
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitle = await firstProduct.getByText(/Fjallraven|Mens|Women/i).textContent();
+    const productTitleElement = firstProduct.locator('.product-title, h3, h2, h1').first();
+    const productTitle = await productTitleElement.textContent();
     
     await firstProduct.click();
     
-    // Should navigate to a detail page or show a modal
-    // Check if URL changed (for routing) or modal opened
-    const currentUrl = page.url();
-    const hasModal = await page.locator('[data-testid="product-modal"], .modal, [role="dialog"]').count() > 0;
-    const urlChanged = !currentUrl.endsWith('/') && currentUrl !== 'http://localhost:3001/';
-    
-    expect(hasModal || urlChanged).toBeTruthy();
+    // Should navigate to a detail page (check URL changed)
+    await page.waitForURL(/\/products\/\d+/);
+    expect(page.url()).toMatch(/\/products\/\d+/);
     
     // Verify product details are displayed
+    await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
+    
     if (productTitle) {
-      await expect(page.locator(`text="${productTitle}"`)).toBeVisible();
+      // The title should match or contain similar text
+      const detailTitle = await page.locator('[data-testid="product-title"]').textContent();
+      expect(detailTitle).toContain(productTitle.trim());
     }
   });
 
   test('should display product information correctly', async ({ page }) => {
-    await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
     // Click on the first product to open details
     await page.locator('[data-testid="product-card"]').first().click();
     
-    // Wait for details to load
-    await page.waitForTimeout(1000);
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
     
-    // Check for key product information elements
-    // Adjust selectors based on your actual product detail UI
-    const productImage = page.locator('[data-testid="product-detail-image"], .product-image img, img[alt*="product" i]');
-    const productTitle = page.locator('[data-testid="product-title"], h1, h2');
-    const productPrice = page.locator('[data-testid="product-price"], .price').or(page.getByText(/\$/));
-    const productDescription = page.locator('[data-testid="product-description"], .description, p');
+    // Check for key product information elements using our test IDs
+    await expect(page.locator('[data-testid="product-detail-image"]')).toBeVisible();
+    await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="product-price"]')).toBeVisible();
+    await expect(page.locator('[data-testid="product-description"]')).toBeVisible();
     
-    // At least some of these elements should be present
-    const hasImage = await productImage.count() > 0;
-    const hasTitle = await productTitle.count() > 0;
-    const hasPrice = await productPrice.count() > 0;
-    const hasDescription = await productDescription.count() > 0;
+    // Verify the price format
+    const priceText = await page.locator('[data-testid="product-price"]').textContent();
+    expect(priceText).toMatch(/\$\d+/);
     
-    expect(hasImage || hasTitle || hasPrice || hasDescription).toBeTruthy();
+    // Verify the title is not empty
+    const titleText = await page.locator('[data-testid="product-title"]').textContent();
+    expect(titleText).toBeTruthy();
+    expect(titleText!.trim().length).toBeGreaterThan(0);
+    
+    // Verify the description is not empty
+    const descText = await page.locator('[data-testid="product-description"]').textContent();
+    expect(descText).toBeTruthy();
+    expect(descText!.trim().length).toBeGreaterThan(0);
   });
 
   test('should allow adding product to cart from details', async ({ page }) => {
-    await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
     // Click on the first product to open details
     await page.locator('[data-testid="product-card"]').first().click();
     
-    // Wait for details to load
-    await page.waitForTimeout(1000);
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
     
-    // Look for "Add to Cart" button
-    const addToCartButton = page.locator('[data-testid="add-to-cart"], button:has-text("Add to Cart"), button:has-text("Add")');
+    // Check initial cart count (if visible)
+    const cartCounter = page.locator('[data-testid="cart-count"]');
+    let initialCartCount = 0;
     
-    if (await addToCartButton.count() > 0) {
-      // Check initial cart count (if visible)
-      const cartCounter = page.locator('[data-testid="cart-count"], .cart-count, .badge');
-      let initialCartCount = 0;
-      
-      if (await cartCounter.count() > 0) {
-        const cartText = await cartCounter.textContent();
-        initialCartCount = parseInt(cartText || '0') || 0;
-      }
-      
-      // Click add to cart
+    if (await cartCounter.count() > 0) {
+      const cartText = await cartCounter.textContent();
+      initialCartCount = parseInt(cartText || '0') || 0;
+    }
+    
+    // Find and click "Add to Cart" button
+    const addToCartButton = page.locator('[data-testid="add-to-cart"]');
+    await expect(addToCartButton).toBeVisible();
+    
+    // Only click if button is not already disabled (meaning item not already in cart)
+    if (!(await addToCartButton.isDisabled())) {
       await addToCartButton.click();
       
       // Wait for cart update
       await page.waitForTimeout(1000);
       
-      // Verify cart was updated (success message, cart count change, etc.)
-      const successMessage = page.locator('.toast, .notification').or(page.getByText(/added.*cart/i));
+      // Verify cart was updated (success message or cart count change)
+      const successMessage = page.locator('.chakra-toast, [role="alert"]');
       const hasSuccessMessage = await successMessage.count() > 0;
       
       let cartCountIncreased = false;
@@ -98,37 +96,148 @@ test.describe('Product Details', () => {
       }
       
       expect(hasSuccessMessage || cartCountIncreased).toBeTruthy();
+      
+      // Button should now show "Added to Cart" and be disabled
+      await expect(addToCartButton).toContainText('Added to Cart');
+      await expect(addToCartButton).toBeDisabled();
     } else {
-      test.skip('No "Add to Cart" button found');
+      // Product was already in cart - that's OK, just verify the state
+      await expect(addToCartButton).toContainText('Added to Cart');
     }
   });
 
-  test('should close product details when clicking outside/back', async ({ page }) => {
-    await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
+  test('should navigate back from product details', async ({ page }) => {
     // Click on the first product to open details
     await page.locator('[data-testid="product-card"]').first().click();
     
-    // Wait for details to load
-    await page.waitForTimeout(1000);
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
     
-    // Look for close button or back navigation
-    const closeButton = page.locator('[data-testid="close-modal"], .close, button:has-text("×"), button:has-text("Close")');
+    // Use browser back button to return
+    await page.goBack();
     
-    if (await closeButton.count() > 0) {
-      await closeButton.click();
+    // Should return to product listing  
+    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
+    
+    // URL should be back to home
+    await page.waitForURL('/');
+    expect(page.url()).toMatch(/\/$|\/\?/);
+  });
+
+  test('should show breadcrumb navigation', async ({ page }) => {
+    // Click on the first product to open details
+    await page.locator('[data-testid="product-card"]').first().click();
+    
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
+    
+    // Check for breadcrumb navigation
+    const breadcrumbs = page.locator('nav[aria-label="breadcrumb"]').first();
+    
+    if (await breadcrumbs.count() > 0) {
+      await expect(breadcrumbs).toBeVisible();
       
-      // Should return to product listing
-      await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
-    } else {
-      // Try browser back button
-      await page.goBack();
+      // Should contain "Home" link
+      const homeLink = page.getByText('Home');
+      if (await homeLink.count() > 0) {
+        await expect(homeLink).toBeVisible();
+      }
+    }
+  });
+
+  test('should display product rating and reviews', async ({ page }) => {
+    // Click on the first product to open details
+    await page.locator('[data-testid="product-card"]').first().click();
+    
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
+    
+    // Look for rating component (stars)
+    const rating = page.locator('[role="img"], .MuiRating-root, .rating');
+    
+    if (await rating.count() > 0) {
+      await expect(rating.first()).toBeVisible();
+    }
+    
+    // Look for review count
+    const reviewCount = page.getByText(/\d+\s+(rating|review)/i);
+    
+    if (await reviewCount.count() > 0) {
+      await expect(reviewCount).toBeVisible();
+    }
+  });
+
+  test('should show product sizes if available', async ({ page }) => {
+    // Click on the first product to open details
+    await page.locator('[data-testid="product-card"]').first().click();
+    
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
+    
+    // Look for size options
+    const sizeText = page.getByText('Size:');
+    const sizeTags = page.locator('[role="button"]:has-text("S"), [role="button"]:has-text("M"), [role="button"]:has-text("L")');
+    
+    if (await sizeText.count() > 0) {
+      await expect(sizeText).toBeVisible();
+    }
+    
+    if (await sizeTags.count() > 0) {
+      // At least one size should be visible
+      await expect(sizeTags.first()).toBeVisible();
+    }
+  });
+
+  test('should show save/heart button on product details', async ({ page }) => {
+    // Click on the first product to open details
+    await page.locator('[data-testid="product-card"]').first().click();
+    
+    // Wait for detail page to load
+    await page.waitForURL(/\/products\/\d+/);
+    
+    // Look for save button (heart icon)
+    const saveButton = page.locator('button:has-text("♡"), button:has-text("♥"), button').filter({ hasText: /heart|save/i }).first();
+    
+    if (await saveButton.count() > 0) {
+      await expect(saveButton).toBeVisible();
       
-      // Should return to product listing  
-      await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
+      // Should be clickable
+      await expect(saveButton).toBeEnabled();
+      
+      // Test clicking it
+      await saveButton.click();
+      
+      // Should show success message
+      const toast = page.locator('.chakra-toast, [role="alert"]');
+      if (await toast.count() > 0) {
+        await expect(toast).toBeVisible({ timeout: 2000 });
+      }
+    }
+  });
+
+  test('should handle multiple product detail views', async ({ page }) => {
+    // Test navigating to multiple products to ensure detail page works consistently
+    const productCards = page.locator('[data-testid="product-card"]');
+    const cardCount = await productCards.count();
+    const testCount = Math.min(3, cardCount);
+    
+    for (let i = 0; i < testCount; i++) {
+      // Click on product
+      await productCards.nth(i).click();
+      
+      // Wait for detail page
+      await page.waitForURL(/\/products\/\d+/);
+      
+      // Verify key elements are present
+      await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
+      await expect(page.locator('[data-testid="product-price"]')).toBeVisible();
+      await expect(page.locator('[data-testid="add-to-cart"]')).toBeVisible();
+      
+      // Go back for next iteration (except last)
+      if (i < testCount - 1) {
+        await page.goBack();
+        await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
+      }
     }
   });
 });
