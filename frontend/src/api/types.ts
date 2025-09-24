@@ -31,6 +31,7 @@ export interface Product {
   image_url?: string
   category?: Category
   delivery_summary?: DeliverySummary
+  cart_popularity_count?: number
 }
 
 export interface DeliverySummary {

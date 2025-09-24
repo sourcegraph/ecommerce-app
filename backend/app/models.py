@@ -73,4 +73,14 @@ class DeliveryOption(SQLModel, table=True):
         link_model=ProductDeliveryLink
     )
 
+class CartPopularity(SQLModel, table=True):
+    __tablename__ = "cart_popularity"
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    product_id: int = Field(foreign_key="products.id", index=True)
+    session_id: str = Field(index=True)  # Track unique sessions/users
+    added_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    
+    product: Optional[Product] = Relationship()
+
 

@@ -122,6 +122,14 @@ const ProductCard = ({ product }: Props) => {
           <Flex align="center" minH="18px">
             <DeliveryOptionsSummary summary={product.delivery_summary} />
           </Flex>
+          {/* Cart popularity display - only show if product is not in user's cart and has popularity > 0 */}
+          {product.inCart !== true && product.cart_popularity_count && product.cart_popularity_count > 0 && (
+            <Flex mt={1} align="center" justify="center">
+              <Text fontSize="xs" color="orange.600" fontWeight="medium">
+                {product.cart_popularity_count} {product.cart_popularity_count === 1 ? 'person has' : 'people have'} this in their cart
+              </Text>
+            </Flex>
+          )}
           <Flex mt={1} align="center" justify="space-between" flexWrap="wrap">
             <Flex align="center">
               <MUIRating
@@ -174,8 +182,8 @@ const ProductCard = ({ product }: Props) => {
           colorScheme="red"
           variant="outline"
           fontSize="sm"
-          onClick={() => {
-            addToCart(product);
+          onClick={async () => {
+            await addToCart(product);
           }}
           isDisabled={product.inCart === true}
         >
