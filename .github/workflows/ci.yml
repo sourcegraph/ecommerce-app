@@ -132,7 +132,7 @@ jobs:
 
       - name: Get installed Playwright version
         id: playwright-version
-        run: echo "PLAYWRIGHT_VERSION=$(cd frontend && node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")" >> $GITHUB_OUTPUT
+        run: echo "PLAYWRIGHT_VERSION=$(cd frontend && node -e "console.log(require('./package.json').devDependencies['@playwright/test'])")" >> $GITHUB_OUTPUT
 
       - name: Cache playwright binaries
         uses: actions/cache@v4

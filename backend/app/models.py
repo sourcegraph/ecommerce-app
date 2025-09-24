@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import LargeBinary, Column, Numeric
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 from decimal import Decimal
 
@@ -16,8 +16,8 @@ class Category(SQLModel, table=True):
     
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     
     products: List["Product"] = Relationship(back_populates="category")
 
@@ -42,8 +42,8 @@ class Product(SQLModel, table=True):
     image_filename: Optional[str] = Field(default=None)   # Original filename
     is_saved: bool = Field(default=False)
     
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     
     category_id: int = Field(foreign_key="categories.id", index=True)
     category: Optional[Category] = Relationship(back_populates="products")
@@ -75,8 +75,8 @@ class DeliveryOption(SQLModel, table=True):
     estimated_days_min: int = Field(ge=0)  # Minimum delivery days
     estimated_days_max: int = Field(ge=0)  # Maximum delivery days
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     
     products: List["Product"] = Relationship(
         back_populates="delivery_options", 

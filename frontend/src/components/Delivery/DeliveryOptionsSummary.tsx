@@ -21,7 +21,7 @@ export const DeliveryOptionsSummary = ({ summary }: DeliveryOptionsSummaryProps)
 
   if (summary.has_free) {
     return (
-      <Box fontSize="sm" mt={1}>
+      <Box fontSize="sm" mt={1} data-testid="delivery-summary">
         <Badge colorScheme="green" variant="subtle" mr={2}>
           Free delivery
         </Badge>
@@ -35,7 +35,7 @@ export const DeliveryOptionsSummary = ({ summary }: DeliveryOptionsSummaryProps)
   }
 
   return (
-    <Box fontSize="sm" mt={1} color="gray.600">
+    <Box fontSize="sm" mt={1} color="gray.600" data-testid="delivery-summary">
       <Text as="span">
         Delivery from {formatPrice(summary.cheapest_price)}
       </Text>
