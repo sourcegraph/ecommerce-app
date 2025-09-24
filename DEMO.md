@@ -2,13 +2,21 @@
 
 Below is a menu of demo blocks that you can run to show Amp in actions. Make sure you have followed [quick start instructions](README.md#quick-start) before running any of the demos.
 
-**Table of Contents**  
+To get setup to demo, do the following steps:
+1) Download [Github Desktop](https://desktop.github.com/download/) and clone this repository locally
+2) [Install](https://ampcode.com/manual#install) Amp in CLI and VS Code.
+3) Copy [settings.json file](../settings.json) file to ~/.config/amp/settings.json
+4) Download [Github CLI](https://cli.github.com) and [log into your Github account](https://cli.github.com/manual/gh_auth_login) by typing ```gh auth login``` in a terminal
+5) Download latest version of Intellij IDEA Community Edition from [here](https://www.jetbrains.com/idea/download/other.html)
+
+**Table of Contents**
+
 [VS Code](#VS-Code)
 - [Issue to PR](#Issue-to-PR) - [Bugfix](#Fixing-Github-Issue-Bug) and [New feature](Implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
-- [IDE diagnostics](#ide-diagnostics)
+- [IDE diagnostics and testing](#ide-diagnostics-and-testing)
 - [AGENTS.md / Multiple AGENTS.md](#agentsmd--multiple-agentsmd)
 - [MCP and tool calling](#mcp-and-tool-calling)
   
@@ -19,6 +27,7 @@ Below is a menu of demo blocks that you can run to show Amp in actions. Make sur
 - [Slash commands](#Slash-commands)
 - [Amp shell](#Amp-shell)
 
+[Intellij IDEA](#Intellij-IDEA)
 
 
 # VS Code
@@ -54,7 +63,7 @@ Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new bran
 ```
 - While Amp is executing you can optionally show a previous [thread](https://ampcode.com/threads/T-d37dc873-6b2d-4afe-b0be-a75b18a26aa5) that was run to for the feature. Or you can switch to [feature/landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch which has changes committed. 
 - The end result is a new landing pag with a nice carousel as per screenshot below:
-<img width="1000" height="600" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
+<img width="500" height="350" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
 
 ### PR review bot
 
@@ -129,14 +138,19 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen and auto populate the correct cur
 ```
  Implement multi currency support using Oracle's suggestion using sub agents
 ```
-- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-e46bc945-46ab-427d-bffc-082763f201cc) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
-- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/amp-demo/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
-<img width="1736" height="587" alt="Screenshot 2025-09-18 at 12 56 46" src="https://github.com/user-attachments/assets/9a4ee0b6-6f27-4f6d-a81f-4f7b9985bc73" />
+- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-5c2a0c8d-41cf-464f-9e33-acb0040634ec) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
+- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/ecommerce-app/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have option to select currency from a dropdown on the page:
+<img width="240" height="316" alt="image" src="https://github.com/user-attachments/assets/9dbfdfcf-be5d-4133-a5e3-33f1c42556ca" />
 
-## IDE diagnostics
+
+## IDE diagnostics and testing
 Amp will automatically read IDE diagnostics while implementing a feature or fixing a bug, you don't need to do any configuration here. Just tell the user that Amp reads IDE diagnostics and fixes issues/autocorrect any problems as they appear
 
 <img width="648" height="529" alt="Screenshot 2025-09-18 at 11 56 52" src="https://github.com/user-attachments/assets/793c1008-41ac-43c4-a734-8124e565c153" />
+
+Similarly, Amp will do tests after making changest:
+- Run local tests as part of the feature implementation/bug fix
+- Do a screenshot via Playwright to validate changes and ensure that feature has been implemented as specified
 
 ## AGENTS.md / Multiple AGENTS.md
 
@@ -182,8 +196,10 @@ Start Amp and execute the following prompt:
 
 Explain that we are going to refactor the authentication system in the Amp CLI GUI. 
 Amp will figure out vulnerabilities, consult Oracle on how to fix and refactor code (as per screenshot). 
+
 <img width="700" height="400" alt="Screenshot 2025-09-23 at 17 00 50" src="https://github.com/user-attachments/assets/671e0bb6-3709-41aa-909c-0b2fe20346c8" />
 [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3)
+
 This takes a while to execute so go to this [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3) and walk the audience through the execution. 
 
 ### Thread management
@@ -212,10 +228,24 @@ Within the repo, there are a few custom slash commands execute any one of these 
 
 Hopefully, the thread we kicked off earlier would have finished executing by now. You can choose to execute either one of the custom commands to show how users can configure their own custom commands. Type ```amp``` in terminal to go into interactive mode and type ```/``` to invoke slash commands.
 - ```/clean```: Command will clean up code base. Update deprecated usage, find dead code, improve code quality and etc. Explain that the command can be invoked to clean up code base on regular basis to avoid tech debt. See prior [thread execution here](https://ampcode.com/threads/T-55c288eb-319d-44dd-ab89-400e79a0bce4).
-- ```/code-review-local```:  Command will do a local code review. A dev can execute this command before pushing changes upstream. See prior [thread execution here](https://ampcode.com/threads/T-0bceb27f-07f4-4032-ab75-6a3557ae049b)
+- ```/code-review-local```:  Command will do a local code review. A dev can execute this command before pushing changes upstream. See prior [thread here](https://ampcode.com/threads/T-e6546b2c-a8ae-489d-9132-3a7982fd4784).
+```bash
+# checkout the landing page carousel feature add and run a review on it
+git checkout feature/landing-page-carousel
+amp
+/code-review-local
+```
 - ```/code-review```: Example code review command that could be executed on a PR in Github/Gitlab CI action.
 
 ### Amp shell
 Amp shell is [ability](https://ampcode.com/news/through-the-agent-into-the-shell) to execute a command in interactive GUI.
 1) Type amp and execute ```$just test local```
 2) There may be test failures, in which case ask Amp to fix test failures. See this [thread for reference](https://ampcode.com/threads/T-ee9a2da8-0048-479d-8ecb-19edd94739cf).
+
+# Intellij IDEA
+Amp provides an IntelliJ plugin. When you run Amp in a terminal inside IntelliJ, it automatically installs the plugin. This allows Amp to communicate with IntelliJ via MCP, enabling it to access diagnostics data, see which files are open, and identify highlighted lines in the IDE.
+
+Demonstrating IntelliJ is straightforward: start by running Amp in the terminal in Intellij, this will install the Amp plugin in In tellij
+Then open the ecommerce-app project in IntelliJ. From there, 
+- You can showcase the integration; highlight how Amp interacts with the IDE—and
+- Run any of the prompts on this page (bug fix or feature improvment) to demonstrate Amp’s functionality within IntelliJ.
