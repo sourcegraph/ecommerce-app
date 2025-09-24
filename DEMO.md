@@ -7,6 +7,7 @@ To get setup to demo, do the following steps:
 2) [Install](https://ampcode.com/manual#install) Amp in CLI and VS Code.
 3) Copy [settings.json file](../settings.json) file to ~/.config/amp/settings.json
 4) Download [Github CLI](https://cli.github.com) and [log into your Github account](https://cli.github.com/manual/gh_auth_login) by typing ```gh auth login``` in a terminal
+5) Download latest version of Intellij IDEA Community Edition from [here](https://www.jetbrains.com/idea/download/other.html)
 
 **Table of Contents**
 
@@ -26,6 +27,7 @@ To get setup to demo, do the following steps:
 - [Slash commands](#Slash-commands)
 - [Amp shell](#Amp-shell)
 
+[Intellij IDEA](#Intellij-IDEA)
 
 
 # VS Code
@@ -237,3 +239,8 @@ amp
 Amp shell is [ability](https://ampcode.com/news/through-the-agent-into-the-shell) to execute a command in interactive GUI.
 1) Type amp and execute ```$just test local```
 2) There may be test failures, in which case ask Amp to fix test failures. See this [thread for reference](https://ampcode.com/threads/T-ee9a2da8-0048-479d-8ecb-19edd94739cf).
+
+# Intellij IDEA
+Amp provides an IntelliJ plugin. When you run Amp in a terminal inside IntelliJ, it automatically installs the plugin. This allows Amp to communicate with IntelliJ via MCP, enabling it to access diagnostics data, see which files are open, and identify highlighted lines in the IDE.
+
+Demonstrating IntelliJ is straightforward: start by running Amp in the terminal, then open the ecommerce-app project in IntelliJ. From there, you can showcase the integration. Highlight how Amp interacts with the IDE—and run any of the previously mentioned prompts to demonstrate Amp’s functionality within IntelliJ.
