@@ -2,7 +2,7 @@ from typing import Optional
 import io
 from PIL import Image
 from sqlmodel import Session
-from app.models import Category, Product, DeliveryOption, DeliverySpeed
+from app.models import Category, Product, DeliveryOption, DeliverySpeed, ProductCartCount
 from app.schemas import CategoryCreate
 
 
@@ -160,3 +160,24 @@ def create_standard_delivery_options(session: Session) -> list[DeliveryOption]:
         )
     ]
     return options
+
+
+def create_test_cart_count(
+    session: Session,
+    product_id: int,
+    session_id: Optional[str] = None
+) -> ProductCartCount:
+    """Create a test cart count entry"""
+    if session_id is None:
+        import uuid
+        session_id = str(uuid.uuid4())
+    
+    cart_count = ProductCartCount(
+        product_id=product_id,
+        session_id=session_id
+    )
+    
+    session.add(cart_count)
+    session.commit()
+    session.refresh(cart_count)
+    return cart_count

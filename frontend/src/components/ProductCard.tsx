@@ -165,6 +165,18 @@ const ProductCard = ({ product }: Props) => {
               {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
             </Button>
           </Flex>
+          {/* Cart social proof - only show if not in user's cart and has count > 0 */}
+          {!product.inCart && product.cart_count && product.cart_count > 0 && (
+            <Text 
+              fontSize="xs" 
+              color="blue.600" 
+              mt={1}
+              textAlign="center"
+              data-testid="cart-count-message"
+            >
+              🛒 {product.cart_count} {product.cart_count === 1 ? 'person has' : 'people have'} added to cart
+            </Text>
+          )}
         </Box>
         <Button
           opacity={{ base: 1, sm: 0 }}

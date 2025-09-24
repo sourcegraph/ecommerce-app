@@ -59,6 +59,7 @@ class ProductRead(ProductBase):
     updated_at: datetime
     category: Optional[CategoryRead] = None
     delivery_summary: Optional["DeliverySummary"] = None
+    cart_count: Optional[int] = None  # Number of users who have this in cart
 
 class ProductReadWithCategory(ProductRead):
     category: CategoryRead
@@ -123,3 +124,12 @@ class DeliverySummary(BaseModel):
 
 class ProductReadWithDeliveryOptions(ProductRead):
     delivery_options: List[DeliveryOptionRead] = []
+
+# Cart-related schemas
+class CartItemRequest(BaseModel):
+    product_id: int
+    session_id: str
+
+class CartCountResponse(BaseModel):
+    product_id: int
+    cart_count: int

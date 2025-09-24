@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from sqlalchemy.orm import selectinload
 from typing import List, Optional, cast, Any
 from sqlalchemy.sql.elements import ColumnElement
@@ -14,10 +14,10 @@ from .schemas import (
     ProductRead, ProductCreate, ProductUpdate,
     ProductReadWithDeliveryOptions, DeliverySummary,
     CategoryRead, CategoryCreate, CategoryReadWithProducts,
-    DeliveryOptionRead
+    DeliveryOptionRead, CartItemRequest, CartCountResponse
 )
 from . import crud
-from .models import Product, DeliveryOption, Category, ProductDeliveryLink
+from .models import Product, DeliveryOption, Category, ProductDeliveryLink, ProductCartCount
 
 def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Optional[DeliverySummary]:
     """Calculate delivery summary from a list of delivery options"""
@@ -36,6 +36,15 @@ def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Option
         fastest_days_max=fastest_max,
         options_count=len(active_options)
     )
+
+def get_product_cart_counts(session: Session, product_ids: Optional[List[int]] = None) -> dict[int, int]:
+    """Get cart counts for products"""
+    stmt = select(ProductCartCount.product_id, func.count(cast(Any, ProductCartCount.id)).label("count")).group_by(cast(Any, ProductCartCount.product_id))
+    if product_ids:
+        stmt = stmt.where(cast(Any, ProductCartCount.product_id).in_(product_ids))
+    
+    result = session.exec(stmt).all()
+    return {row[0]: row[1] for row in result}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -178,6 +187,7 @@ def get_products_api(
     deliveryOptionId: Optional[int] = Query(None),
     sort: str = Query("created_desc"),
     include_delivery_summary: bool = Query(True),
+    include_cart_count: bool = Query(True),
     session: Session = Depends(get_session)
 ):
     """Get products with filtering and sorting for the frontend dropdown functionality"""
@@ -226,6 +236,12 @@ def get_products_api(
     
     products = session.exec(stmt).all()
     
+    # Get cart counts if requested
+    cart_counts = {}
+    if include_cart_count and products:
+        product_ids = [p.id for p in products if p.id is not None]
+        cart_counts = get_product_cart_counts(session, product_ids)
+    
     # Convert to response format
     result = []
     for product in products:
@@ -245,7 +261,8 @@ def get_products_api(
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
             } if product.category else None,
-            "delivery_summary": None
+            "delivery_summary": None,
+            "cart_count": cart_counts.get(product.id or 0, 0) if include_cart_count else None
         }
         
         if include_delivery_summary and hasattr(product, 'delivery_options'):
@@ -423,6 +440,80 @@ def get_product_image(
             "Cache-Control": "public, max-age=86400"  # Cache for 1 day
         }
     )
+
+# Cart management endpoints
+@app.post("/cart/add", response_model=CartCountResponse)
+def add_to_cart(
+    request: CartItemRequest,
+    session: Session = Depends(get_session)
+):
+    """Add a product to user's cart (track in database for social proof)"""
+    # Verify product exists
+    product = session.get(Product, request.product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Check if already added by this session
+    existing = session.exec(
+        select(ProductCartCount)
+        .where(ProductCartCount.product_id == request.product_id)
+        .where(ProductCartCount.session_id == request.session_id)
+    ).first()
+    
+    if not existing:
+        # Add new cart entry
+        cart_entry = ProductCartCount(
+            product_id=request.product_id,
+            session_id=request.session_id
+        )
+        session.add(cart_entry)
+        session.commit()
+    
+    # Return updated count
+    count = session.exec(
+        select(func.count(cast(Any, ProductCartCount.id)))
+        .where(ProductCartCount.product_id == request.product_id)
+    ).first()
+    
+    return CartCountResponse(product_id=request.product_id, cart_count=count or 0)
+
+@app.post("/cart/remove", response_model=CartCountResponse)
+def remove_from_cart(
+    request: CartItemRequest,
+    session: Session = Depends(get_session)
+):
+    """Remove a product from user's cart"""
+    # Find and delete the cart entry
+    existing = session.exec(
+        select(ProductCartCount)
+        .where(ProductCartCount.product_id == request.product_id)
+        .where(ProductCartCount.session_id == request.session_id)
+    ).first()
+    
+    if existing:
+        session.delete(existing)
+        session.commit()
+    
+    # Return updated count
+    count = session.exec(
+        select(func.count(cast(Any, ProductCartCount.id)))
+        .where(ProductCartCount.product_id == request.product_id)
+    ).first()
+    
+    return CartCountResponse(product_id=request.product_id, cart_count=count or 0)
+
+@app.get("/cart/count/{product_id}", response_model=CartCountResponse)
+def get_cart_count(
+    product_id: int,
+    session: Session = Depends(get_session)
+):
+    """Get the cart count for a specific product"""
+    count = session.exec(
+        select(func.count(cast(Any, ProductCartCount.id)))
+        .where(ProductCartCount.product_id == product_id)
+    ).first()
+    
+    return CartCountResponse(product_id=product_id, cart_count=count or 0)
 
 if __name__ == "__main__":
     import uvicorn

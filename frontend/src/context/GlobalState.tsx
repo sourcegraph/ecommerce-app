@@ -36,6 +36,7 @@ type Product = {
   isSaved?: boolean;
   delivery_summary?: DeliverySummary | null;
   delivery_options?: DeliveryOption[];
+  cart_count?: number; // Number of people who have this in cart
 };
 
 export type ProductInCart = Product & {
@@ -60,6 +61,53 @@ export const getImageUrl = (product: ProductType): string => {
     return `${API_BASE_URL}${product.image_url}`;
   }
   return "";
+};
+
+// Helper function to get or create session ID
+const getSessionId = (): string => {
+  let sessionId = localStorage.getItem('cart-session-id');
+  if (!sessionId) {
+    sessionId = window.crypto.randomUUID();
+    localStorage.setItem('cart-session-id', sessionId);
+  }
+  return sessionId;
+};
+
+// API functions for cart management
+const addToCartAPI = async (productId: number | string): Promise<void> => {
+  const API_BASE_URL = "http://localhost:8001";
+  const response = await fetch(`${API_BASE_URL}/cart/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      product_id: Number(productId),
+      session_id: getSessionId(),
+    }),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to add to cart');
+  }
+};
+
+const removeFromCartAPI = async (productId: number | string): Promise<void> => {
+  const API_BASE_URL = "http://localhost:8001";
+  const response = await fetch(`${API_BASE_URL}/cart/remove`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      product_id: Number(productId),
+      session_id: getSessionId(),
+    }),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to remove from cart');
+  }
 };
 
 type ContextType = {
@@ -152,7 +200,7 @@ export const Provider: FC<Props> = ({ children }) => {
     try {
       setIsLoading(true);
       const API_BASE_URL = "http://localhost:8001";
-      const response = await fetch(`${API_BASE_URL}/products?include_delivery_summary=true`);
+      const response = await fetch(`${API_BASE_URL}/api/products?include_delivery_summary=true&include_cart_count=true`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -230,37 +278,57 @@ export const Provider: FC<Props> = ({ children }) => {
     });
   };
 
-  const addToCart = (product: ProductType) => {
-    toast({
-      title: "Product successfully added to your cart",
-      status: "success",
-      duration: 1500,
-      isClosable: true,
-    });
-    setProducts(prevProducts => {
-      const updatedProducts = prevProducts.map(prevProduct =>
-        prevProduct.id === product.id
-          ? { ...prevProduct, quantity: 1, inCart: true }
-          : prevProduct
-      );
-      saveCartState(updatedProducts);
-      return updatedProducts;
-    });
+  const addToCart = async (product: ProductType) => {
+    try {
+      // Call API to track cart addition
+      await addToCartAPI(product.id);
+      
+      toast({
+        title: "Product successfully added to your cart",
+        status: "success",
+        duration: 1500,
+        isClosable: true,
+      });
+      setProducts(prevProducts => {
+        const updatedProducts = prevProducts.map(prevProduct =>
+          prevProduct.id === product.id
+            ? { ...prevProduct, quantity: 1, inCart: true }
+            : prevProduct
+        );
+        saveCartState(updatedProducts);
+        return updatedProducts;
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to add product to cart",
+        status: "error",
+        duration: 1500,
+        isClosable: true,
+      });
+      console.error('Error adding to cart:', error);
+    }
   };
 
-  const deleteFromCart = (id: number | string) => {
-    setProducts(prevProducts => {
-      const updatedProducts = prevProducts.map(prevProduct => {
-        if (prevProduct.id === id) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { quantity: _, ...productWithoutQuantity } = prevProduct as ProductInCart;
-          return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
-        }
-        return prevProduct;
+  const deleteFromCart = async (id: number | string) => {
+    try {
+      // Call API to track cart removal
+      await removeFromCartAPI(id);
+      
+      setProducts(prevProducts => {
+        const updatedProducts = prevProducts.map(prevProduct => {
+          if (prevProduct.id === id) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { quantity: _, ...productWithoutQuantity } = prevProduct as ProductInCart;
+            return { ...productWithoutQuantity, inCart: false } as ProductNotInCart;
+          }
+          return prevProduct;
+        });
+        saveCartState(updatedProducts);
+        return updatedProducts;
       });
-      saveCartState(updatedProducts);
-      return updatedProducts;
-    });
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+    }
   };
 
   const setQuantity = (qty: string, id: number | string) => {

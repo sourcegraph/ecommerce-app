@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import LargeBinary, Column
+from sqlalchemy import LargeBinary, Column, Index
 from typing import Optional, List
 from datetime import datetime, UTC
 from enum import Enum
@@ -72,5 +72,17 @@ class DeliveryOption(SQLModel, table=True):
         back_populates="delivery_options", 
         link_model=ProductDeliveryLink
     )
+
+class ProductCartCount(SQLModel, table=True):
+    """Tracks how many users have added each product to their cart"""
+    __tablename__ = "product_cart_counts"
+    __table_args__ = (Index("idx_product_session", "product_id", "session_id", unique=True),)
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    product_id: int = Field(foreign_key="products.id", index=True)
+    session_id: str = Field(index=True)  # Browser session ID
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    
+    product: Optional["Product"] = Relationship()
 
 
