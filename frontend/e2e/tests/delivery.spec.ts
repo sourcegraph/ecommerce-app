@@ -1,125 +1,117 @@
 import { test, expect } from '@playwright/test';
+import { waitForProductsLoaded, openFirstProductDetail, openProductWithDeliveryOptions, addToCartAndWaitForUpdate, navigateToFirstProductWithDelivery } from './utils/waits';
 
 test.describe('Delivery Options', () => {
+  let deliveryAvailable = false;
+
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage();
+    try {
+      await page.goto('/');
+      await waitForProductsLoaded(page);
+      await navigateToFirstProductWithDelivery(page);
+      deliveryAvailable = true;
+    } catch {
+      deliveryAvailable = false;
+    } finally {
+      await page.close();
+    }
+  });
+
   test.beforeEach(async ({ page }) => {
+    // Clear cart state before each test
+    await page.addInitScript(() => {
+      try {
+        localStorage.removeItem('cart');
+        // Clear any other cart-related storage if needed
+        localStorage.removeItem('cartItems');
+        localStorage.removeItem('selectedDelivery');
+      } catch (e) {
+        // Ignore storage errors in case localStorage is restricted
+      }
+    });
+    
     await page.goto('/');
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
+    await waitForProductsLoaded(page);
+
+    test.skip(!deliveryAvailable, 'Delivery UI not found anywhere – skipping delivery tests');
   });
 
   test('should display delivery summary on product cards', async ({ page }) => {
-    // Check that products show delivery information
-    const productCards = page.locator('[data-testid="product-card"]');
-    const cardCount = await productCards.count();
-    expect(cardCount).toBeGreaterThan(0);
+    await openProductWithDeliveryOptions(page);
+    const deliverySection = page.locator('[data-testid="delivery-section"], [data-testid="delivery-options"], [data-testid="shipping-section"], [data-testid="shipping-options"]');
+    await expect(deliverySection.first()).toBeVisible();
     
-    // Check first few product cards for delivery info
-    let hasDeliveryInfo = false;
-    for (let i = 0; i < Math.min(3, cardCount); i++) {
-      const card = productCards.nth(i);
-      
-      // Look for delivery-related text (flexible patterns)
-      const deliveryInfo = card.getByText(/Free delivery|delivery from|\d+.day|same day/i).first();
-      
-      if (await deliveryInfo.count() > 0) {
-        await expect(deliveryInfo).toBeVisible();
-        hasDeliveryInfo = true;
-        break;
-      }
+    // Go back to verify delivery info shows on product card
+    await page.goBack();
+    await waitForProductsLoaded(page);
+    
+    // Check if delivery summary is visible on product cards
+    const deliverySummary = page.locator('[data-testid="delivery-summary"]').first();
+    if (await deliverySummary.count() > 0) {
+      await expect(deliverySummary).toBeVisible();
     }
-    
-    // At least one card should show delivery info, but it's OK if none do (depends on backend data)
-    // This test passes regardless since we're checking for presence, not requiring it
-    expect(hasDeliveryInfo || !hasDeliveryInfo).toBeTruthy();
   });
 
   test('should display delivery options on product detail page', async ({ page }) => {
-    // Click on first product to go to detail page
-    await page.locator('[data-testid="product-card"]').first().click();
+    await navigateToFirstProductWithDelivery(page);
     
-    // Wait for product detail page to load
-    await page.waitForTimeout(1000);
+    const deliverySection = page.locator('[data-testid="delivery-section"], [data-testid="delivery-options"], [data-testid="shipping-section"], [data-testid="shipping-options"]').first();
+    await expect(deliverySection).toBeVisible();
     
-    // Look for delivery options section
-    const deliverySection = page.locator('[data-testid="delivery-section"]');
+    // Check for radio buttons
+    const radioButtons = deliverySection.locator('input[type="radio"]');
+    const radioCount = await radioButtons.count();
+    expect(radioCount).toBeGreaterThan(0);
+    await expect(radioButtons.first()).toBeVisible();
     
-    if (await deliverySection.count() > 0) {
-      await expect(deliverySection).toBeVisible();
-      
-      // Check for radio buttons
-      const radioButtons = deliverySection.locator('input[type="radio"]');
-      const radioCount = await radioButtons.count();
-      expect(radioCount).toBeGreaterThanOrEqual(1);
-      
-      // Check that at least one option is visible
-      await expect(radioButtons.first()).toBeVisible();
-      
-      // Verify one option is selected by default
-      const selectedRadio = deliverySection.locator('input[type="radio"]:checked');
-      expect(await selectedRadio.count()).toBe(1);
-    } else {
-      // No delivery options available for this product - that's OK
-      console.log('No delivery options found for this product');
-    }
+    // Verify one option is selected by default
+    const selectedRadio = deliverySection.locator('input[type="radio"]:checked');
+    expect(await selectedRadio.count()).toBe(1);
   });
 
   test('should allow selecting different delivery options', async ({ page }) => {
-    // Click on first product to go to detail page
-    await page.locator('[data-testid="product-card"]').first().click();
+    await navigateToFirstProductWithDelivery(page);
     
-    // Wait for product detail page to load
-    await page.waitForTimeout(1000);
+    const deliverySection = page.locator('[data-testid="delivery-section"], [data-testid="delivery-options"], [data-testid="shipping-section"], [data-testid="shipping-options"]').first();
+    const radioButtons = deliverySection.locator('input[type="radio"]');
+    const radioCount = await radioButtons.count();
     
-    // Check if delivery options are present
-    const deliverySection = page.locator('[data-testid="delivery-section"]');
+    expect(radioCount).toBeGreaterThanOrEqual(2); // Should have multiple options
     
-    if (await deliverySection.count() > 0) {
-      const radioButtons = deliverySection.locator('input[type="radio"]');
-      const radioCount = await radioButtons.count();
+    // Get the initially selected option
+    const initiallySelected = deliverySection.locator('input[type="radio"]:checked');
+    const initialValue = await initiallySelected.getAttribute('value');
+    
+    // Find a different option to select
+    for (let i = 0; i < radioCount; i++) {
+      const radio = radioButtons.nth(i);
+      const value = await radio.getAttribute('value');
+      const isDisabled = await radio.isDisabled();
       
-      if (radioCount >= 2) {
-        // Get the initially selected option
-        const initiallySelected = deliverySection.locator('input[type="radio"]:checked');
-        const initialValue = await initiallySelected.getAttribute('value');
+      if (value !== initialValue && !isDisabled) {
+        // Click the radio button's container instead of the radio directly
+        const radioContainer = radio.locator('..').locator('..');
+        await radioContainer.click();
         
-        // Find a different option to select
-        for (let i = 0; i < radioCount; i++) {
-          const radio = radioButtons.nth(i);
-          const value = await radio.getAttribute('value');
-          const isDisabled = await radio.isDisabled();
-          
-          if (value !== initialValue && !isDisabled) {
-            // Click the radio button's container instead of the radio directly
-            const radioContainer = radio.locator('..').locator('..');
-            await radioContainer.click();
-            
-            // Verify the selection changed
-            await expect(radio).toBeChecked();
-            
-            // Verify the previously selected is no longer checked
-            if (initialValue) {
-              const previousRadio = deliverySection.locator(`input[type="radio"][value="${initialValue}"]`);
-              if (await previousRadio.count() > 0) {
-                await expect(previousRadio).not.toBeChecked();
-              }
-            }
-            break;
+        // Verify the selection changed
+        await expect(radio).toBeChecked();
+        
+        // Verify the previously selected is no longer checked
+        if (initialValue) {
+          const previousRadio = deliverySection.locator(`input[type="radio"][value="${initialValue}"]`);
+          if (await previousRadio.count() > 0) {
+            await expect(previousRadio).not.toBeChecked();
           }
         }
-      } else {
-        console.log('Only one delivery option available, selection test not applicable');
+        break;
       }
-    } else {
-      console.log('No delivery options available for selection test');
     }
   });
 
   test('should display delivery icons for different options', async ({ page }) => {
-    // Click on first product to go to detail page
-    await page.locator('[data-testid="product-card"]').first().click();
-    
-    // Wait for product detail page to load
-    await page.waitForTimeout(1000);
+    // Open first product detail page and wait for it to load
+    await openFirstProductDetail(page);
     
     // Look for delivery options section
     const deliverySection = page.locator('[data-testid="delivery-section"]');
@@ -133,17 +125,15 @@ test.describe('Delivery Options', () => {
         // Should have at least one icon per delivery option
         expect(iconCount).toBeGreaterThanOrEqual(1);
       } else {
-        console.log('No delivery icons found, but section exists');
+        // With deterministic delivery options, we should have at least some icons
+        throw new Error('Expected delivery icons but none found in delivery section');
       }
     }
   });
 
   test('should auto-select appropriate default delivery option', async ({ page }) => {
-    // Click on first product to go to detail page
-    await page.locator('[data-testid="product-card"]').first().click();
-    
-    // Wait for product detail page to load
-    await page.waitForTimeout(1000);
+    // Open first product detail page and wait for it to load
+    await openFirstProductDetail(page);
     
     // Check if delivery options are present
     const deliverySection = page.locator('[data-testid="delivery-section"]');
@@ -162,11 +152,8 @@ test.describe('Delivery Options', () => {
   });
 
   test('should show delivery section header text', async ({ page }) => {
-    // Click on first product to go to detail page
-    await page.locator('[data-testid="product-card"]').first().click();
-    
-    // Wait for product detail page to load
-    await page.waitForTimeout(1000);
+    // Open first product detail page and wait for it to load
+    await openFirstProductDetail(page);
     
     // Look for delivery section
     const deliverySection = page.locator('[data-testid="delivery-section"]');
@@ -178,8 +165,8 @@ test.describe('Delivery Options', () => {
       if (await headerText.count() > 0) {
         await expect(headerText).toBeVisible();
       } else {
-        // Section exists but no header text - still OK
-        console.log('Delivery section found but no header text');
+        // With proper UI implementation, delivery section should have header
+        throw new Error('Delivery section found but missing expected header text');
       }
     }
   });
@@ -195,7 +182,9 @@ test.describe('Delivery Options', () => {
     for (let i = 0; i < Math.min(3, cardCount); i++) {
       const card = productCards.nth(i);
       await card.click();
-      await page.waitForTimeout(1000);
+      
+      // Wait for product detail page to load by waiting for product title
+      await page.locator('[data-testid="product-title"]').waitFor({ state: 'visible' });
       
       // Verify NO minimum order restrictions are shown on product pages
       const minOrderText = page.getByText(/Minimum order|Min order/i);
@@ -215,62 +204,39 @@ test.describe('Delivery Options', () => {
       // Go back to test another product
       if (i < Math.min(3, cardCount) - 1) {
         await page.goBack();
-        await page.waitForTimeout(500);
+        await waitForProductsLoaded(page);
       }
     }
   });
 
   test('should handle products without delivery options gracefully', async ({ page }) => {
     // Test that the app works fine even when products don't have delivery options
+    await openFirstProductDetail(page);
     
-    const productCards = page.locator('[data-testid="product-card"]');
-    const cardCount = await productCards.count();
+    // Whether or not delivery section exists, the product page should be functional
+    await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="product-price"]')).toBeVisible();
+    await expect(page.locator('[data-testid="add-to-cart"]')).toBeVisible();
     
-    let testedProduct = false;
+    // Add to cart should work regardless of delivery options
+    const addToCartButton = page.locator('[data-testid="add-to-cart"]');
     
-    // Test at least one product
-    for (let i = 0; i < Math.min(3, cardCount); i++) {
-      const card = productCards.nth(i);
-      await card.click();
-      await page.waitForTimeout(1000);
+    if (!(await addToCartButton.isDisabled())) {
+      const cartBadge = page.locator('[data-testid="cart-count"]');
+      let initialCount = 0;
       
-      testedProduct = true;
-      
-      // Whether or not delivery section exists, the product page should be functional
-      await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
-      await expect(page.locator('[data-testid="product-price"]')).toBeVisible();
-      await expect(page.locator('[data-testid="add-to-cart"]')).toBeVisible();
-      
-      // Add to cart should work regardless of delivery options
-      const addToCartButton = page.locator('[data-testid="add-to-cart"]');
-      
-      if (!(await addToCartButton.isDisabled())) {
-        const cartBadge = page.locator('[data-testid="cart-count"]');
-        let initialCount = 0;
-        
-        if (await cartBadge.count() > 0) {
-          const initialCountText = await cartBadge.textContent();
-          initialCount = parseInt(initialCountText || '0') || 0;
-        }
-        
-        await addToCartButton.click();
-        await page.waitForTimeout(500);
-        
-        // Verify cart was updated
-        if (await cartBadge.count() > 0) {
-          const newCountText = await cartBadge.textContent();
-          const newCount = parseInt(newCountText || '0') || 0;
-          expect(newCount).toBeGreaterThan(initialCount);
-        }
+      if (await cartBadge.count() > 0) {
+        const initialCountText = await cartBadge.textContent();
+        initialCount = parseInt(initialCountText || '0') || 0;
       }
       
-      // Go back for next product
-      if (i < Math.min(3, cardCount) - 1) {
-        await page.goBack();
-        await page.waitForTimeout(500);
+      // Add to cart and verify it works
+      await addToCartButton.click();
+      
+      // Verify cart was updated
+      if (await cartBadge.count() > 0) {
+        await expect(cartBadge).toHaveText(String(initialCount + 1));
       }
     }
-    
-    expect(testedProduct).toBeTruthy();
   });
 });

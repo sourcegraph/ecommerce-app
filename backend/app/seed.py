@@ -11,7 +11,7 @@ from .db import engine, create_db_and_tables
 from .models import Product, DeliveryOption, DeliverySpeed
 from .crud import get_category_by_name, create_category, download_and_store_image
 from .schemas import CategoryCreate
-import random
+
 
 def load_products_json():
     """Load products from the JSON file"""
@@ -34,8 +34,8 @@ def load_products_json():
 
 def seed_categories(session: Session, products: list) -> dict:
     """Create categories from product data and return a mapping"""
-    # Extract unique categories
-    categories = set(product['category'] for product in products)
+    # Extract unique categories and sort for deterministic order
+    categories = sorted({product['category'] for product in products})
     category_map = {}
     
     for category_name in categories:
@@ -175,8 +175,8 @@ def assign_delivery_options_to_products(session: Session, delivery_options: list
     next_day_count = max(1, num_products // 3)  # ~33% get Next Day
     same_day_count = max(1, num_products // 5)  # ~20% get Same Day
     
-    # Shuffle products to randomly select which ones get premium options
-    random.shuffle(products)
+    # Sort products by ID for deterministic assignment
+    products.sort(key=lambda p: p.id or 0)
     
     for i, product in enumerate(products):
         # All products get standard options
@@ -234,7 +234,7 @@ def seed_database(custom_engine=None):
     print(f"   - Products: {len(products)}")
     print(f"   - Delivery options: {len(delivery_options) if 'delivery_options' in locals() else 0}")
     print("   - All product images downloaded and stored as BLOBs")
-    print("   - Delivery options randomly assigned to products")
+    print("   - Delivery options deterministically assigned to products (by product ID)")
 
 if __name__ == "__main__":
     seed_database()
