@@ -73,7 +73,7 @@ Demonstrate Amp Github code review feature.
 **Steps:**  
 - No manual action is required to execute the PR Review bot. The bot automatically runs whenever a pull request is created.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo and show the Github PR bot working automatically.
-- Example PR https://github.com/sourcegraph/amp-demo/pull/7 (Note, this isn't working atm. working on getting it fixed).
+- Example PR https://github.com/sourcegraph/ecommerce-app/pull/26
 
 ### Small change - Amp demo in <2 mins 
 
