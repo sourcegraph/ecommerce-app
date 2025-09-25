@@ -18,7 +18,7 @@ test.describe('Product Browsing', () => {
   });
 
   test('should show loading state initially', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     const loading = page.getByTestId('loading');
     
@@ -53,10 +53,10 @@ test.describe('Product Browsing', () => {
   });
 
   test('should handle API errors gracefully', async ({ page }) => {
-    // Intercept API calls and simulate failure
-    await page.route('**/products', route => route.abort());
+    // Intercept only the main products API call (not featured/popular) and simulate failure
+    await page.route('**/api/products?**', route => route.abort());
     
-    await page.goto('/');
+    await page.goto('/products');
     
     // Should either show error message or fallback content
     // Wait for error state or fallback instead of arbitrary timeout

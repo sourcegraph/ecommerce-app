@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Product Filtering', () => {
   test('should filter products by category', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -27,7 +27,7 @@ test.describe('Product Filtering', () => {
   });
 
   test('should search products by name', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
@@ -61,7 +61,7 @@ test.describe('Product Filtering', () => {
   });
 
   test('should show "no results" message when appropriate', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/products');
     
     // Wait for products to load
     await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });

@@ -56,6 +56,11 @@ def seed_products(session: Session, products: list, category_map: dict):
     """Create products with image download and storage"""
     print(f"\nSeeding {len(products)} products...")
     
+    # Randomly select some products to be featured (about 30% of products)
+    featured_count = max(3, len(products) // 3)  # Ensure at least 3 featured products
+    random.shuffle(products)  # Randomize the order
+    featured_products = set(products[i]['id'] for i in range(featured_count))
+    
     for product_data in products:
         # Check if product already exists
         existing_product = session.get(Product, product_data['id'])
@@ -64,20 +69,23 @@ def seed_products(session: Session, products: list, category_map: dict):
             continue
         
         # Create new product
+        is_featured = product_data['id'] in featured_products
         new_product = Product(
             id=product_data['id'],
             title=product_data['title'],
             description=product_data['description'],
             price=float(product_data['price']),
             category_id=category_map[product_data['category']],
-            is_saved=False
+            is_saved=False,
+            featured=is_featured
         )
         
         session.add(new_product)
         session.commit()
         session.refresh(new_product)
         
-        print(f"Created product '{product_data['title']}' (ID: {product_data['id']})")
+        featured_text = " (FEATURED)" if is_featured else ""
+        print(f"Created product '{product_data['title']}' (ID: {product_data['id']}){featured_text}")
         
         # Download and store image
         image_url = product_data.get('image')

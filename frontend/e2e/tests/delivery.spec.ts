@@ -239,4 +239,94 @@ test.describe('Delivery Options', () => {
       }
     }
   });
+
+  test('should maintain functionality when no delivery restrictions apply', async ({ page }) => {
+    // This test ensures that products don't show minimum order restrictions
+    // which was mentioned in the original test as something that shouldn't happen
+    
+    const productCards = page.locator('[data-testid="product-card"]');
+    const cardCount = await productCards.count();
+    
+    // Test a few products to ensure no minimum order restrictions are shown
+    for (let i = 0; i < Math.min(3, cardCount); i++) {
+      const card = productCards.nth(i);
+      await card.click();
+      await page.waitForTimeout(1000);
+      
+      // Verify NO minimum order restrictions are shown on product pages
+      const minOrderText = page.getByText(/Minimum order|Min order/i);
+      await expect(minOrderText).toHaveCount(0);
+      
+      // Verify delivery options are still displayed and selectable (if they exist)
+      const deliverySection = page.locator('[data-testid="delivery-section"]');
+      if (await deliverySection.count() > 0) {
+        const deliveryOptions = deliverySection.locator('input[type="radio"]');
+        if (await deliveryOptions.count() > 0) {
+          // All options should be enabled (not disabled)
+          const disabledOptions = deliverySection.locator('input[type="radio"]:disabled');
+          await expect(disabledOptions).toHaveCount(0);
+        }
+      }
+      
+      // Go back to test another product
+      if (i < Math.min(3, cardCount) - 1) {
+        await page.goBack();
+        await page.waitForTimeout(500);
+      }
+    }
+  });
+
+  test('should handle products without delivery options gracefully', async ({ page }) => {
+    // Test that the app works fine even when products don't have delivery options
+    
+    const productCards = page.locator('[data-testid="product-card"]');
+    const cardCount = await productCards.count();
+    
+    let testedProduct = false;
+    
+    // Test at least one product
+    for (let i = 0; i < Math.min(3, cardCount); i++) {
+      const card = productCards.nth(i);
+      await card.click();
+      await page.waitForTimeout(1000);
+      
+      testedProduct = true;
+      
+      // Whether or not delivery section exists, the product page should be functional
+      await expect(page.locator('[data-testid="product-title"]')).toBeVisible();
+      await expect(page.locator('[data-testid="product-price"]')).toBeVisible();
+      await expect(page.locator('[data-testid="add-to-cart"]')).toBeVisible();
+      
+      // Add to cart should work regardless of delivery options
+      const addToCartButton = page.locator('[data-testid="add-to-cart"]');
+      
+      if (!(await addToCartButton.isDisabled())) {
+        const cartBadge = page.locator('[data-testid="cart-count"]');
+        let initialCount = 0;
+        
+        if (await cartBadge.count() > 0) {
+          const initialCountText = await cartBadge.textContent();
+          initialCount = parseInt(initialCountText || '0') || 0;
+        }
+        
+        await addToCartButton.click();
+        await page.waitForTimeout(500);
+        
+        // Verify cart was updated
+        if (await cartBadge.count() > 0) {
+          const newCountText = await cartBadge.textContent();
+          const newCount = parseInt(newCountText || '0') || 0;
+          expect(newCount).toBeGreaterThan(initialCount);
+        }
+      }
+      
+      // Go back for next product
+      if (i < Math.min(3, cardCount) - 1) {
+        await page.goBack();
+        await page.waitForTimeout(500);
+      }
+    }
+    
+    expect(testedProduct).toBeTruthy();
+  });
 });
