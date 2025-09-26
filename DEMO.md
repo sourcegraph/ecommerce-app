@@ -12,7 +12,7 @@ To get setup to demo, do the following steps:
 **Table of Contents**
 
 [VS Code](#VS-Code)
-- [Small change: Quick Amp demo](#Small-change:-Quick-Amp-demo) 
+- [Small change: Quick Amp demo](#Small-change-Quick-Amp-demo) 
 - [Issue to PR](#Issue-to-PR) - [Bugfix](#Fixing-Github-Issue-Bug) and [New feature](Implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
@@ -32,7 +32,7 @@ To get setup to demo, do the following steps:
 
 
 # VS Code
-## Small change: Quick Amp demo
+## Small change Quick Amp demo
 
 If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
 - Start the ecomerce website by entering '''start the website in the Amp command prompt'''. Show that website on [http://localhost:3001](http://localhost:3001) has a white background and you will change it to light blue.
