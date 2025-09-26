@@ -37,7 +37,7 @@ To get setup to demo, do the following steps:
 If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
 - Start the ecomerce website by entering '''start the website in the Amp command prompt'''. Show that website on [http://localhost:3001](http://localhost:3001) has a white background and you will change it to light blue.
 - Run this prompt ```Make the background light blue instead of white``` and Amp will upgrade the CSS to make background light blue.
-- Wait thread to finish executing and reload the website on [http://localhost:3001](http://localhost:3001)
+- Wait for the thread to finish executing and reload the website on [http://localhost:3001](http://localhost:3001)
 
 
 
