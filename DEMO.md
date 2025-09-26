@@ -18,7 +18,7 @@ To get setup to demo, do the following steps:
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
 - [IDE diagnostics and testing](#ide-diagnostics-and-testing)
 - [AGENTS.md / Multiple AGENTS.md](#agentsmd--multiple-agentsmd)
-- [MCP and tool calling](#mcp-and-tool-calling)
+- [Sourcegraph Search MCP and tool calling](#mcp-and-tool-calling)
   
 [Amp CLI in Terminal](#Amp-CLI-in-Terminal)
 - [Amp in non-interactive mode](#Amp-in-non-interactive-mode)
