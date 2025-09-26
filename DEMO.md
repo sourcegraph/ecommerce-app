@@ -12,6 +12,7 @@ To get setup to demo, do the following steps:
 **Table of Contents**
 
 [VS Code](#VS-Code)
+- [Small change: Quick Amp demo](#Small-change:-Quick-Amp-demo) 
 - [Issue to PR](#Issue-to-PR) - [Bugfix](#Fixing-Github-Issue-Bug) and [New feature](Implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
@@ -31,6 +32,14 @@ To get setup to demo, do the following steps:
 
 
 # VS Code
+## Small change: Quick Amp demo
+
+If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
+- Start the ecomerce website by entering '''start the website in the Amp command prompt'''. Show that website on [http://localhost:3001](http://localhost:3001) has a white background and you will change it to light blue.
+- Run this prompt ```Make the background light blue instead of white``` and Amp will upgrade the CSS to make background light blue.
+- Wait thread to finish executing and reload the website on [http://localhost:3001](http://localhost:3001)
+
+
 
 ## Issue to PR
 
@@ -74,13 +83,6 @@ Demonstrate Amp Github code review feature.
 - No manual action is required to execute the PR Review bot. The bot automatically runs whenever a pull request is created.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo and show the Github PR bot working automatically.
 - Example PR https://github.com/sourcegraph/ecommerce-app/pull/26
-
-### Small change - Amp demo in <2 mins 
-
-If you want to quickly demo Amp in under 2 mins, you can make a small change like changing the website background. Steps:
-- Start the website using the command 'just up'. Show that website on [http://localhost:3001](http://localhost:3001) has a white background and you will change it to light blue.
-- Run this prompt ```Make the background light blue instead of white``` and Amp will upgrade the CSS to make background light blue.
-- Restart the website; execute 'just down' then 'just up'.
 
 
 ## Oracle planning prompts
