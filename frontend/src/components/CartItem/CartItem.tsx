@@ -116,7 +116,7 @@ const CartItem = ({ product }: Props) => {
                 colorScheme="red"
                 variant="ghost"
                 size="sm"
-                onClick={() => deleteFromCart(product.id)}
+                onClick={async () => await deleteFromCart(product.id)}
                 data-testid="remove-item"
               >
                 Remove Item

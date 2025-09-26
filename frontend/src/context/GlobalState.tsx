@@ -1,6 +1,8 @@
 import { useToast } from "@chakra-ui/react";
 import { FC, ReactNode, createContext, useEffect, useState } from "react";
 import seed from "./products.json";
+import { api } from '../api/client';
+import { getSessionId } from '../utils/sessionId';
 
 type DeliverySpeed = "standard" | "express" | "next_day" | "same_day";
 
@@ -36,6 +38,7 @@ type Product = {
   isSaved?: boolean;
   delivery_summary?: DeliverySummary | null;
   delivery_options?: DeliveryOption[];
+  cart_popularity_count?: number;
 };
 
 export type ProductInCart = Product & {
@@ -67,8 +70,8 @@ type ContextType = {
   cartItemCount: number;
   totalPrice: number;
   savedItemsCount: number;
-  addToCart: (product: ProductType) => void;
-  deleteFromCart: (id: number | string) => void;
+  addToCart: (product: ProductType) => Promise<void>;
+  deleteFromCart: (id: number | string) => Promise<void>;
   setQuantity: (qty: string, id: number | string) => void;
   decrementQty: (id: number | string) => void;
   incrementQty: (id: number | string) => void;
@@ -230,13 +233,22 @@ export const Provider: FC<Props> = ({ children }) => {
     });
   };
 
-  const addToCart = (product: ProductType) => {
+  const addToCart = async (product: ProductType) => {
     toast({
       title: "Product successfully added to your cart",
       status: "success",
       duration: 1500,
       isClosable: true,
     });
+    
+    // Track in backend
+    try {
+      const sessionId = getSessionId();
+      await api.addToCart(+product.id, sessionId);
+    } catch (error) {
+      console.error('Failed to track cart addition:', error);
+    }
+    
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.id === product.id
@@ -248,7 +260,15 @@ export const Provider: FC<Props> = ({ children }) => {
     });
   };
 
-  const deleteFromCart = (id: number | string) => {
+  const deleteFromCart = async (id: number | string) => {
+    // Track removal in backend
+    try {
+      const sessionId = getSessionId();
+      await api.removeFromCart(+id, sessionId);
+    } catch (error) {
+      console.error('Failed to track cart removal:', error);
+    }
+    
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(prevProduct => {
         if (prevProduct.id === id) {

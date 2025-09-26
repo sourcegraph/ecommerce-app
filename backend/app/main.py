@@ -14,7 +14,7 @@ from .schemas import (
     ProductRead, ProductCreate, ProductUpdate,
     ProductReadWithDeliveryOptions, DeliverySummary,
     CategoryRead, CategoryCreate, CategoryReadWithProducts,
-    DeliveryOptionRead
+    DeliveryOptionRead, CartAddRequest, CartRemoveRequest
 )
 from . import crud
 from .models import Product, DeliveryOption, Category, ProductDeliveryLink
@@ -229,6 +229,9 @@ def get_products_api(
     # Convert to response format
     result = []
     for product in products:
+        # Get cart popularity count
+        cart_popularity_count = crud.get_cart_popularity_count(session, product.id) if product.id else 0
+        
         product_dict = {
             "id": product.id,
             "title": product.title,
@@ -245,7 +248,8 @@ def get_products_api(
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
             } if product.category else None,
-            "delivery_summary": None
+            "delivery_summary": None,
+            "cart_popularity_count": cart_popularity_count
         }
         
         if include_delivery_summary and hasattr(product, 'delivery_options'):
@@ -276,6 +280,9 @@ def get_products(
     # Convert to response format with image URLs
     result = []
     for product in products:
+        # Get cart popularity count
+        cart_popularity_count = crud.get_cart_popularity_count(session, product.id) if product.id else 0
+        
         product_dict = {
             "id": product.id,
             "title": product.title,
@@ -292,7 +299,8 @@ def get_products(
                 "created_at": product.category.created_at,
                 "updated_at": product.category.updated_at,
             } if product.category else None,
-            "delivery_summary": None
+            "delivery_summary": None,
+            "cart_popularity_count": cart_popularity_count
         }
         
         if include_delivery_summary and hasattr(product, 'delivery_options'):
@@ -423,6 +431,35 @@ def get_product_image(
             "Cache-Control": "public, max-age=86400"  # Cache for 1 day
         }
     )
+
+# Cart tracking endpoints
+@app.post("/cart/add")
+def add_to_cart(
+    cart_request: CartAddRequest,
+    session: Session = Depends(get_session)
+):
+    """Track when a user adds a product to their cart"""
+    # Verify product exists
+    product = crud.get_product(session, cart_request.product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    crud.add_to_cart_tracking(session, cart_request.product_id, cart_request.session_id)
+    return {"message": "Product added to cart tracking"}
+
+@app.post("/cart/remove")
+def remove_from_cart(
+    cart_request: CartRemoveRequest,
+    session: Session = Depends(get_session)
+):
+    """Remove tracking when a user removes a product from their cart"""
+    # Verify product exists
+    product = crud.get_product(session, cart_request.product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    crud.remove_from_cart_tracking(session, cart_request.product_id, cart_request.session_id)
+    return {"message": "Product removed from cart tracking"}
 
 if __name__ == "__main__":
     import uvicorn

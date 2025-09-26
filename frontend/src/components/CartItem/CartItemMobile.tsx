@@ -138,7 +138,7 @@ const CartItemMobile = ({ product }: Props) => {
             variant="ghost"
             size="md"
             px={2}
-            onClick={() => deleteFromCart(product.id)}
+            onClick={async () => await deleteFromCart(product.id)}
             data-testid="remove-item"
           >
             <TrashIcon mr={1} sx={{ "@media(max-width:365px)": { marginRight: 0 } }} />

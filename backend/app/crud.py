@@ -1,6 +1,6 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from typing import List, Optional, Union
-from .models import Product, Category
+from .models import Product, Category, CartPopularity
 from .schemas import ProductCreate, ProductUpdate, CategoryCreate
 import requests
 from PIL import Image
@@ -186,3 +186,49 @@ def download_and_store_image(session: Session, product: Product, image_url: str)
         print(f"Error downloading image for product {product.id}: {e}")
         print("Creating placeholder image instead...")
         return create_placeholder_image(session, product)
+
+# Cart popularity functions
+def add_to_cart_tracking(session: Session, product_id: int, session_id: str) -> bool:
+    """Track when a user adds a product to their cart"""
+    # Check if this session already has this product tracked
+    existing = session.exec(
+        select(CartPopularity).where(
+            CartPopularity.product_id == product_id,
+            CartPopularity.session_id == session_id
+        )
+    ).first()
+    
+    if not existing:
+        cart_popularity = CartPopularity(
+            product_id=product_id,
+            session_id=session_id
+        )
+        session.add(cart_popularity)
+        session.commit()
+    
+    return True
+
+def remove_from_cart_tracking(session: Session, product_id: int, session_id: str) -> bool:
+    """Remove tracking when a user removes a product from their cart"""
+    existing = session.exec(
+        select(CartPopularity).where(
+            CartPopularity.product_id == product_id,
+            CartPopularity.session_id == session_id
+        )
+    ).first()
+    
+    if existing:
+        session.delete(existing)
+        session.commit()
+    
+    return True
+
+def get_cart_popularity_count(session: Session, product_id: int) -> int:
+    """Get the number of unique sessions/users who have this product in their cart"""
+    result = session.exec(
+        select(func.count(func.distinct(CartPopularity.id))).where(
+            CartPopularity.product_id == product_id
+        )
+    ).first()
+    
+    return result or 0

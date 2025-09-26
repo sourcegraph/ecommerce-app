@@ -42,6 +42,26 @@ class ApiClient {
     
     return this.request<Product[]>(`/api/products?${searchParams.toString()}`)
   }
+
+  async addToCart(productId: number, sessionId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({
+        product_id: productId,
+        session_id: sessionId
+      })
+    })
+  }
+
+  async removeFromCart(productId: number, sessionId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>('/cart/remove', {
+      method: 'POST',
+      body: JSON.stringify({
+        product_id: productId,
+        session_id: sessionId
+      })
+    })
+  }
 }
 
 export const api = new ApiClient()
