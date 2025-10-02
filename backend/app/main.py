@@ -201,19 +201,19 @@ def get_products_api(
             delivery_option = session.exec(delivery_stmt).first()
             if delivery_option:
                 if delivery_option.speed.value == "express":
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).distinct().order_by(
                         cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                         cast(ColumnElement[float], Product.price).asc()
                     )
                 else:
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).distinct().order_by(
                         cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                         cast(ColumnElement[float], Product.price).asc()
                     )
             else:
                 stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
         else:
-            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).distinct().order_by(
                 cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                 cast(ColumnElement[float], Product.price).asc()
             )

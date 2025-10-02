@@ -12,6 +12,7 @@ const styles = {
     // styles for the `html` and `body`
     "html,body": {
       minWidth: "fit-content",
+      backgroundColor: "#add8e6",
     },
     // Shopping Cart Badge styles
     ".MuiBadge-root > span": {
