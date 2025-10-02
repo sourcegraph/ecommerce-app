@@ -27,8 +27,8 @@ const SearchResults = () => {
         spacing="8px"
         m={3}
         mb={6}
-        color="gray.500"
-        separator={<ChevronRightIcon color="gray.500" />}
+        color="text.secondary"
+        separator={<ChevronRightIcon color="text.secondary" />}
       >
         <BreadcrumbItem>
           <BreadcrumbLink as={RouterLink} to="/">

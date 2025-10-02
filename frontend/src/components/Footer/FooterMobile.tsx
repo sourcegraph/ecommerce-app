@@ -18,14 +18,14 @@ const FooterMobile = () => {
     <Flex
       as="footer"
       display={{ base: "flex", smallTablet: "none" }}
-      bg="appBlue.800"
+      bg="ink.900"
       color="white"
       pb={8}
       direction="column"
     >
       <Accordion allowToggle mb={8}>
         <AccordionItem borderTop="none" py={2}>
-          <AccordionButton color="gray.400" _expanded={{ color: "white" }}>
+          <AccordionButton color="ink.400" _expanded={{ color: "white" }}>
             <Box flex="1" textAlign="left">
               <Heading as="h6" fontSize="md" textTransform="uppercase">
                 Pages
@@ -43,8 +43,8 @@ const FooterMobile = () => {
             </VStack>
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem borderColor="gray.600" py={2}>
-          <AccordionButton color="gray.400" _expanded={{ color: "white" }}>
+        <AccordionItem borderColor="ink.600" py={2}>
+          <AccordionButton color="ink.400" _expanded={{ color: "white" }}>
             <Box flex="1" textAlign="left">
               <Heading as="h6" fontSize="md" textTransform="uppercase">
                 Top Designer Brands

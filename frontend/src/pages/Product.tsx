@@ -1,25 +1,21 @@
 import { ChevronRightIcon } from "@chakra-ui/icons";
 
 import {
-  Badge,
+  AspectRatio,
   Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   Button,
   Flex,
-  HStack,
   Heading,
   Icon,
   Image,
-  Stack,
-  StackDivider,
   Tag,
   Text,
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import ProgressLine from "../components/Loading/ProgressLine";
@@ -27,6 +23,7 @@ import MUIRating from "../components/MUI/MUIRating";
 import { DeliveryOptionsSelector } from "../components/Delivery";
 import { useGlobalContext } from "../context/useGlobalContext";
 import { getImageUrl, ProductType, DeliveryOption } from "../context/GlobalState";
+import { BookmarkIcon } from "../components/Icons/BookmarkIcon";
 
 interface ProductWithDelivery {
   id: string | number;
@@ -106,129 +103,120 @@ const Product = () => {
     ? { ...productWithDelivery, inCart: product?.inCart, quantity: product?.inCart ? product.quantity : undefined }
     : product;
 
+
+
   return isLoading || isLoadingProduct ? (
     <ProgressLine />
   ) : (
-    <Box p={3}>
-      <Breadcrumb
-        fontSize="sm"
-        spacing="8px"
-        mb={6}
-        color="gray.500"
-        separator={<ChevronRightIcon color="gray.500" />}
-      >
+    <Box p={{ base: 4, md: 6 }}>
+      <Breadcrumb mb={6} fontSize="sm" separator={<ChevronRightIcon color="ink.400" />}>
         <BreadcrumbItem>
-          <BreadcrumbLink as={RouterLink} to="/">
+          <BreadcrumbLink as={RouterLink} to="/" color="ink.500" _hover={{ color: "ink.600" }}>
             Home
           </BreadcrumbLink>
         </BreadcrumbItem>
-
         <BreadcrumbItem isCurrentPage>
-          <BreadcrumbLink>Product</BreadcrumbLink>
+          <BreadcrumbLink color="ink.500">Product</BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
+
       {displayProduct ? (
-        <Box maxW="640px">
-          <Stack
-            direction={{ base: "column", smallTablet: "row" }}
-            spacing={4}
-            m={2}
-            mb={8}
-            divider={<StackDivider borderColor="blackAlpha.300" borderWidth="2px" />}
-          >
-            <Flex align="center" justify="center" w="220px" h="220px" m="auto">
-              <Image 
-                src={getImageUrl(displayProduct as ProductType)} 
-                maxW="100%" 
-                maxH="100%" 
-                objectFit="contain" 
-                bg="white" 
-                borderRadius="md"
-                style={{ backgroundColor: 'white' }} 
-                data-testid="product-detail-image"
-              />
-            </Flex>
-            <Box>
-              <Heading fontSize="2xl" mb={4} data-testid="product-title">
-                {displayProduct.title}
-              </Heading>
-              <Flex align="center" mb={3}>
-                <MUIRating
-                  name="read-only-stars"
-                  value={
-                    displayProduct.id === 1 ||
-                    displayProduct.id === 4 ||
-                    displayProduct.id === 7 ||
-                    displayProduct.id === 10 ||
-                    displayProduct.id === 12 ||
-                    displayProduct.id === 16 ||
-                    displayProduct.id === 19
-                      ? 4.7
-                      : 4.1
-                  }
-                  precision={0.1}
-                  size="small"
-                  readOnly
+        <Flex
+          direction={{ base: "column", lg: "row" }}
+          gap={{ base: 6, lg: 10 }}
+          maxW="1200px"
+          mx="auto"
+        >
+          {/* Left: Image Gallery (60% on desktop) */}
+          <Box flex={{ base: "1", lg: "0 0 58%" }}>
+            <AspectRatio ratio={1} w="100%" maxW="600px">
+              <Box
+                bg="bg.surface"
+                rounded="lg"
+                p={6}
+                border="1px solid"
+                borderColor="border.subtle"
+                shadow="card"
+              >
+                <Image
+                  src={getImageUrl(displayProduct as ProductType)}
+                  w="100%"
+                  h="100%"
+                  objectFit="contain"
+                  data-testid="product-detail-image"
                 />
-                <Text ml={1} fontSize="sm">
-                  256 Ratings
-                </Text>
-              </Flex>
-              <Flex mb={2}>
-                <Text mr={2}>Size:</Text>{" "}
-                <Tag bg="blackAlpha.200" borderRadius="none" mx={1}>
-                  S
-                </Tag>
-                <Tag bg="blackAlpha.200" borderRadius="none" mx={1}>
-                  M
-                </Tag>
-                <Tag bg="blackAlpha.200" borderRadius="none" mx={1}>
-                  L
-                </Tag>
-                <Tag bg="blackAlpha.200" borderRadius="none" mx={1}>
-                  XL
-                </Tag>
-              </Flex>
-              <Flex align="center" mb={3}>
-                <Text fontSize="2xl" fontWeight="bold" data-testid="product-price">
-                  ${displayProduct.price}{" "}
-                  <Box
-                    as="span"
-                    textDecoration="line-through"
-                    color="blackAlpha.500"
-                    fontSize="lg"
-                  >
-                    {displayProduct.id === 1 ||
-                    displayProduct.id === 4 ||
-                    displayProduct.id === 7 ||
-                    displayProduct.id === 10 ||
-                    displayProduct.id === 12 ||
-                    displayProduct.id === 16 ||
-                    displayProduct.id === 19
-                      ? +displayProduct.price * 2
-                      : null}
-                  </Box>
-                </Text>
-                <Badge
-                  ml={4}
-                  h="fit-content"
-                  textTransform="uppercase"
-                  colorScheme="green"
+              </Box>
+            </AspectRatio>
+
+            {/* Description section below image on desktop */}
+            <Box
+              mt={6}
+              bg="bg.surface"
+              rounded="lg"
+              border="1px solid"
+              borderColor="border.subtle"
+              p={6}
+              shadow="card"
+            >
+              <Heading as="h3" fontSize="xl" mb={3} color="text.primary">
+                Description
+              </Heading>
+              <Text color="text.secondary" lineHeight={1.7} data-testid="product-description">
+                {displayProduct.description}
+              </Text>
+            </Box>
+          </Box>
+
+          {/* Right: Product Details (40% on desktop, sticky) */}
+          <Box flex="1" position={{ lg: "sticky" }} top={{ lg: "120px" }} h="fit-content">
+            <Heading fontSize="2xl" mb={3} color="text.primary" data-testid="product-title">
+              {displayProduct.title}
+            </Heading>
+
+            {/* Rating */}
+            <Flex align="center" mb={4}>
+              <MUIRating
+                name="read-only-stars"
+                value={4.1}
+                precision={0.1}
+                size="small"
+                readOnly
+              />
+              <Text ml={1} fontSize="sm" color="text.secondary">
+                256 Ratings
+              </Text>
+            </Flex>
+
+            {/* Price */}
+            <Flex align="center" mb={4}>
+              <Text fontSize="3xl" fontWeight="bold" color="text.primary" data-testid="product-price">
+                ${displayProduct.price}
+              </Text>
+            </Flex>
+
+            {/* Size selector */}
+            <Flex mb={4} gap={2} align="center">
+              <Text color="text.primary" fontWeight="medium">Size:</Text>
+              {["S", "M", "L", "XL"].map((size) => (
+                <Tag
+                  key={size}
+                  bg="bg.surface"
+                  border="1px solid"
+                  borderColor="border.default"
+                  borderRadius="md"
+                  cursor="pointer"
+                  _hover={{ borderColor: "focus.ring", bg: "bg.subtle" }}
+                  transition="all 0.2s"
                 >
-                  {displayProduct.id === 1 ||
-                  displayProduct.id === 4 ||
-                  displayProduct.id === 7 ||
-                  displayProduct.id === 10 ||
-                  displayProduct.id === 12 ||
-                  displayProduct.id === 16 ||
-                  displayProduct.id === 19
-                    ? "-50%"
-                    : null}
-                </Badge>
-              </Flex>
-              {/* Delivery Options */}
-              {productWithDelivery?.delivery_options && productWithDelivery.delivery_options.length > 0 && (
-                <Box mb={4} data-testid="delivery-section">
+                  {size}
+                </Tag>
+              ))}
+            </Flex>
+
+            {/* Delivery options */}
+            {productWithDelivery?.delivery_options &&
+              productWithDelivery.delivery_options.length > 0 && (
+                <Box mb={6} data-testid="delivery-section">
                   <DeliveryOptionsSelector
                     options={productWithDelivery.delivery_options}
                     productPrice={+displayProduct.price}
@@ -238,65 +226,58 @@ const Product = () => {
                 </Box>
               )}
 
-              <HStack spacing={3}>
-                <Button
-                  colorScheme="red"
-                  onClick={() => {
-                    // Use the fallback product for cart operations since that's what the context expects
-                    const cartProduct = product || (displayProduct as ProductType);
-                    addToCart(cartProduct as ProductType);
-                  }}
-                  isDisabled={displayProduct.inCart ? true : false}
-                  data-testid="add-to-cart"
-                >
-                  <Icon as={FaShoppingCart} mr={3} />
-                  {displayProduct.inCart ? "Added to Cart" : "Add to Cart"}
-                </Button>
-                <Button
-                  colorScheme="appBlue"
-                  variant="outline"
-                  height={9}
-                  minW={9}
-                  w={9}
-                  fontSize="2xl"
-                  px={2}
-                  borderRadius="full"
-                  border={displayProduct.isSaved ? "none" : "1px solid"}
-                  onClick={() => {
-                    toast({
-                      title: displayProduct.isSaved
-                        ? "Product successfully removed from your saved items"
-                        : "Product successfully added to your saved items",
-                      status: "success",
-                      duration: 1500,
-                      isClosable: true,
-                    });
-                    toggleSaved(displayProduct.id);
-                  }}
-                  data-testid="save-button"
-                  aria-pressed={displayProduct.isSaved}
-                  aria-label={displayProduct.isSaved ? "Unsave" : "Save"}
-                >
-                  {displayProduct.isSaved ? <HeartIconFill /> : <HeartIcon />}
-                </Button>
-              </HStack>
-            </Box>
-          </Stack>
-          <Box
-            boxShadow="base"
-            rounded="md"
-            border="1px solid"
-            borderColor="gray.200"
-            p={3}
-          >
-            <Heading as="h3" fontSize="2xl" mb={2}>
-              Description
-            </Heading>
-            <Text data-testid="product-description">{displayProduct.description}</Text>
+            {/* Action buttons */}
+            <Flex gap={3} mb={6}>
+              <Button
+                variant="accent"
+                size="lg"
+                flex="1"
+                onClick={() => {
+                  const cartProduct = product || (displayProduct as ProductType);
+                  addToCart(cartProduct as ProductType);
+                }}
+                isDisabled={displayProduct.inCart ? true : false}
+                data-testid="add-to-cart"
+                leftIcon={<Icon as={FaShoppingCart} />}
+              >
+                {displayProduct.inCart ? "Added to Cart" : "Add to Cart"}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                minW="56px"
+                w="56px"
+                p={0}
+                borderRadius="md"
+                borderColor={displayProduct.isSaved ? "ink.600" : "border.default"}
+                bg={displayProduct.isSaved ? "ink.600" : "transparent"}
+                color={displayProduct.isSaved ? "white" : "text.secondary"}
+                _hover={{
+                  borderColor: "ink.600",
+                  bg: displayProduct.isSaved ? "ink.700" : "bg.subtle",
+                }}
+                onClick={() => {
+                  toast({
+                    title: displayProduct.isSaved
+                      ? "Product successfully removed from your saved items"
+                      : "Product successfully added to your saved items",
+                    status: "success",
+                    duration: 1500,
+                    isClosable: true,
+                  });
+                  toggleSaved(displayProduct.id);
+                }}
+                data-testid="save-button"
+                aria-pressed={displayProduct.isSaved}
+                aria-label={displayProduct.isSaved ? "Unsave" : "Save"}
+              >
+                <BookmarkIcon filled={displayProduct.isSaved} boxSize={5} />
+              </Button>
+            </Flex>
           </Box>
-        </Box>
+        </Flex>
       ) : (
-        <Text>No product found</Text>
+        <Text color="text.secondary">No product found</Text>
       )}
     </Box>
   );

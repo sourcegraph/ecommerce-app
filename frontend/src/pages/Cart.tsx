@@ -20,7 +20,7 @@ const Cart = () => {
         fontWeight="bold"
         fontSize="lg"
         mb={3}
-        color="gray.600"
+        color="text.secondary"
       >
         <Text w="70%" pl={3}>
           Item
@@ -40,7 +40,7 @@ const Cart = () => {
         fontWeight="bold"
         fontSize="lg"
         mb={3}
-        color="gray.600"
+        color="text.secondary"
       >
         MY CART
       </Box>
@@ -67,21 +67,21 @@ const Cart = () => {
             <Text fontSize="lg" fontWeight="semibold">
               Total:
             </Text>
-            <Box as="span" fontWeight="bold" color="appBlue.600" fontSize="xl" data-testid="cart-total">
+            <Box as="span" fontWeight="bold" color="text.primary" fontSize="xl" data-testid="cart-total">
               ${totalPrice.toFixed(2)}
             </Box>
           </Flex>
           <HStack spacing={4} alignSelf="flex-end">
             <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>
               <Button
-                colorScheme="gray"
-                boxShadow="md"
+                variant="outline"
+                shadow="card"
                 size={isLargerThan345 ? "md" : "sm"}
               >
                 Continue Shopping
               </Button>
             </Link>
-            <Button colorScheme="red" boxShadow="md" size={isLargerThan345 ? "md" : "sm"}>
+            <Button variant="solid" shadow="card" size={isLargerThan345 ? "md" : "sm"}>
               Checkout
             </Button>
           </HStack>
@@ -96,7 +96,7 @@ const Cart = () => {
         >
           <Text mb={4}>No Items in your cart</Text>
           <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>
-            <Button colorScheme="gray" boxShadow="md">
+            <Button variant="outline" shadow="card">
               Continue Shopping
             </Button>
           </Link>

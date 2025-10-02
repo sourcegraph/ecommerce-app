@@ -36,19 +36,19 @@ const SearchBar = ({ display }: Props) => {
       <InputGroup>
         <InputLeftElement
           pointerEvents="none"
-          children={<SearchIcon color="gray.600" />}
+          children={<SearchIcon color="text.secondary" />}
         />
         <Input
           borderRadius="full"
-          bg="blackAlpha.200"
+          bg="bg.subtle"
           _focus={{
-            borderColor: "appBlue.400",
-            boxShadow: "0 0 0 1px #3564e6",
+            borderColor: "focus.ring",
+            boxShadow: "0 0 0 1px var(--chakra-colors-focus-ring)",
           }}
           placeholder="Search Items"
           fontSize={{ base: "sm", sm: "md" }}
           _placeholder={{
-            color: "gray.600",
+            color: "text.secondary",
           }}
           value={value}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
@@ -57,7 +57,7 @@ const SearchBar = ({ display }: Props) => {
           <InputRightElement
             children={
               <CloseIcon
-                color="appBlue.400"
+                color="focus.ring"
                 fontSize={12}
                 cursor="pointer"
                 onClick={() => setValue("")}

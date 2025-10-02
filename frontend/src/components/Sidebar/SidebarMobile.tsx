@@ -26,9 +26,9 @@ const SidebarMobile = ({ isOpen, onClose, hamburgerRef }: Props) => {
       finalFocusRef={hamburgerRef}
     >
       <DrawerOverlay display={{ base: "block", sm: "none" }}>
-        <DrawerContent pt={16} color="blackAlpha.700">
+        <DrawerContent pt={16} color="text.secondary">
           <DrawerCloseButton
-            color="appBlue.500"
+            color="focus.ring"
             top="1rem"
             right={0}
             left="0.5rem"

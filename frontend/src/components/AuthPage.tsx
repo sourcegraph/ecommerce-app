@@ -73,7 +73,7 @@ const AuthPage = ({ authType }: Props) => {
             mt={{ base: "130px", smallTablet: "152px" }}
           >
             <VStack spacing={8}>
-              <Heading fontSize="2xl" textTransform="uppercase" color="red.500">
+              <Heading fontSize="2xl" textTransform="uppercase" color="text.primary">
                 {authType}
               </Heading>
               <Field name="email">
@@ -89,9 +89,9 @@ const AuthPage = ({ authType }: Props) => {
                       type="email"
                       placeholder="Email Address"
                       _placeholder={{
-                        color: "gray.600",
+                        color: "text.secondary",
                       }}
-                      bg="blackAlpha.200"
+                      bg="bg.subtle"
                       py={7}
                       autoComplete="on"
                     />
@@ -113,9 +113,9 @@ const AuthPage = ({ authType }: Props) => {
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         _placeholder={{
-                          color: "gray.600",
+                          color: "text.secondary",
                         }}
-                        bg="blackAlpha.200"
+                        bg="bg.subtle"
                         py={7}
                         autoComplete="on"
                       />
@@ -123,9 +123,9 @@ const AuthPage = ({ authType }: Props) => {
                         <IconButton
                           aria-label="Show or Hide password"
                           borderRadius="full"
-                          colorScheme="red"
-                          variant="link"
+                          variant="ghost"
                           size="sm"
+                          color="text.primary"
                           icon={
                             showPassword ? (
                               <VisibleEye size={22} />
@@ -147,11 +147,11 @@ const AuthPage = ({ authType }: Props) => {
                 fontWeight="500"
                 display={authType === "login" ? "flex" : "none"}
               >
-                <Checkbox colorScheme="red" color="gray.700">
+                <Checkbox color="text.primary">
                   <Text fontSize={{ base: "0.9375rem", sm: "1rem" }}>Remember me</Text>
                 </Checkbox>
                 <Link
-                  color="red"
+                  color="text.primary"
                   textDecoration={{ base: "underline", sm: "none" }}
                   fontSize={{ base: "0.9375rem", sm: "1rem" }}
                 >
@@ -163,7 +163,7 @@ const AuthPage = ({ authType }: Props) => {
                 isLoading={props.isSubmitting}
                 textTransform="uppercase"
                 w="100%"
-                colorScheme="red"
+                variant="accent"
                 py={{ base: 6, sm: 7 }}
                 fontWeight="700"
               >
@@ -176,7 +176,7 @@ const AuthPage = ({ authType }: Props) => {
               <Link w="100%" _hover={{ textDecoration: "none" }}>
                 <Button
                   textTransform="uppercase"
-                  colorScheme="facebook"
+                  variant="solid"
                   w="100%"
                   py={{ base: 6, sm: 7 }}
                   fontWeight="700"

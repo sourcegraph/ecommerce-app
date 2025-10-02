@@ -14,12 +14,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { BiTrash } from "react-icons/bi";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
 import MUISkeleton from "../MUI/MUISkeleton";
 import MotionBox from "../MotionBox";
+import { BookmarkIcon } from "../Icons/BookmarkIcon";
 
 type Props = {
   product: ProductInCart;
@@ -46,18 +46,17 @@ const CartItemMobile = ({ product }: Props) => {
       opacity={0}
       // animation
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.5 } }}
-      layout
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
+        duration: 0.2,
+        ease: "easeInOut",
       }}
     >
       <MotionBox
         display={{ base: "flex", bigTablet: "none" }}
         flexDirection="column"
-        boxShadow="base"
+        shadow="card"
         p={3}
         mb={4}
         rounded="base"
@@ -69,10 +68,10 @@ const CartItemMobile = ({ product }: Props) => {
           as={LinkBox}
           p={1}
           borderBottom="1px solid"
-          borderColor="blackAlpha.200"
+          borderColor="border.subtle"
           _hover={{
             ".product-title": {
-              color: "appBlue.600",
+              color: "focus.ring",
             },
           }}
         >
@@ -83,7 +82,7 @@ const CartItemMobile = ({ product }: Props) => {
               maxW="100%"
               maxH="100%"
               objectFit="contain"
-              bg="white"
+              bg="bg.surface"
               borderRadius="md"
               style={{ backgroundColor: 'white' }}
             />
@@ -91,7 +90,7 @@ const CartItemMobile = ({ product }: Props) => {
               <MUISkeleton
                 height="120px"
                 style={{ transform: "none" }}
-                animation="wave"
+                animation={false}
               />
             </Box>
           </Flex>
@@ -105,7 +104,7 @@ const CartItemMobile = ({ product }: Props) => {
                 <Text fontWeight="medium">{product.title}</Text>
               </LinkOverlay>
             </Box>
-            <Box mt={2} fontWeight="bold" fontSize="lg" color="appBlue.600">
+            <Box mt={2} fontWeight="bold" fontSize="lg" color="text.primary">
               ${subTotal.toFixed(2)}
             </Box>
           </Flex>
@@ -113,9 +112,10 @@ const CartItemMobile = ({ product }: Props) => {
 
         <Flex mt={3}>
           <Button
-            colorScheme="appBlue"
             variant="ghost"
             size="md"
+            color="text.secondary"
+            _hover={{ color: "focus.ring" }}
             onClick={() => {
               toast({
                 title: product.isSaved
@@ -129,15 +129,16 @@ const CartItemMobile = ({ product }: Props) => {
             }}
             px={2}
             borderRight="1px solid"
-            borderColor="blackAlpha.200"
+            borderColor="border.subtle"
           >
-            {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
+            <BookmarkIcon filled={product.isSaved} boxSize={5} />
           </Button>
           <Button
-            colorScheme="red"
             variant="ghost"
             size="md"
             px={2}
+            color="text.secondary"
+            _hover={{ color: "ink.600" }}
             onClick={() => deleteFromCart(product.id)}
             data-testid="remove-item"
           >
@@ -153,7 +154,7 @@ const CartItemMobile = ({ product }: Props) => {
           <HStack spacing={1} w="100px" justify="center" align="center" ml="auto">
             <Button
               size="xs"
-              colorScheme="appBlue"
+              variant="accent"
               rounded="full"
               {...dec}
               disabled={+product.quantity === 1}
@@ -172,11 +173,12 @@ const CartItemMobile = ({ product }: Props) => {
               w="65%"
               textAlign="center"
               border="none"
-              borderBottom="1px solid #00000014"
+              borderBottom="1px solid"
+              borderColor="border.default"
             />
             <Button
               size="xs"
-              colorScheme="appBlue"
+              variant="accent"
               rounded="full"
               {...inc}
               disabled={+product.quantity === 10}

@@ -7,7 +7,7 @@ const Footer = () => {
     <Flex
       as="footer"
       display={{ base: "none", smallTablet: "flex" }}
-      bg="appBlue.800"
+      bg="ink.900"
       color="white"
       pl={{ base: 16, md: "236px" }}
       pr={{ base: 16, md: 8 }}

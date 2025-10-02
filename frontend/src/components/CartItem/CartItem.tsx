@@ -11,12 +11,12 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent } from "react";
 import { BiTrash as TrashIcon } from "react-icons/bi";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
 import MUISkeleton from "../MUI/MUISkeleton";
 import MotionBox from "../MotionBox";
+import { BookmarkIcon } from "../Icons/BookmarkIcon";
 
 type Props = {
   product: ProductInCart;
@@ -33,17 +33,16 @@ const CartItem = ({ product }: Props) => {
       opacity={0}
       // animation
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.5 } }}
-      layout
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
+        duration: 0.2,
+        ease: "easeInOut",
       }}
     >
       <MotionBox
         display={{ base: "none", bigTablet: "flex" }}
-        boxShadow="base"
+        shadow="card"
         mb={4}
         rounded="base"
         // animation
@@ -55,10 +54,10 @@ const CartItem = ({ product }: Props) => {
           p={3}
           w="70%"
           borderRight="2px solid"
-          borderColor="blackAlpha.200"
+          borderColor="border.subtle"
           _hover={{
             ".product-title": {
-              color: "appBlue.600",
+              color: "focus.ring",
             },
           }}
         >
@@ -69,7 +68,7 @@ const CartItem = ({ product }: Props) => {
               maxW="100%"
               maxH="100%"
               objectFit="contain"
-              bg="white"
+              bg="bg.surface"
               borderRadius="md"
               style={{ backgroundColor: 'white' }}
             />
@@ -77,7 +76,7 @@ const CartItem = ({ product }: Props) => {
               <MUISkeleton
                 height="140px"
                 style={{ transform: "none" }}
-                animation="wave"
+                animation={false}
               />
             </Box>
           </Flex>
@@ -93,10 +92,11 @@ const CartItem = ({ product }: Props) => {
             </Box>
             <Flex flexWrap="wrap" mt={2}>
               <Button
-                leftIcon={product.isSaved ? <HeartIconFill /> : <HeartIcon />}
-                colorScheme="appBlue"
+                leftIcon={<BookmarkIcon filled={product.isSaved} boxSize={4} />}
                 variant="ghost"
                 size="sm"
+                color="text.secondary"
+                _hover={{ color: "focus.ring" }}
                 onClick={() => {
                   toast({
                     title: product.isSaved
@@ -113,9 +113,10 @@ const CartItem = ({ product }: Props) => {
               </Button>
               <Button
                 leftIcon={<TrashIcon />}
-                colorScheme="red"
                 variant="ghost"
                 size="sm"
+                color="text.secondary"
+                _hover={{ color: "ink.600" }}
                 onClick={() => deleteFromCart(product.id)}
                 data-testid="remove-item"
               >
@@ -127,7 +128,7 @@ const CartItem = ({ product }: Props) => {
         <Flex
           w="30%"
           borderRight="2px solid"
-          borderColor="blackAlpha.200"
+          borderColor="border.subtle"
           justify="center"
           align="center"
         >
@@ -155,7 +156,7 @@ const CartItem = ({ product }: Props) => {
         <Flex
           w="30%"
           borderRight="2px solid"
-          borderColor="blackAlpha.200"
+          borderColor="border.subtle"
           fontWeight="bold"
           fontSize="lg"
           justify="center"
@@ -169,7 +170,7 @@ const CartItem = ({ product }: Props) => {
           fontSize="lg"
           justify="center"
           align="center"
-          color="appBlue.600"
+          color="text.primary"
         >
           ${subTotal.toFixed(2)}
         </Flex>

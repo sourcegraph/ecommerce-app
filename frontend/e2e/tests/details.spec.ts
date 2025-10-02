@@ -10,7 +10,7 @@ test.describe('Product Details', () => {
   test('should navigate to product detail page', async ({ page }) => {
     // Get product title before clicking
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitleElement = firstProduct.locator('.product-title, h3, h2, h1').first();
+    const productTitleElement = firstProduct.locator('[data-testid="product-title"]');
     const productTitle = await productTitleElement.textContent();
     
     await firstProduct.click();

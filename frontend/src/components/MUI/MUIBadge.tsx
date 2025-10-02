@@ -1,6 +1,7 @@
 import Badge from "@mui/material/Badge";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
+import { muiTheme } from "../../theme/mui-theme";
 
 type Props = {
   badgeContent?: number;
@@ -8,11 +9,9 @@ type Props = {
   testId?: string;
 };
 
-const theme = createTheme();
-
 const MUIBadge = ({ badgeContent, children, testId = "cart-count" }: Props) => {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={muiTheme}>
       <Badge badgeContent={badgeContent} color="secondary" data-testid={testId}>
         {children}
       </Badge>

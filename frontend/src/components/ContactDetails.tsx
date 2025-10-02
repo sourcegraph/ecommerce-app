@@ -30,13 +30,13 @@ const ContactDetails = () => {
       </Stack>
       <HStack spacing={6}>
         <Link>
-          <TwitterIcon color="white" _hover={{ color: "#1DA1F2" }} size={24} />
+          <TwitterIcon color="white" _hover={{ color: "ink.600" }} size={24} />
         </Link>
         <Link>
-          <FbIcon color="white" _hover={{ color: "#4267B2" }} size={24} />
+          <FbIcon color="white" _hover={{ color: "ink.600" }} size={24} />
         </Link>
         <Link>
-          <LinkedinIcon color="white" _hover={{ color: "#2867B2" }} size={24} />
+          <LinkedinIcon color="white" _hover={{ color: "ink.600" }} size={24} />
         </Link>
       </HStack>
     </Flex>

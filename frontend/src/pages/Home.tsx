@@ -1,4 +1,5 @@
 import { HStack, Tag, Text } from "@chakra-ui/react";
+import FeaturedBanner from "../components/FeaturedBanner";
 import LoadingProduct from "../components/Loading/LoadingProduct";
 import Main from "../components/Main";
 import ProductCard from "../components/ProductCard";
@@ -49,12 +50,16 @@ const Home = () => {
   
   return (
     <Main>
+      {!isLoading && products.length > 0 && (
+        <FeaturedBanner product={products[0]} />
+      )}
+
       <HStack p={3} mb={5} spacing={2} flexWrap="wrap">
-        <Text fontWeight="bold" fontSize="sm" mr={3}>
+        <Text fontWeight="bold" fontSize="sm" mr={3} color="text.primary">
           Related
         </Text>
         {searchTags.map((tag, i) => (
-          <Tag key={i} size="sm" bg="blackAlpha.200" rounded="full" m={1}>
+          <Tag key={i} size="sm" bg="bg.subtle" color="text.secondary" rounded="full" m={1}>
             {tag}
           </Tag>
         ))}

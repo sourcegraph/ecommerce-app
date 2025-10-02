@@ -1,11 +1,10 @@
 import { Rating, RatingProps } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-
-const theme = createTheme();
+import { ThemeProvider } from "@mui/material/styles";
+import { muiTheme } from "../../theme/mui-theme";
 
 const MUIRating = (props: RatingProps) => {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={muiTheme}>
       <Rating {...props} />
     </ThemeProvider>
   );
