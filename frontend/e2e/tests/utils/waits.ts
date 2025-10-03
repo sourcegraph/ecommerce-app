@@ -84,7 +84,9 @@ async function updateQuantityControl(page: Page, quantity: number) {
   const quantityDisplay = page.locator('[data-testid="quantity-display"]').first();
   
   // Check if NumberInput field is available (desktop)
-  if (await quantityDisplay.count() > 0 && await quantityDisplay.getAttribute('type') === 'text') {
+  const count = await quantityDisplay.count();
+  const inputType = await quantityDisplay.getAttribute('type');
+  if (count > 0 && (inputType === 'text' || inputType === 'number')) {
     // Desktop: use NumberInput field
     await quantityDisplay.clear();
     await quantityDisplay.fill(String(quantity));

@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from typing import List, Optional, cast, Any
 from sqlalchemy.sql.elements import ColumnElement
 import io
+import os
 
 from .db import get_session, create_db_and_tables
 
@@ -52,13 +53,13 @@ app = FastAPI(
 )
 
 # CORS middleware for frontend integration
+origins = os.getenv(
+    "CORS_ALLOW_ORIGINS", 
+    "http://localhost:3001,http://127.0.0.1:3001"
+).split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-        "http://192.168.0.132:3001",
-    ],
+    allow_origins=[o.strip() for o in origins if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -416,16 +417,13 @@ def get_product_image(
     if not product.image_data:
         raise HTTPException(status_code=404, detail="No image found for this product")
     
-    # Return image as streaming response with CORS headers
+    # Return image as streaming response
     return StreamingResponse(
         io.BytesIO(product.image_data),
         media_type=product.image_mime_type or "image/jpeg",
         headers={
             "Content-Disposition": f'inline; filename="{product.image_filename or f"product_{product_id}.jpg"}"',
             "Cache-Control": "public, max-age=86400",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "*",
         }
     )
 

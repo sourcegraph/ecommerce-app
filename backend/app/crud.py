@@ -125,32 +125,6 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         print(f"Error creating placeholder image for product {product.id}: {e}")
         return False
 
-def _remove_transparency(img: Image.Image, bg_colour: tuple[int, int, int] = (245, 245, 244)) -> Image.Image:
-    """
-    Returns an RGB image with transparency removed (flattened on bg_colour).
-    Works for RGBA, LA, P and RGB+tRNS PNGs.
-    Default background color is sand.100 (#F5F5F4) to match the UI theme.
-    """
-    # Check for transparency in any form
-    if (img.mode in ('RGBA', 'LA') or 
-        (img.mode == 'P' and 'transparency' in img.info) or 
-        ('transparency' in img.info)):  # RGB + tRNS
-        
-        alpha = None
-        if img.mode in ('RGBA', 'LA'):
-            alpha = img.split()[-1]
-            img = img.convert('RGBA')  # ensure 4-channel
-        else:
-            img = img.convert('RGBA')  # adds alpha from tRNS/palette
-            alpha = img.split()[-1]
-
-        background = Image.new('RGB', img.size, bg_colour)
-        background.paste(img, mask=alpha)
-        return background
-
-    # No transparency – just ensure RGB
-    return img.convert('RGB')
-
 def download_and_store_image(session: Session, product: Product, image_url: str) -> bool:
     """Download image from URL and store as BLOB in database. Fallback to placeholder if failed."""
     try:
