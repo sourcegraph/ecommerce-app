@@ -15,7 +15,7 @@ To get setup to demo, do the following steps:
 [VS Code](#vs-code)
 
 - [Small change: Quick Amp demo](#small-change-quick-amp-demo)
-- [Issue to PR](#issue-to-pr) - [Bugfix](#fixing-github-issue-bug) and [New feature](Implementing-a-new-feature)
+- [Issue to PR](#issue-to-pr) - [Bugfix](#fixing-github-issue-bug) and [New feature](#implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
 - [Oracle planning prompts](#oracle-planning-prompts)
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
@@ -69,16 +69,18 @@ Demonstrate how you can use Amp to implement a new feature from issue to PR in o
 
 **Steps:**
 
-- The landing page is pretty bare bones. We want to create a carousel to highlight products and make it more interactive and responsive
+- The current featured product banner is not engaging and doesn't cycle through products. We want to create a carousel to highlight products and make it more interactive and responsive
 - In VS Code or Terminal, type:
 
 ```
-Implement feature https://github.com/sourcegraph/amp-demo/issues/4 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request
+Implement feature https://github.com/sourcegraph/amp-demo/issues/38 in a new branch. Consult the oracle to plan, check the plan over yourself, then once decided execute the changes, test and validate. CI checks must all pass. Then create a pull request.
 ```
 
-- While Amp is executing, you can optionally show a previous [thread](https://ampcode.com/threads/T-d37dc873-6b2d-4afe-b0be-a75b18a26aa5) that was run for the feature. Or you can switch to [feature/landing-page-carousel](https://github.com/sourcegraph/amp-demo/tree/feature/landing-page-carousel) branch, which has changes committed.
-- The end result is a new landing page with a nice carousel as per the screenshot below:
-  <img width="500" height="350" alt="image" src="https://github.com/user-attachments/assets/78ffc993-25e3-4cee-b35f-fd3765474227" />
+- While Amp is executing, you can optionally show a previous [thread](https://ampcode.com/threads/T-fee44ba4-ea71-48af-8144-e84de8063b8c) that was run for the feature. Or you can switch to the [feature/featured-carousel](https://github.com/sourcegraph/ecommerce-app/tree/feature/featured-carousel) branch, which has the changes committed.
+- The end result is a new carousel as per the screenshot below:
+<img width="1446" height="627" alt="image" src="https://github.com/user-attachments/assets/e31d03ff-35d5-4017-8468-87e547da8e28" />
+
+
 
 ### PR review bot
 
@@ -89,7 +91,7 @@ Demonstrate the GitHub code review feature of Amp.
 
 - No manual action is required to execute the PR Review bot. The bot automatically runs whenever a pull request is created.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo, and show the GitHub PR bot working automatically.
-- Example PR <https://github.com/sourcegraph/ecommerce-app/pull/26>
+- Example PR <https://github.com/sourcegraph/ecommerce-app/pull/36>
 
 ## Oracle planning prompts
 
