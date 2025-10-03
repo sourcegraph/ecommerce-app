@@ -362,10 +362,8 @@ def test_fastest_delivery_sort_returns_unique_products(client: TestClient, sessi
     assert product1_idx < product2_idx, "Same day should come before express"
     assert product3_idx < product2_idx, "Product with same day should come before express-only"
     if product4_idx is not None:
-        products_with_delivery = [p for p in products if p.get("delivery_summary")]
         products_without_delivery = [p for p in products if not p.get("delivery_summary")]
         if products_without_delivery:
-            first_no_delivery_idx = next(i for i, p in enumerate(products) if not p.get("delivery_summary"))
             last_with_delivery_idx = next((len(products) - 1 - i for i, p in enumerate(reversed(products)) if p.get("delivery_summary")), -1)
             assert product4_idx > last_with_delivery_idx, "Product without delivery should come after products with delivery"
 

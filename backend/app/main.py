@@ -201,24 +201,33 @@ def get_products_api(
     
     if sort == "delivery_fastest":
         if deliveryOptionId:
-            stmt = stmt.join(DeliveryOption, DeliveryOption.id == ProductDeliveryLink.delivery_option_id).order_by(
+            stmt = stmt.join(
+                DeliveryOption, 
+                cast(Any, DeliveryOption.id == ProductDeliveryLink.delivery_option_id)
+            ).order_by(
                 cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                 cast(ColumnElement[float], Product.price).asc()
             )
         else:
             fastest_subq = (
                 select(
-                    ProductDeliveryLink.product_id.label("pid"),
-                    func.min(DeliveryOption.estimated_days_min).label("fastest_days")
+                    cast(Any, ProductDeliveryLink.product_id).label("pid"),
+                    func.min(cast(Any, DeliveryOption.estimated_days_min)).label("fastest_days")
                 )
-                .join(DeliveryOption, DeliveryOption.id == ProductDeliveryLink.delivery_option_id)
-                .where(DeliveryOption.is_active == True)
-                .group_by(ProductDeliveryLink.product_id)
+                .join(
+                    DeliveryOption, 
+                    cast(Any, DeliveryOption.id == ProductDeliveryLink.delivery_option_id)
+                )
+                .where(cast(Any, DeliveryOption.is_active))
+                .group_by(cast(Any, ProductDeliveryLink.product_id))
                 .subquery()
             )
             
-            stmt = stmt.outerjoin(fastest_subq, fastest_subq.c.pid == Product.id).order_by(
-                func.coalesce(fastest_subq.c.fastest_days, 999999).asc(),
+            stmt = stmt.outerjoin(
+                fastest_subq, 
+                cast(Any, fastest_subq.c.pid == Product.id)
+            ).order_by(
+                cast(Any, func.coalesce(fastest_subq.c.fastest_days, 999999)).asc(),
                 cast(ColumnElement[float], Product.price).asc()
             )
     elif sort == "price_asc":
