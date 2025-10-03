@@ -6,7 +6,8 @@
 **Architecture:** FastAPI (Python 3.13+) backend + React TypeScript frontend  
 **Stack:** SQLite + Alembic, Native hot-reload, E2E testing with Playwright  
 **Design System:** Monochrome palette (sand/ink/charcoal) with subtle slate blue accents  
-**URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
+**URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs  
+**Features:** Multi-currency (USD/GBP/EUR/AUD/MXN/JPY), live FX rates, delivery options
 
 ## Essential Commands
 
@@ -160,6 +161,7 @@ def process_payment(payment_data: dict) -> Result:
 ### Frontend Architecture  
 - **Components:** Functional components only, TypeScript interfaces
 - **State Management:** Context API for global state, local state with useState/useReducer
+- **Currency System:** CurrencyContext manages FX rates, conversion, formatting (6 currencies)
 - **Forms:** Formik + Yup for validation
 - **UI:** Chakra UI components
 - **Data Flow:** API calls → context state → component props
