@@ -13,7 +13,7 @@ export default function TabComponent({ mediaQuery, children, navigatePath, testI
   return (
     <Tab
       _selected={{
-        color: "appBlue.400",
+        color: "focus.ring",
         bg: "white",
         rounded: "base",
         boxShadow: "base",

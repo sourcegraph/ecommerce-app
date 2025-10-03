@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -9,9 +8,8 @@ import {
   LinkOverlay,
   Skeleton,
   Text,
-  useToast,
+  AspectRatio,
 } from "@chakra-ui/react";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import { useGlobalContext } from "../context/useGlobalContext";
@@ -20,6 +18,7 @@ import MotionBox from "./MotionBox";
 import { DeliveryOptionsSummary } from "./Delivery";
 import { useState } from "react";
 import { ProductType, getImageUrl } from "../context/GlobalState";
+import { BookmarkIcon } from "./Icons/BookmarkIcon";
 
 type Props = {
   product: ProductType;
@@ -28,161 +27,130 @@ type Props = {
 
 const ProductCard = ({ product }: Props) => {
   const { addToCart, toggleSaved } = useGlobalContext();
-  const toast = useToast();
   const [imgLoaded, setImgLoaded] = useState(false);
-
-  const isWithinRange = (item: number) => {
-    const nums = [1, 4, 7, 10, 12, 16, 19];
-    return nums.includes(item);
-  };
 
   return (
     <MotionBox
       as="article"
-      h="420px"
-      w="100%"
-      maxW="280px"
-      opacity={0}
-      // animation
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.3 } }}
-      layout
-      transition={{
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
+      bg="bg.card"
+      rounded="lg"
+      overflow="hidden"
+      border="1px solid"
+      borderColor="border.subtle"
+      position="relative"
+      boxShadow="card"
+      shadow="cardHover"
+      transition="box-shadow 200ms ease-in-out"
+      whileHover={{
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
       }}
+      sx={{
+        '@media (prefers-reduced-motion: reduce)': {
+          transition: 'none',
+        },
+      }}
+      data-testid="product-card"
     >
-      <MotionBox
-        as={LinkBox}
-        display="flex"
-        flexDirection="column"
-        h="100%"
-        className="product-card"
-        data-testid="product-card"
-        p={{ base: 2, sm: 3 }}
-        rounded="md"
-        border="none"
-        _hover={{
-          ".product-title": {
-            color: "appBlue.600",
-          },
-          ".btn": {
-            opacity: 1,
-          },
-          ".btn:disabled": {
-            opacity: 0.4,
-          },
-        }}
-        transition="all 0.2s ease"
-        // animation
-        exit={{ opacity: 0 }}
-      >
-        <Skeleton isLoaded={imgLoaded} w="140px" h="140px" m="auto">
-          <Image
-            src={getImageUrl(product)}
-            className="image"
-            onLoad={() => setImgLoaded(true)}
-            w="100%"
-            h="100%"
-            objectFit="contain"
-            bg="white"
-            borderRadius="md"
-            style={{ backgroundColor: 'white' }}
-          />
-        </Skeleton>
-        <LinkOverlay
-          as={RouterLink}
-          to={`/products/${product.id}`}
-          className="product-title"
-        >
-          <Flex direction="column" minH="84px" justify="center">
-            <Text mt={2} fontSize="sm" fontWeight="medium" lineHeight="short" data-testid="product-title">
-              {product.title}
-            </Text>
-          </Flex>
-        </LinkOverlay>
-        <Box>
-          <Flex align="center" justify="space-between" h="38px">
-            <Text fontSize="xl" fontWeight="bold" color="appBlue.600" data-testid="product-price">
-              ${product.price}{" "}
-              <Box
-                as="span"
-                textDecoration="line-through"
-                color="blackAlpha.500"
-                fontSize="md"
-              >
-                {isWithinRange(+product.id) ? +product.price * 2 : null}
-              </Box>
-            </Text>
-            <Badge colorScheme="green">
-              {isWithinRange(+product.id) ? "-50%" : null}
-            </Badge>
-          </Flex>
-          <Flex align="center" minH="18px">
-            <DeliveryOptionsSummary summary={product.delivery_summary} />
-          </Flex>
-          <Flex mt={1} align="center" justify="space-between" flexWrap="wrap">
-            <Flex align="center">
-              <MUIRating
-                name="read-only-stars"
-                value={isWithinRange(+product.id) ? 4.7 : 4.1}
-                precision={0.1}
-                size="small"
-                readOnly
+      <LinkBox>
+        <AspectRatio ratio={1}>
+          <Box bg="bg.image" p={4} position="relative">
+            <Skeleton
+              isLoaded={imgLoaded}
+              w="100%"
+              h="100%"
+              startColor="sand.50"
+              endColor="sand.100"
+            >
+              <Image
+                src={getImageUrl(product)}
+                alt={product.title}
+                objectFit="contain"
+                w="100%"
+                h="100%"
+                onLoad={() => setImgLoaded(true)}
               />
-              <Text ml={1} fontSize="sm">
-                {isWithinRange(+product.id) ? "4.7" : "4.1"}
-              </Text>
-            </Flex>
+            </Skeleton>
+
             <Button
-              opacity={product.isSaved ? 1 : { base: 1, sm: 0 }}
-              className="btn"
+              position="absolute"
+              top={2}
+              right={2}
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleSaved(product.id);
+              }}
+              bg="sand.200"
+              _hover={{ bg: "sand.50" }}
               data-testid="save-button"
               aria-pressed={product.isSaved}
               aria-label={product.isSaved ? "Unsave" : "Save"}
-              colorScheme="appBlue"
-              variant="outline"
-              height={9}
-              minW={9}
-              w={9}
-              fontSize="lg"
-              px={2}
-              borderRadius="full"
-              border={product.isSaved ? "none" : "1px solid"}
-              onClick={() => {
-                toast({
-                  title: product.isSaved
-                    ? "Product successfully removed from your saved items"
-                    : "Product successfully added to your saved items",
-                  status: "success",
-                  duration: 1500,
-                  isClosable: true,
-                });
-                toggleSaved(product.id);
-              }}
+              zIndex={1}
             >
-              {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
+              <BookmarkIcon 
+                filled={product.isSaved} 
+                boxSize={4} 
+                color="ink.600" 
+              />
             </Button>
+          </Box>
+        </AspectRatio>
+
+        <Flex direction="column" p={4} gap={2}>
+          <LinkOverlay as={RouterLink} to={`/products/${product.id}`}>
+            <Text
+              fontSize="md"
+              fontWeight="600"
+              color="ink.900"
+              noOfLines={2}
+              minH="48px"
+              _hover={{ color: "ink.600" }}
+              data-testid="product-title"
+            >
+              {product.title}
+            </Text>
+          </LinkOverlay>
+
+          <Flex align="center" gap={1}>
+            <MUIRating
+              name={`rating-${product.id}`}
+              value={4.1}
+              precision={0.1}
+              size="small"
+              readOnly
+            />
+            <Text fontSize="xs" color="ink.500">
+              (256)
+            </Text>
           </Flex>
-        </Box>
-        <Button
-          opacity={{ base: 1, sm: 0 }}
-          className="btn"
-          data-testid="add-to-cart"
-          mt={3}
-          colorScheme="red"
-          variant="outline"
-          fontSize="sm"
-          onClick={() => {
-            addToCart(product);
-          }}
-          isDisabled={product.inCart === true}
-        >
-          <Icon as={FaShoppingCart} mr={4} />
-          {product.inCart === true ? "Added to Cart" : "Add to Cart"}
-        </Button>
-      </MotionBox>
+
+          <Flex align="baseline" gap={2}>
+            <Text fontSize="xl" fontWeight="bold" color="ink.900" data-testid="product-price">
+              ${product.price}
+            </Text>
+          </Flex>
+
+          {product.delivery_summary && (
+            <DeliveryOptionsSummary summary={product.delivery_summary} />
+          )}
+
+          <Button
+            variant="accent"
+            size="md"
+            mt={2}
+            onClick={(e) => {
+              e.preventDefault();
+              addToCart(product);
+            }}
+            isDisabled={product.inCart}
+            leftIcon={<Icon as={FaShoppingCart} />}
+            data-testid="add-to-cart"
+          >
+            {product.inCart ? "Added" : "Add to Cart"}
+          </Button>
+        </Flex>
+      </LinkBox>
     </MotionBox>
   );
 };

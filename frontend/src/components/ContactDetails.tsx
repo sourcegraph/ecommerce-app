@@ -20,23 +20,42 @@ const ContactDetails = () => {
         mb={{ base: 5, sm: 8 }}
       >
         <HStack spacing={2}>
-          <LocationIcon color="white" size={24} />
-          <Text fontSize="sm">7480 Mockingbird Hill</Text>
+          <LocationIcon color="icon.footer" size={24} />
+          <Text fontSize="sm" color="text.footer">
+            7480 Mockingbird Hill
+          </Text>
         </HStack>
         <HStack spacing={2}>
-          <PhoneIcon color="white" size={24} />
-          <Text fontSize="sm">(239) 555-0108</Text>
+          <PhoneIcon color="icon.footer" size={24} />
+          <Text fontSize="sm" color="text.footer">
+            (239) 555-0108
+          </Text>
         </HStack>
       </Stack>
       <HStack spacing={6}>
         <Link>
-          <TwitterIcon color="white" _hover={{ color: "#1DA1F2" }} size={24} />
+          <TwitterIcon
+            color="icon.footer"
+            _hover={{ color: "icon.footerHover" }}
+            transition="color 150ms ease"
+            size={24}
+          />
         </Link>
         <Link>
-          <FbIcon color="white" _hover={{ color: "#4267B2" }} size={24} />
+          <FbIcon
+            color="icon.footer"
+            _hover={{ color: "icon.footerHover" }}
+            transition="color 150ms ease"
+            size={24}
+          />
         </Link>
         <Link>
-          <LinkedinIcon color="white" _hover={{ color: "#2867B2" }} size={24} />
+          <LinkedinIcon
+            color="icon.footer"
+            _hover={{ color: "icon.footerHover" }}
+            transition="color 150ms ease"
+            size={24}
+          />
         </Link>
       </HStack>
     </Flex>

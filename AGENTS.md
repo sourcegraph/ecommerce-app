@@ -1,9 +1,11 @@
-# ecommerce-demo Agent Guide
+# Linea Supply - Agent Guide
 
 ## Project Overview
+**Brand:** Linea Supply - Premium minimal e-commerce with monochrome design  
 **Purpose:** Full-stack e-commerce demo showcasing modern development practices with TDD  
 **Architecture:** FastAPI (Python 3.13+) backend + React TypeScript frontend  
 **Stack:** SQLite + Alembic, Native hot-reload, E2E testing with Playwright  
+**Design System:** Monochrome palette (sand/ink/charcoal) with subtle slate blue accents  
 **URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
 
 ## Essential Commands

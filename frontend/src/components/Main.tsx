@@ -52,12 +52,9 @@ const Main = ({ children }: Props) => {
   return (
     <Box
       as="main"
-      boxShadow="base"
-      mx={{ base: 0, sm: 4 }}
+      bg="transparent"
       h="100%"
-      rounded="md"
-      border="1px solid"
-      borderColor="gray.200"
+      px={{ base: 4, md: 6 }}
     >
       <Flex p={3} pb={0} align="flex-end" justify="space-between" flexWrap="wrap">
         <HStack align="flex-end" mr={5} mb={5}>
@@ -69,7 +66,7 @@ const Main = ({ children }: Props) => {
               minW="fit-content"
               size={isLargerThan567 ? "sm" : "xs"}
               rounded="base"
-              borderColor="gray.500"
+              borderColor="border.default"
               cursor="pointer"
               value={selectedCat}
               onChange={(e) => {
@@ -99,7 +96,7 @@ const Main = ({ children }: Props) => {
               minW="fit-content"
               size={isLargerThan567 ? "sm" : "xs"}
               rounded="base"
-              borderColor="gray.400"
+              borderColor="border.default"
               cursor="pointer"
               value={sort}
               onChange={(e) => {
@@ -133,7 +130,7 @@ const Main = ({ children }: Props) => {
                 : undefined
             }
           >
-            <TabList bg="appBlue.50" rounded="md">
+            <TabList bg="bg.surface" rounded="md" border="1px solid" borderColor="ink.200">
               <Tab mediaQuery={isLargerThan567} navigatePath="/">
                 Show All
               </Tab>

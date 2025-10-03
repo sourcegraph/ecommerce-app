@@ -2,193 +2,167 @@ import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  Flex,
   HStack,
   Image,
-  Input,
-  LinkBox,
-  LinkOverlay,
+  Link,
+  VStack,
   Text,
-  chakra,
-  useNumberInput,
-  useToast,
+  Skeleton,
+  IconButton,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { BiTrash } from "react-icons/bi";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
-import MUISkeleton from "../MUI/MUISkeleton";
 import MotionBox from "../MotionBox";
 
 type Props = {
   product: ProductInCart;
 };
 
-// Give the components chakra props
-const TrashIcon = chakra(BiTrash);
+const formatUSD = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
 
 const CartItemMobile = ({ product }: Props) => {
-  const toast = useToast();
+  const [imgLoaded, setImgLoaded] = useState(false);
   const subTotal = +product.price * +product.quantity;
 
   const { deleteFromCart, incrementQty, decrementQty, toggleSaved } = useGlobalContext();
-
-  const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-    useNumberInput();
-  const inc = getIncrementButtonProps();
-  const dec = getDecrementButtonProps();
-  const input = getInputProps();
 
   return (
     <MotionBox
       display={{ base: "block", bigTablet: "none" }}
       opacity={0}
-      // animation
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.5 } }}
-      layout
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
+        duration: 0.3,
+        ease: "easeInOut",
       }}
+      mb={4}
     >
-      <MotionBox
-        display={{ base: "flex", bigTablet: "none" }}
-        flexDirection="column"
-        boxShadow="base"
-        p={3}
-        mb={4}
-        rounded="base"
-        // animation
-        exit={{ opacity: 0 }}
+      <Box
+        bg="white"
+        border="1px solid"
+        borderColor="charcoal.200"
+        rounded="md"
+        p={4}
         data-testid="cart-item"
       >
-        <Flex
-          as={LinkBox}
-          p={1}
-          borderBottom="1px solid"
-          borderColor="blackAlpha.200"
-          _hover={{
-            ".product-title": {
-              color: "appBlue.600",
-            },
-          }}
-        >
-          <Flex align="center" justify="center" w="120px" h="120px" mr={2}>
-            <Image
-              src={getImageUrl(product)}
-              className="image"
-              maxW="100%"
-              maxH="100%"
-              objectFit="contain"
-              bg="white"
-              borderRadius="md"
-              style={{ backgroundColor: 'white' }}
-            />
-            <Box w="120px" h="120px">
-              <MUISkeleton
-                height="120px"
-                style={{ transform: "none" }}
-                animation="wave"
+        <HStack align="flex-start" spacing={4} mb={4}>
+          <Box
+            w="96px"
+            h="96px"
+            bg="sand.100"
+            border="1px solid"
+            borderColor="sand.300"
+            rounded="lg"
+            overflow="hidden"
+            flexShrink={0}
+          >
+            <Skeleton
+              isLoaded={imgLoaded}
+              fadeDuration={0.2}
+              w="100%"
+              h="100%"
+              startColor="sand.200"
+              endColor="charcoal.100"
+            >
+              <Image
+                src={getImageUrl(product)}
+                alt={product.title}
+                w="100%"
+                h="100%"
+                objectFit="contain"
+                onLoad={() => setImgLoaded(true)}
               />
-            </Box>
-          </Flex>
-          <Flex direction="column" flex={1}>
-            <Box>
-              <LinkOverlay
-                as={RouterLink}
-                to={`/products/${product.id}`}
-                className="product-title"
-              >
-                <Text fontWeight="medium">{product.title}</Text>
-              </LinkOverlay>
-            </Box>
-            <Box mt={2} fontWeight="bold" fontSize="lg" color="appBlue.600">
-              ${subTotal.toFixed(2)}
-            </Box>
-          </Flex>
-        </Flex>
+            </Skeleton>
+          </Box>
 
-        <Flex mt={3}>
-          <Button
-            colorScheme="appBlue"
-            variant="ghost"
-            size="md"
-            onClick={() => {
-              toast({
-                title: product.isSaved
-                  ? "Product successfully removed from your saved items"
-                  : "Product successfully added to your saved items",
-                status: "success",
-                duration: 1500,
-                isClosable: true,
-              });
-              toggleSaved(product.id);
-            }}
-            px={2}
-            borderRight="1px solid"
-            borderColor="blackAlpha.200"
-          >
-            {product.isSaved ? <HeartIconFill /> : <HeartIcon />}
-          </Button>
-          <Button
-            colorScheme="red"
-            variant="ghost"
-            size="md"
-            px={2}
-            onClick={() => deleteFromCart(product.id)}
-            data-testid="remove-item"
-          >
-            <TrashIcon mr={1} sx={{ "@media(max-width:365px)": { marginRight: 0 } }} />
-            <Box
-              as="span"
-              fontSize="sm"
-              sx={{ "@media(max-width:365px)": { display: "none" } }}
+          <VStack align="flex-start" spacing={2} flex={1} minW={0}>
+            <Link
+              as={RouterLink}
+              to={`/products/${product.id}`}
+              color="ink.900"
+              fontWeight="semibold"
+              fontSize="md"
+              _hover={{ textDecoration: "underline" }}
+              noOfLines={2}
             >
-              Remove Item
-            </Box>
-          </Button>
-          <HStack spacing={1} w="100px" justify="center" align="center" ml="auto">
-            <Button
-              size="xs"
-              colorScheme="appBlue"
-              rounded="full"
-              {...dec}
-              disabled={+product.quantity === 1}
-              onClick={() => decrementQty(product.id)}
-              w="17.5%"
-              data-testid="decrement-qty"
-            >
-              <MinusIcon />
-            </Button>
-            <Input
+              {product.title}
+            </Link>
+
+            <Text color="ink.900" fontWeight="medium" fontSize="md">
+              {formatUSD(subTotal)}
+            </Text>
+
+            <Text fontSize="xs" color="charcoal.600">
+              {formatUSD(+product.price)} each
+            </Text>
+          </VStack>
+        </HStack>
+
+        <HStack justify="space-between" align="center" pt={3} borderTop="1px solid" borderColor="charcoal.200">
+          <HStack spacing={3}>
+            <IconButton
+              icon={<MinusIcon />}
+              aria-label="Decrease quantity"
               size="sm"
-              {...input}
-              value={product.quantity}
-              readOnly
-              pattern="^[-+]?[0-9]\d*(\.\d+)?$"
-              w="65%"
-              textAlign="center"
-              border="none"
-              borderBottom="1px solid #00000014"
+              variant="outline"
+              borderColor="sand.300"
+              isDisabled={+product.quantity === 1}
+              onClick={() => decrementQty(product.id)}
+              _hover={{ bg: "sand.100" }}
+              _disabled={{ opacity: 0.4, cursor: "not-allowed" }}
+              data-testid="decrement-qty"
             />
-            <Button
-              size="xs"
-              colorScheme="appBlue"
-              rounded="full"
-              {...inc}
-              disabled={+product.quantity === 10}
+            <Text fontSize="md" minW="24px" textAlign="center" fontWeight="medium" data-testid="quantity-display">
+              {product.quantity}
+            </Text>
+            <IconButton
+              icon={<AddIcon />}
+              aria-label="Increase quantity"
+              size="sm"
+              variant="outline"
+              borderColor="sand.300"
+              isDisabled={+product.quantity === 10}
               onClick={() => incrementQty(product.id)}
-              w="17.5%"
+              _hover={{ bg: "sand.100" }}
+              _disabled={{ opacity: 0.4, cursor: "not-allowed" }}
               data-testid="increment-qty"
+            />
+          </HStack>
+
+          <HStack spacing={2}>
+            <Button
+              variant="link"
+              size="sm"
+              color="charcoal.700"
+              fontWeight="normal"
+              _hover={{ color: "ink.900" }}
+              onClick={() => {
+                toggleSaved(product.id);
+              }}
             >
-              <AddIcon />
+              {product.isSaved ? "Unsave" : "Save"}
+            </Button>
+            <Button
+              variant="link"
+              size="sm"
+              color="charcoal.700"
+              fontWeight="normal"
+              leftIcon={<BiTrash />}
+              _hover={{ color: "ink.900" }}
+              onClick={() => deleteFromCart(product.id)}
+              data-testid="remove-item"
+            >
+              Remove
             </Button>
           </HStack>
-        </Flex>
-      </MotionBox>
+        </HStack>
+      </Box>
     </MotionBox>
   );
 };

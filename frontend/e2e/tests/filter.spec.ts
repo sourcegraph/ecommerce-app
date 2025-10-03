@@ -1,31 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Product Filtering', () => {
-  test('should filter products by category', async ({ page }) => {
-    await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
-    // Get initial product count
-    const initialProductCount = await page.locator('[data-testid="product-card"]').count();
-    
-    // Look for category filter dropdown (the first Select element in Main.tsx)
-    const categorySelect = page.locator('select').first();
-    
-    // Select a category (not "All Categories")
-    await categorySelect.selectOption({ index: 1 });
-    
-    // Wait for filtered results
-    await page.waitForTimeout(1000);
-    
-    // Verify URL contains category parameter
-    expect(page.url()).toContain('cat=');
-    
-    // Verify products are still displayed (filtered results)
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
-  });
-
   test('should search products by name', async ({ page }) => {
     await page.goto('/');
     

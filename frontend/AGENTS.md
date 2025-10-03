@@ -1,8 +1,10 @@
-# Frontend Agent Guide
+# Frontend Agent Guide - Linea Supply
 
 ## Overview
+**Brand:** Linea Supply - Premium minimal e-commerce with monochrome design  
 **Purpose:** React TypeScript frontend for e-commerce demo with strict TDD practices  
 **Stack:** React 18, TypeScript, Vite, Chakra UI, React Testing Library, Playwright  
+**Design System:** Modular theme with semantic tokens (sand/ink/charcoal colors, Inter font)  
 **Architecture:** Component-based with Context API for state management
 
 ## Essential Commands

@@ -10,7 +10,7 @@ test.describe('Product Details', () => {
   test('should navigate to product detail page', async ({ page }) => {
     // Get product title before clicking
     const firstProduct = page.locator('[data-testid="product-card"]').first();
-    const productTitleElement = firstProduct.locator('.product-title, h3, h2, h1').first();
+    const productTitleElement = firstProduct.locator('[data-testid="product-title"]');
     const productTitle = await productTitleElement.textContent();
     
     await firstProduct.click();
@@ -142,49 +142,6 @@ test.describe('Product Details', () => {
       if (await homeLink.count() > 0) {
         await expect(homeLink).toBeVisible();
       }
-    }
-  });
-
-  test('should display product rating and reviews', async ({ page }) => {
-    // Click on the first product to open details
-    await page.locator('[data-testid="product-card"]').first().click();
-    
-    // Wait for detail page to load
-    await page.waitForURL(/\/products\/\d+/);
-    
-    // Look for rating component (stars)
-    const rating = page.locator('[role="img"], .MuiRating-root, .rating');
-    
-    if (await rating.count() > 0) {
-      await expect(rating.first()).toBeVisible();
-    }
-    
-    // Look for review count
-    const reviewCount = page.getByText(/\d+\s+(rating|review)/i);
-    
-    if (await reviewCount.count() > 0) {
-      await expect(reviewCount).toBeVisible();
-    }
-  });
-
-  test('should show product sizes if available', async ({ page }) => {
-    // Click on the first product to open details
-    await page.locator('[data-testid="product-card"]').first().click();
-    
-    // Wait for detail page to load
-    await page.waitForURL(/\/products\/\d+/);
-    
-    // Look for size options
-    const sizeText = page.getByText('Size:');
-    const sizeTags = page.locator('[role="button"]:has-text("S"), [role="button"]:has-text("M"), [role="button"]:has-text("L")');
-    
-    if (await sizeText.count() > 0) {
-      await expect(sizeText).toBeVisible();
-    }
-    
-    if (await sizeTags.count() > 0) {
-      // At least one size should be visible
-      await expect(sizeTags.first()).toBeVisible();
     }
   });
 

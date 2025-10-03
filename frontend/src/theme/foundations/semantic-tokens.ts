@@ -1,0 +1,31 @@
+export const semanticTokens = {
+  colors: {
+    "bg.page": "sand.50",
+    "bg.surface": "sand.50",
+    "bg.card": "sand.100",
+    "bg.image": "sand.100",
+    "bg.subtle": "sand.100",
+    "bg.footer": "charcoal.500",
+    "text.primary": "ink.900",
+    "text.secondary": "ink.500",
+    "text.muted": "ink.400",
+    "text.footer": "sand.50",
+    "text.footerMuted": "ink.200",
+    "border.subtle": "ink.200",
+    "border.default": "ink.300",
+    "border.footer": "ink.700",
+    "focus.ring": "ink.600",
+    "button.primary.bg": "charcoal.500",
+    "button.primary.hover": "charcoal.600",
+    "button.primary.active": "charcoal.700",
+    "button.secondary.bg": "ink.600",
+    "button.secondary.hover": "ink.700",
+    "button.secondary.active": "ink.800",
+    "link.footer": "sand.50",
+    "link.footerHover": "sand.50",
+    "icon.footer": "ink.200",
+    "icon.footerHover": "sand.50",
+  },
+};
+
+export default semanticTokens;

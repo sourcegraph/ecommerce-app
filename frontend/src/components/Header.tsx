@@ -28,32 +28,41 @@ const Header = () => {
     <Flex
       as="header"
       direction="column"
-      height={{ base: "120px", sm: "fit-content" }}
-      px={3}
+      height={{ base: "100px", sm: "fit-content" }}
+      px={{ base: 4, md: 6 }}
       position="fixed"
       top={0}
       zIndex={10}
       w="100%"
-      bg="white"
-      boxShadow="base"
+      bg="bg.page"
+      backdropFilter="saturate(180%) blur(8px)"
+      borderBottom="1px solid"
+      borderColor="border.subtle"
+      boxShadow="header"
+      sx={{
+        "@supports (backdrop-filter: blur(8px))": {
+          bg: "rgba(250, 250, 249, 0.85)",
+        },
+      }}
     >
       <Flex
         height="65px"
         align="center"
         px={{ sm: 2 }}
-        py={{ base: 7, sm: 9 }}
+        py={{ base: 3, sm: 4 }}
         justify="space-between"
       >
         <Flex align="center">
           <HamburgerIcon
             display={{ base: "inline-block", sm: "none" }}
-            color="appBlue.500"
+            color="ink.800"
             w="1.5rem"
             h="1.5rem"
             mr={2}
             cursor="pointer"
             ref={hamburgerRef}
             onClick={onOpen}
+            _hover={{ color: "ink.600" }}
           />
           <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>
             <Logo />
@@ -71,18 +80,7 @@ const Header = () => {
                 height={{ base: 8, sm: 9 }}
                 minW={{ base: 8, sm: 9 }}
                 fontSize={{ base: "sm", sm: "md" }}
-                variant="outline"
-                borderColor="appBlue.400"
-                borderRadius="0.3rem"
-                color="appBlue.400"
-                _hover={{
-                  bg: "appBlue.400",
-                  color: "white",
-                }}
-                _active={{
-                  bg: "appBlue.500",
-                  color: "white",
-                }}
+                variant="ghost"
               >
                 {location.pathname === "/login" ? "Sign Up" : "Sign In"}
               </Button>
@@ -100,10 +98,10 @@ const Header = () => {
                     as={FaShoppingCart}
                     height={{ base: 25, smallTablet: 27, sm: 30 }}
                     width={{ base: 25, smallTablet: 27, sm: 30 }}
-                    color="gray.400"
+                    color="ink.500"
                     cursor="pointer"
-                    _hover={{ color: "appBlue.300" }}
-                    _active={{ color: "appBlue.400" }}
+                    _hover={{ color: "ink.600" }}
+                    _active={{ color: "ink.700" }}
                   />
                 </MUIBadge>
               </Link>
@@ -120,8 +118,9 @@ const Header = () => {
                   ml={cartItemCount > 0 ? { base: 5, sm: 7 } : { base: 3, sm: 5 }}
                   width={{ base: 7, sm: 8 }}
                   height={{ base: 7, sm: 8 }}
-                  src="https://bit.ly/broken-link"
                   cursor="pointer"
+                  border="1px solid"
+                  borderColor="border.subtle"
                 />
               }
             />

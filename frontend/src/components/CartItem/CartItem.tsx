@@ -1,179 +1,169 @@
 import {
   Box,
   Button,
-  Flex,
+  HStack,
   Image,
-  LinkBox,
-  LinkOverlay,
-  Select,
+  Link,
+  VStack,
   Text,
-  useToast,
+  Skeleton,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
-import { ChangeEvent } from "react";
-import { BiTrash as TrashIcon } from "react-icons/bi";
-import { BsHeart as HeartIcon, BsHeartFill as HeartIconFill } from "react-icons/bs";
+import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
-import MUISkeleton from "../MUI/MUISkeleton";
 import MotionBox from "../MotionBox";
 
 type Props = {
   product: ProductInCart;
 };
 
+const formatUSD = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+
 const CartItem = ({ product }: Props) => {
-  const toast = useToast();
+  const [imgLoaded, setImgLoaded] = useState(false);
   const { setQuantity, deleteFromCart, toggleSaved } = useGlobalContext();
   const subTotal = +product.price * +product.quantity;
 
+  const handleQuantityChange = (_: string, valueAsNumber: number) => {
+    if (!isNaN(valueAsNumber) && valueAsNumber >= 1 && valueAsNumber <= 10) {
+      setQuantity(valueAsNumber.toString(), product.id);
+    }
+  };
+
   return (
     <MotionBox
-      display={{ base: "none", bigTablet: "block" }}
+      display={{ base: "none", bigTablet: "flex" }}
+      alignItems="flex-start"
+      gap={6}
       opacity={0}
-      // animation
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.5 } }}
-      layout
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
-        type: "spring",
-        stiffness: 600,
-        damping: 30,
+        duration: 0.3,
+        ease: "easeInOut",
       }}
+      data-testid="cart-item"
     >
-      <MotionBox
-        display={{ base: "none", bigTablet: "flex" }}
-        boxShadow="base"
-        mb={4}
-        rounded="base"
-        // animation
-        exit={{ opacity: 0 }}
-        data-testid="cart-item"
+      <Box
+        w="112px"
+        h="112px"
+        bg="sand.100"
+        border="1px solid"
+        borderColor="sand.300"
+        rounded="lg"
+        overflow="hidden"
+        flexShrink={0}
       >
-        <Flex
-          as={LinkBox}
-          p={3}
-          w="70%"
-          borderRight="2px solid"
-          borderColor="blackAlpha.200"
-          _hover={{
-            ".product-title": {
-              color: "appBlue.600",
-            },
-          }}
+        <Skeleton
+          isLoaded={imgLoaded}
+          fadeDuration={0.2}
+          w="100%"
+          h="100%"
+          startColor="sand.200"
+          endColor="charcoal.100"
         >
-          <Flex align="center" justify="center" w="140px" h="140px" mr={4}>
-            <Image
-              src={getImageUrl(product)}
-              className="image"
-              maxW="100%"
-              maxH="100%"
-              objectFit="contain"
-              bg="white"
-              borderRadius="md"
-              style={{ backgroundColor: 'white' }}
-            />
-            <Box w="140px" h="140px">
-              <MUISkeleton
-                height="140px"
-                style={{ transform: "none" }}
-                animation="wave"
-              />
-            </Box>
-          </Flex>
-          <Flex direction="column" justify="space-between" overflow="auto">
-            <Box>
-              <LinkOverlay
-                as={RouterLink}
-                to={`/products/${product.id}`}
-                className="product-title"
-              >
-                <Text fontWeight="medium">{product.title}</Text>
-              </LinkOverlay>
-            </Box>
-            <Flex flexWrap="wrap" mt={2}>
-              <Button
-                leftIcon={product.isSaved ? <HeartIconFill /> : <HeartIcon />}
-                colorScheme="appBlue"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  toast({
-                    title: product.isSaved
-                      ? "Product successfully removed from your saved items"
-                      : "Product successfully added to your saved items",
-                    status: "success",
-                    duration: 1500,
-                    isClosable: true,
-                  });
-                  toggleSaved(product.id);
-                }}
-              >
-                Save Item
-              </Button>
-              <Button
-                leftIcon={<TrashIcon />}
-                colorScheme="red"
-                variant="ghost"
-                size="sm"
-                onClick={() => deleteFromCart(product.id)}
-                data-testid="remove-item"
-              >
-                Remove Item
-              </Button>
-            </Flex>
-          </Flex>
-        </Flex>
-        <Flex
-          w="30%"
-          borderRight="2px solid"
-          borderColor="blackAlpha.200"
-          justify="center"
-          align="center"
-        >
-          <Select
-            size="sm"
-            minW={12}
-            maxW={16}
-            m="auto"
-            rounded="md"
-            value={product.quantity}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-              setQuantity(e.target.value, product.id)
-            }
-            data-testid="quantity-select"
+          <Image
+            src={getImageUrl(product)}
+            alt={product.title}
+            w="100%"
+            h="100%"
+            objectFit="contain"
+            onLoad={() => setImgLoaded(true)}
+          />
+        </Skeleton>
+      </Box>
+
+      <HStack w="full" align="flex-start" spacing={6} flex={1}>
+        <VStack align="flex-start" spacing={3} flex={1} minW={0}>
+          <Link
+            as={RouterLink}
+            to={`/products/${product.id}`}
+            color="ink.900"
+            fontWeight="semibold"
+            fontSize="md"
+            _hover={{ textDecoration: "underline" }}
+            noOfLines={2}
           >
-            {Array(10)
-              .fill("")
-              .map((_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-          </Select>
-        </Flex>
-        <Flex
-          w="30%"
-          borderRight="2px solid"
-          borderColor="blackAlpha.200"
-          fontWeight="bold"
-          fontSize="lg"
-          justify="center"
-          align="center"
-        >
-          ${product.price}
-        </Flex>
-        <Flex
-          w="30%"
-          fontWeight="bold"
-          fontSize="lg"
-          justify="center"
-          align="center"
-          color="appBlue.600"
-        >
-          ${subTotal.toFixed(2)}
-        </Flex>
-      </MotionBox>
+            {product.title}
+          </Link>
+
+          <HStack spacing={4} pt={1}>
+            <Button
+              variant="link"
+              size="sm"
+              color="charcoal.700"
+              fontWeight="normal"
+              _hover={{ color: "ink.900", textDecoration: "underline" }}
+              onClick={() => {
+                toggleSaved(product.id);
+              }}
+            >
+              {product.isSaved ? "Unsave" : "Save for later"}
+            </Button>
+            <Button
+              variant="link"
+              size="sm"
+              color="charcoal.700"
+              fontWeight="normal"
+              _hover={{ color: "ink.900", textDecoration: "underline" }}
+              onClick={() => deleteFromCart(product.id)}
+              data-testid="remove-item"
+            >
+              Remove
+            </Button>
+          </HStack>
+        </VStack>
+
+        <VStack minW="140px" align="flex-end" spacing={3}>
+          <Text color="ink.900" fontWeight="medium" fontSize="md">
+            {formatUSD(subTotal)}
+          </Text>
+
+          <NumberInput
+            size="sm"
+            value={product.quantity}
+            min={1}
+            max={10}
+            w="90px"
+            onChange={handleQuantityChange}
+            focusBorderColor="slate.500"
+          >
+            <NumberInputField
+              borderColor="sand.300"
+              _hover={{ borderColor: "sand.400" }}
+              _focus={{
+                borderColor: "slate.500",
+                boxShadow: "0 0 0 1px var(--chakra-colors-slate-500)",
+              }}
+              textAlign="center"
+              rounded="md"
+              data-testid="quantity-display"
+            />
+            <NumberInputStepper>
+              <NumberIncrementStepper
+                borderColor="sand.300"
+                _hover={{ bg: "sand.100" }}
+              />
+              <NumberDecrementStepper
+                borderColor="sand.300"
+                _hover={{ bg: "sand.100" }}
+              />
+            </NumberInputStepper>
+          </NumberInput>
+
+          <Text fontSize="xs" color="charcoal.600">
+            {formatUSD(+product.price)} each
+          </Text>
+        </VStack>
+      </HStack>
     </MotionBox>
   );
 };

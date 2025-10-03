@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from typing import List, Optional, cast, Any
 from sqlalchemy.sql.elements import ColumnElement
 import io
+import os
 
 from .db import get_session, create_db_and_tables
 
@@ -52,15 +53,17 @@ app = FastAPI(
 )
 
 # CORS middleware for frontend integration
+origins = os.getenv(
+    "CORS_ALLOW_ORIGINS", 
+    "http://localhost:3001,http://127.0.0.1:3001"
+).split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-    ],
+    allow_origins=[o.strip() for o in origins if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/health")
@@ -420,7 +423,7 @@ def get_product_image(
         media_type=product.image_mime_type or "image/jpeg",
         headers={
             "Content-Disposition": f'inline; filename="{product.image_filename or f"product_{product_id}.jpg"}"',
-            "Cache-Control": "public, max-age=86400"  # Cache for 1 day
+            "Cache-Control": "public, max-age=86400",
         }
     )
 

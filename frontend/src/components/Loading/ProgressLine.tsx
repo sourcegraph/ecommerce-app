@@ -11,7 +11,11 @@ const ProgressLine = () => {
           : 0
       }
       size="xs"
-      colorScheme="appBlue"
+      sx={{
+        "& > div": {
+          bg: "focus.ring"
+        }
+      }}
       isIndeterminate
     />
   );

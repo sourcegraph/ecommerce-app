@@ -74,9 +74,9 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
     try:
         from PIL import ImageDraw, ImageFont
         
-        # Create a simple placeholder image
+        # Create a simple placeholder image with beige background (sand.100)
         width, height = 300, 300
-        image = Image.new('RGB', (width, height), color=(240, 240, 240))
+        image = Image.new('RGB', (width, height), color=(245, 245, 244))
         draw = ImageDraw.Draw(image)
         
         # Draw a border
@@ -125,31 +125,6 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         print(f"Error creating placeholder image for product {product.id}: {e}")
         return False
 
-def _remove_transparency(img: Image.Image, bg_colour: tuple[int, int, int] = (255, 255, 255)) -> Image.Image:
-    """
-    Returns an RGB image with transparency removed (flattened on bg_colour).
-    Works for RGBA, LA, P and RGB+tRNS PNGs.
-    """
-    # Check for transparency in any form
-    if (img.mode in ('RGBA', 'LA') or 
-        (img.mode == 'P' and 'transparency' in img.info) or 
-        ('transparency' in img.info)):  # RGB + tRNS
-        
-        alpha = None
-        if img.mode in ('RGBA', 'LA'):
-            alpha = img.split()[-1]
-            img = img.convert('RGBA')  # ensure 4-channel
-        else:
-            img = img.convert('RGBA')  # adds alpha from tRNS/palette
-            alpha = img.split()[-1]
-
-        background = Image.new('RGB', img.size, bg_colour)
-        background.paste(img, mask=alpha)
-        return background
-
-    # No transparency – just ensure RGB
-    return img.convert('RGB')
-
 def download_and_store_image(session: Session, product: Product, image_url: str) -> bool:
     """Download image from URL and store as BLOB in database. Fallback to placeholder if failed."""
     try:
@@ -165,18 +140,15 @@ def download_and_store_image(session: Session, product: Product, image_url: str)
         # Open image with PIL to validate and get format
         raw_image: Image.Image = Image.open(io.BytesIO(response.content))
         
-        # Handle all transparency cases and ensure RGB output
-        processed_image = _remove_transparency(raw_image)
-        
-        # Save image to bytes buffer
+        # Save image to bytes buffer as PNG to preserve transparency
         img_buffer = io.BytesIO()
-        processed_image.save(img_buffer, format='JPEG', quality=85, optimize=True)
+        raw_image.save(img_buffer, format='PNG', optimize=True)
         img_buffer.seek(0)
         
         # Store in database
         product.image_data = img_buffer.getvalue()
-        product.image_mime_type = 'image/jpeg'
-        product.image_filename = f"product_{product.id}.jpg"
+        product.image_mime_type = 'image/png'
+        product.image_filename = f"product_{product.id}.png"
         
         session.add(product)
         session.commit()

@@ -43,7 +43,7 @@ export const DeliveryOptionsSelector = ({
 
   if (sortedOptions.length === 0) {
     return (
-      <Box p={4} textAlign="center" color="gray.500">
+      <Box p={4} textAlign="center" color="text.secondary">
         <Text>No delivery options available</Text>
       </Box>
     );
@@ -63,9 +63,10 @@ export const DeliveryOptionsSelector = ({
                 p={3}
                 borderWidth="1px"
                 borderRadius="md"
-                bg="white"
+                borderColor="border.subtle"
+                bg="bg.surface"
                 cursor="pointer"
-                _hover={{ borderColor: "gray.400", shadow: "sm" }}
+                _hover={{ borderColor: "border.default", shadow: "sm" }}
                 onClick={() => onChange(option.id.toString())}
               >
                 <HStack spacing={3} align="flex-start">
@@ -79,11 +80,11 @@ export const DeliveryOptionsSelector = ({
                       <Text fontWeight="medium">
                         {option.name}
                       </Text>
-                      <Text fontWeight="semibold" color="blue.600">
+                      <Text fontWeight="semibold" color="text.primary">
                         {formatPrice(option.price)}
                       </Text>
                     </HStack>
-                    <Text fontSize="sm" color="gray.600" mb={1}>
+                    <Text fontSize="sm" color="text.secondary" mb={1}>
                       {formatEta(option.estimated_days_min, option.estimated_days_max)}
                     </Text>
                   </Box>

@@ -1,4 +1,3 @@
-import { useToast } from "@chakra-ui/react";
 import { FC, ReactNode, createContext, useEffect, useState } from "react";
 import seed from "./products.json";
 
@@ -85,7 +84,6 @@ export const GlobalContext = createContext<ContextType | null>(null);
 
 // Provider component
 export const Provider: FC<Props> = ({ children }) => {
-  const toast = useToast();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -231,12 +229,6 @@ export const Provider: FC<Props> = ({ children }) => {
   };
 
   const addToCart = (product: ProductType) => {
-    toast({
-      title: "Product successfully added to your cart",
-      status: "success",
-      duration: 1500,
-      isClosable: true,
-    });
     setProducts(prevProducts => {
       const updatedProducts = prevProducts.map(prevProduct =>
         prevProduct.id === product.id

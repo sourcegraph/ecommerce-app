@@ -18,7 +18,7 @@ const Sidebar = () => {
     <>
       <Heading
         as="h4"
-        color="appBlue.600"
+        color="text.secondary"
         fontSize="md"
         fontWeight="bold"
         mt={2}
@@ -37,7 +37,7 @@ const Sidebar = () => {
                 Health and Beauty
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -58,7 +58,7 @@ const Sidebar = () => {
                 Home and Office
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -79,7 +79,7 @@ const Sidebar = () => {
                 Phones and Tablets
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -99,7 +99,7 @@ const Sidebar = () => {
                 Computing
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -120,7 +120,7 @@ const Sidebar = () => {
                 Electronics
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -141,7 +141,7 @@ const Sidebar = () => {
                 Fashion
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>
@@ -162,7 +162,7 @@ const Sidebar = () => {
                 Gaming
               </Heading>
             </Box>
-            <AccordionIcon color="appBlue.600" mr={1} />
+            <AccordionIcon color="focus.ring" mr={1} />
           </AccordionButton>
           {/* Children */}
           <AccordionPanel ml={6}>

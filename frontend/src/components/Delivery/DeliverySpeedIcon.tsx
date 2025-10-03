@@ -18,14 +18,14 @@ export const DeliverySpeedIcon = ({ speed, size = "16px" }: DeliverySpeedIconPro
 
   switch (speed) {
     case "standard":
-      return <Icon as={TruckIcon} {...iconProps} color="gray.500" />;
+      return <Icon as={TruckIcon} {...iconProps} color="text.secondary" />;
     case "express":
-      return <Icon as={BoltIcon} {...iconProps} color="blue.500" />;
+      return <Icon as={BoltIcon} {...iconProps} color="focus.ring" />;
     case "next_day":
-      return <Icon as={CalendarDaysIcon} {...iconProps} color="orange.500" />;
+      return <Icon as={CalendarDaysIcon} {...iconProps} color="ink.600" />;
     case "same_day":
-      return <Icon as={ClockIcon} {...iconProps} color="red.500" />;
+      return <Icon as={ClockIcon} {...iconProps} color="ink.600" />;
     default:
-      return <Icon as={TruckIcon} {...iconProps} color="gray.500" />;
+      return <Icon as={TruckIcon} {...iconProps} color="text.secondary" />;
   }
 };

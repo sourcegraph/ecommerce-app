@@ -4,6 +4,10 @@ This is a demo repo that is carefully crafted to showcase the capabilities of Am
 
 For more information about Amp visit the [Amp manual](https://ampcode.com/manual).
 
+## How to use this repo
+
+Follow the [Quick Start](#quick-start) guide to get started. Once the front and back ends are running, then you can open your browser on one side of the screen with Amp up on the other (in VS Code or the CLI).
+
 See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from fixes an issue with a PR to advanced refactors.
 
 <img width="1658" height="993" alt="image" src="https://github.com/user-attachments/assets/c60855c7-b843-4779-8dc0-3a3acf67f35f" />
@@ -37,24 +41,23 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 └── README.md           # README
 ```
 
-## Prerequisites
-
-### Mandatory
-
-- [Just](https://github.com/casey/just) - Command runner (`brew install just`)
-- [Python 3.13+](https://www.python.org/) - Python runtime
-- [uv](https://docs.astral.sh/uv/) - Python package manager
-- [Node.js 20+](https://nodejs.org/) - JavaScript runtime
-- [npm](https://www.npmjs.com/) - Package manager (ships with Node.js)
-
 ## Quick Start
 
-Clone the project and verify prerequisites:
+1. [Install Amp](https://ampcode.com/) (VS Code extension and/or CLI)
+
+2. Install the prerequisites and clone the project:
 
 ```bash
-git clone https://github.com/sourcegraph/amp-demo.git
-cd amp-demo
+# Install just
+brew install just
+# Install uv and python
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv python install
+# Install node
+brew install node
+```
 
+```bash
 # Verify you have required tools
 just --version
 python --version
@@ -62,13 +65,18 @@ uv --version
 node --version 
 ```
 
-Install dependencies and setup testing:
+```bash
+git clone https://github.com/sourcegraph/amp-demo.git
+cd amp-demo
+```
+
+3. Install dependencies and setup testing:
 
 ```bash
 just install-all      # Install all dependencies (backend, frontend, E2E browsers)
 ```
 
-Run the application:
+4. Run the application:
 
 ```bash
 just dev             # Start both services with native hot-reload using concurrently

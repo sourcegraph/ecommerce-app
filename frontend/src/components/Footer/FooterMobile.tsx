@@ -18,16 +18,27 @@ const FooterMobile = () => {
     <Flex
       as="footer"
       display={{ base: "flex", smallTablet: "none" }}
-      bg="appBlue.800"
-      color="white"
+      bg="bg.footer"
+      color="text.footer"
       pb={8}
       direction="column"
+      borderTop="1px solid"
+      borderColor="border.footer"
     >
       <Accordion allowToggle mb={8}>
         <AccordionItem borderTop="none" py={2}>
-          <AccordionButton color="gray.400" _expanded={{ color: "white" }}>
+          <AccordionButton
+            color="text.footerMuted"
+            _expanded={{ color: "text.footer" }}
+          >
             <Box flex="1" textAlign="left">
-              <Heading as="h6" fontSize="md" textTransform="uppercase">
+              <Heading
+                as="h6"
+                fontSize="md"
+                textTransform="uppercase"
+                letterSpacing="0.05em"
+                color="inherit"
+              >
                 Pages
               </Heading>
             </Box>
@@ -35,18 +46,57 @@ const FooterMobile = () => {
           </AccordionButton>
           <AccordionPanel pb={4}>
             <VStack spacing={3} fontSize="sm" align="initial">
-              <Link>Home</Link>
-              <Link>Product</Link>
-              <Link>Pricing</Link>
-              <Link>About</Link>
-              <Link>Contact</Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Home
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Product
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Pricing
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                About
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Contact
+              </Link>
             </VStack>
           </AccordionPanel>
         </AccordionItem>
-        <AccordionItem borderColor="gray.600" py={2}>
-          <AccordionButton color="gray.400" _expanded={{ color: "white" }}>
+        <AccordionItem borderColor="border.footer" py={2}>
+          <AccordionButton
+            color="text.footerMuted"
+            _expanded={{ color: "text.footer" }}
+          >
             <Box flex="1" textAlign="left">
-              <Heading as="h6" fontSize="md" textTransform="uppercase">
+              <Heading
+                as="h6"
+                fontSize="md"
+                textTransform="uppercase"
+                letterSpacing="0.05em"
+                color="inherit"
+              >
                 Top Designer Brands
               </Heading>
             </Box>
@@ -54,16 +104,76 @@ const FooterMobile = () => {
           </AccordionButton>
           <AccordionPanel pb={4}>
             <VStack spacing={3} fontSize="sm" align="initial">
-              <Link>Eleanor Edwards</Link>
-              <Link>Ted Robertson</Link>
-              <Link>Annette Russell</Link>
-              <Link>Jennie Mckinney</Link>
-              <Link>Gloria Richards</Link>
-              <Link>Philip Jones</Link>
-              <Link>Product</Link>
-              <Link>Colleen Russell</Link>
-              <Link>Marvin Hawkins</Link>
-              <Link>Bruce Simmons</Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Eleanor Edwards
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Ted Robertson
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Annette Russell
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Jennie Mckinney
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Gloria Richards
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Philip Jones
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Product
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Colleen Russell
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Marvin Hawkins
+              </Link>
+              <Link
+                fontWeight={500}
+                color="text.footer"
+                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              >
+                Bruce Simmons
+              </Link>
             </VStack>
           </AccordionPanel>
         </AccordionItem>
