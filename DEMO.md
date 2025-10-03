@@ -12,11 +12,14 @@ To get setup to demo, do the following steps:
 
 **Table of Contents**
 
+Note that all blocks listed under VS Code can also be displayed in the CLI if desired.
+
 [VS Code](#vs-code)
 
 - [Small change: Quick Amp demo](#small-change-quick-amp-demo)
 - [Issue to PR](#issue-to-pr) - [Bugfix](#fixing-github-issue-bug) and [New feature](#implementing-a-new-feature)
 - [PR review bot](#pr-review-bot)
+- [Understanding prompts](#understanding-prompts)
 - [Oracle planning prompts](#oracle-planning-prompts)
 - [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
 - [IDE diagnostics and testing](#ide-diagnostics-and-testing)
@@ -92,6 +95,20 @@ Demonstrate the GitHub code review feature of Amp.
 - No manual action is required to execute the PR Review bot. The bot automatically runs whenever a pull request is created.
 - In your issue to PR flow, create a pull request after pushing the branch to the main repo, and show the GitHub PR bot working automatically.
 - Example PR <https://github.com/sourcegraph/ecommerce-app/pull/36>
+
+## Understanding prompts
+
+To demonstrate how Amp can be leveraged to gain codebase understanding, ask these prompts below.
+
+For the persona of a new joiner to the team needing to get up to speed quickly. Here is an existing [thread](https://ampcode.com/threads/T-201945bc-6eda-4943-b2b2-ab954b31fa23) you can use as well.
+```
+I am a new software engineering member on this project team. Please create a diagram along with an explanation of the project architecture.
+```
+
+For the persona of a sophisticated software engineer who knows the code base but is rusty on a particular area. Here is an existing [thread](https://ampcode.com/threads/T-c1a00818-ada0-4789-81da-1a278677ad29) you can use as well.
+```
+Explain how the image processing is done for this project. Provide diagrams and detailed explanations so I can see the full lifecycle from ingestion to serving up in the frontend.
+```
 
 ## Oracle planning prompts
 
