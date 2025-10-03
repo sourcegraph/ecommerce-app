@@ -42,6 +42,10 @@ class ApiClient {
     
     return this.request<Product[]>(`/api/products?${searchParams.toString()}`)
   }
+
+  async getFeaturedProducts(): Promise<Product[]> {
+    return this.request<Product[]>('/api/featured-products')
+  }
 }
 
 export const api = new ApiClient()

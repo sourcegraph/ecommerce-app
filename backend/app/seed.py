@@ -56,12 +56,15 @@ def seed_products(session: Session, products: list, category_map: dict):
     """Create products with image download and storage"""
     print(f"\nSeeding {len(products)} products...")
     
-    for product_data in products:
+    for idx, product_data in enumerate(products):
         # Check if product already exists
         existing_product = session.get(Product, product_data['id'])
         if existing_product:
             print(f"Product '{product_data['title']}' already exists (ID: {product_data['id']})")
             continue
+        
+        # Mark first 5 products as featured for carousel
+        is_featured = idx < 5
         
         # Create new product
         new_product = Product(
@@ -70,7 +73,8 @@ def seed_products(session: Session, products: list, category_map: dict):
             description=product_data['description'],
             price=float(product_data['price']),
             category_id=category_map[product_data['category']],
-            is_saved=False
+            is_saved=False,
+            is_featured=is_featured
         )
         
         session.add(new_product)

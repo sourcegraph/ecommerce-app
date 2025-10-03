@@ -1,8 +1,9 @@
 import pytest
 import time
 from fastapi.testclient import TestClient
-from sqlmodel import Session
+from sqlmodel import Session, select
 from tests.factories import create_test_category, create_test_product
+from app.models import Product
 
 def test_get_products(client: TestClient):
     """Test getting all products"""
@@ -301,3 +302,84 @@ def test_product_search_functionality(client: TestClient, session: Session):
     else:
         # Search not implemented, skip this test
         pytest.skip("Search functionality not implemented")
+
+
+def test_get_featured_products_returns_only_featured(client: TestClient, session: Session):
+    """Test that /api/featured-products returns only featured products"""
+    category = create_test_category(session)
+    
+    featured_product1 = create_test_product(session, category.id, "Featured Product 1", 10.0)
+    featured_product1.is_featured = True
+    session.add(featured_product1)
+    
+    featured_product2 = create_test_product(session, category.id, "Featured Product 2", 20.0)
+    featured_product2.is_featured = True
+    session.add(featured_product2)
+    
+    regular_product = create_test_product(session, category.id, "Regular Product", 30.0)
+    regular_product.is_featured = False
+    session.add(regular_product)
+    
+    session.commit()
+    
+    response = client.get("/api/featured-products")
+    assert response.status_code == 200
+    products = response.json()
+    
+    assert len(products) >= 2
+    for product in products:
+        assert product["is_featured"] is True
+
+
+def test_get_featured_products_limited_to_5(client: TestClient, session: Session):
+    """Test that /api/featured-products returns max 5 products"""
+    category = create_test_category(session)
+    
+    for i in range(10):
+        product = create_test_product(session, category.id, f"Featured Product {i}", 10.0 + i)
+        product.is_featured = True
+        session.add(product)
+    
+    session.commit()
+    
+    response = client.get("/api/featured-products")
+    assert response.status_code == 200
+    products = response.json()
+    
+    assert len(products) == 5
+
+
+def test_get_featured_products_falls_back_to_newest(client: TestClient, session: Session):
+    """Test that /api/featured-products falls back to newest products when no featured products exist"""
+    category = create_test_category(session)
+    
+    session.exec(select(Product)).all()
+    for product in session.exec(select(Product)):
+        session.delete(product)
+    session.commit()
+    
+    for i in range(7):
+        product = create_test_product(session, category.id, f"Product {i}", 10.0 + i)
+        product.is_featured = False
+        session.add(product)
+        session.commit()
+        time.sleep(0.01)
+    
+    response = client.get("/api/featured-products")
+    assert response.status_code == 200
+    products = response.json()
+    
+    assert len(products) == 5
+
+
+def test_get_featured_products_returns_empty_when_no_products(client: TestClient, session: Session):
+    """Test that /api/featured-products returns empty array when no products exist"""
+    for product in session.exec(select(Product)):
+        session.delete(product)
+    session.commit()
+    
+    response = client.get("/api/featured-products")
+    assert response.status_code == 200
+    products = response.json()
+    
+    assert products == []

@@ -121,6 +121,7 @@ def get_category(
             "price": product.price,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
             "created_at": product.created_at,
             "updated_at": product.updated_at,
             "image_url": f"/products/{product.id}/image" if product.image_data else None,
@@ -146,6 +147,53 @@ def get_delivery_options_for_filter(session: Session = Depends(get_session)):
     )
     return session.exec(stmt).all()
 
+@app.get("/api/featured-products", response_model=List[ProductRead])
+def get_featured_products(session: Session = Depends(get_session)):
+    """Get featured products for carousel, limited to 5. Falls back to newest products if no featured products exist."""
+    stmt = (
+        select(Product)
+        .options(selectinload(cast(Any, Product.category)), selectinload(cast(Any, Product.delivery_options)))
+        .where(Product.is_featured)
+        .order_by(cast(ColumnElement[int], Product.id).desc())
+        .limit(5)
+    )
+    
+    featured_products = session.exec(stmt).all()
+    
+    if not featured_products:
+        fallback_stmt = (
+            select(Product)
+            .options(selectinload(cast(Any, Product.category)), selectinload(cast(Any, Product.delivery_options)))
+            .order_by(cast(ColumnElement[int], Product.id).desc())
+            .limit(5)
+        )
+        featured_products = session.exec(fallback_stmt).all()
+    
+    products_with_images = []
+    for product in featured_products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at
+            } if product.category else None,
+            "delivery_summary": calculate_delivery_summary(product.delivery_options) if product.delivery_options else None
+        }
+        products_with_images.append(product_dict)
+    
+    return products_with_images
+
 # Product endpoints
 @app.post("/products", response_model=ProductRead)
 def create_product(
@@ -167,6 +215,7 @@ def create_product(
         "price": created_product.price,
         "category_id": created_product.category_id,
         "is_saved": created_product.is_saved,
+        "is_featured": created_product.is_featured,
         "created_at": created_product.created_at,
         "updated_at": created_product.updated_at,
         "image_url": f"/products/{created_product.id}/image" if created_product.image_data else None,
@@ -239,6 +288,7 @@ def get_products_api(
             "price": product.price,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
             "created_at": product.created_at,
             "updated_at": product.updated_at,
             "image_url": f"/products/{product.id}/image" if product.image_data else None,
@@ -286,6 +336,7 @@ def get_products(
             "price": product.price,
             "category_id": product.category_id,
             "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
             "created_at": product.created_at,
             "updated_at": product.updated_at,
             "image_url": f"/products/{product.id}/image" if product.image_data else None,
@@ -335,6 +386,7 @@ def get_product(
         "price": product.price,
         "category_id": product.category_id,
         "is_saved": product.is_saved,
+        "is_featured": product.is_featured,
         "created_at": product.created_at,
         "updated_at": product.updated_at,
         "image_url": f"/products/{product.id}/image" if product.image_data else None,
@@ -388,6 +440,7 @@ def update_product(
         "price": updated_product.price,
         "category_id": updated_product.category_id,
         "is_saved": updated_product.is_saved,
+        "is_featured": updated_product.is_featured,
         "created_at": updated_product.created_at,
         "updated_at": updated_product.updated_at,
         "image_url": f"/products/{product_id}/image" if updated_product.image_data else None,

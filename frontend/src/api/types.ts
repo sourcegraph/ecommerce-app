@@ -26,6 +26,7 @@ export interface Product {
   price: number
   category_id: number
   is_saved: boolean
+  is_featured: boolean
   created_at: string
   updated_at: string
   image_url?: string
