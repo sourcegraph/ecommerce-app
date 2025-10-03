@@ -107,18 +107,10 @@ const FeaturedCarousel = ({ products, autoIntervalMs = 6000 }: Props) => {
                   fontSize={{ base: '2xl', md: '3xl' }}
                   fontWeight="bold"
                   color="text.primary"
-                  mb={3}
+                  mb={4}
                   data-testid={`carousel-slide-title-${i}`}
                 >
                   {product.title}
-                </Text>
-                <Text
-                  fontSize="md"
-                  color="text.secondary"
-                  mb={4}
-                  noOfLines={2}
-                >
-                  {product.description}
                 </Text>
                 <Flex align="baseline" gap={3} mb={4}>
                   <Text fontSize="2xl" fontWeight="bold" color="text.primary">
