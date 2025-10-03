@@ -1,16 +1,16 @@
-# E-commerce Amp Demo App
+# Amp Demo App
 
 This repository is a carefully crafted demo that showcases the capabilities of Amp, centered around an example e-commerce platform featuring a FastAPI backend and a React frontend. Data is stored in SQLite, so it is self-contained and easy to run.
 
 For more information about Amp visit the [Amp manual](https://ampcode.com/manual).
+
+<img width="1290" height="1016" alt="Screenshot 2025-10-03 at 12 32 11 PM" src="https://github.com/user-attachments/assets/214b7e59-8168-446b-adef-bd481b586d64" />
 
 ## How to use this repo
 
 Follow the [Quick Start](#quick-start) guide to get started. Once the front and back ends are running (with the `just dev` command), then you can open your browser on one side of the screen with Amp up on the other (in VS Code or the CLI).
 
 See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from issue to PR to advanced feature adds.
-
-<img width="1658" height="993" alt="image" src="https://github.com/user-attachments/assets/c60855c7-b843-4779-8dc0-3a3acf67f35f" />
 
 ## Project Structure
 
