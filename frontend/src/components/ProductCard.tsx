@@ -8,7 +8,6 @@ import {
   LinkOverlay,
   Skeleton,
   Text,
-  useToast,
   AspectRatio,
 } from "@chakra-ui/react";
 import { FaShoppingCart } from "react-icons/fa";
@@ -28,13 +27,12 @@ type Props = {
 
 const ProductCard = ({ product }: Props) => {
   const { addToCart, toggleSaved } = useGlobalContext();
-  const toast = useToast();
   const [imgLoaded, setImgLoaded] = useState(false);
 
   return (
     <MotionBox
       as="article"
-      bg="bg.surface"
+      bg="bg.card"
       rounded="lg"
       overflow="hidden"
       border="1px solid"
@@ -55,11 +53,13 @@ const ProductCard = ({ product }: Props) => {
     >
       <LinkBox>
         <AspectRatio ratio={1}>
-          <Box bg="sand.50" p={4} position="relative">
+          <Box bg="bg.image" p={4} position="relative">
             <Skeleton
               isLoaded={imgLoaded}
               w="100%"
               h="100%"
+              startColor="sand.50"
+              endColor="sand.100"
             >
               <Image
                 src={getImageUrl(product)}
@@ -79,18 +79,10 @@ const ProductCard = ({ product }: Props) => {
               variant="ghost"
               onClick={(e) => {
                 e.preventDefault();
-                toast({
-                  title: product.isSaved
-                    ? "Removed from saved items"
-                    : "Added to saved items",
-                  status: "success",
-                  duration: 1500,
-                  isClosable: true,
-                });
                 toggleSaved(product.id);
               }}
-              bg="whiteAlpha.900"
-              _hover={{ bg: "white" }}
+              bg="sand.200"
+              _hover={{ bg: "sand.50" }}
               data-testid="save-button"
               aria-pressed={product.isSaved}
               aria-label={product.isSaved ? "Unsave" : "Save"}

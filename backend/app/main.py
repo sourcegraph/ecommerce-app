@@ -57,10 +57,12 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "http://192.168.0.132:3001",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/health")
@@ -414,13 +416,16 @@ def get_product_image(
     if not product.image_data:
         raise HTTPException(status_code=404, detail="No image found for this product")
     
-    # Return image as streaming response
+    # Return image as streaming response with CORS headers
     return StreamingResponse(
         io.BytesIO(product.image_data),
         media_type=product.image_mime_type or "image/jpeg",
         headers={
             "Content-Disposition": f'inline; filename="{product.image_filename or f"product_{product_id}.jpg"}"',
-            "Cache-Control": "public, max-age=86400"  # Cache for 1 day
+            "Cache-Control": "public, max-age=86400",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
         }
     )
 

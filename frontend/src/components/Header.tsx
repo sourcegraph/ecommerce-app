@@ -118,7 +118,6 @@ const Header = () => {
                   ml={cartItemCount > 0 ? { base: 5, sm: 7 } : { base: 3, sm: 5 }}
                   width={{ base: 7, sm: 8 }}
                   height={{ base: 7, sm: 8 }}
-                  src="https://bit.ly/broken-link"
                   cursor="pointer"
                   border="1px solid"
                   borderColor="border.subtle"

@@ -81,11 +81,14 @@ export async function updateQuantityAndWaitForUpdate(page: Page, newQuantity: nu
 }
 
 async function updateQuantityControl(page: Page, quantity: number) {
-  const quantitySelect = page.locator('[data-testid="quantity-select"]').first();
+  const quantityDisplay = page.locator('[data-testid="quantity-display"]').first();
   
-  if (await quantitySelect.count() > 0) {
-    // Desktop: use select dropdown
-    await quantitySelect.selectOption(String(quantity));
+  // Check if NumberInput field is available (desktop)
+  if (await quantityDisplay.count() > 0 && await quantityDisplay.getAttribute('type') === 'text') {
+    // Desktop: use NumberInput field
+    await quantityDisplay.clear();
+    await quantityDisplay.fill(String(quantity));
+    await quantityDisplay.blur();
   } else {
     // Mobile: use increment/decrement buttons
     const currentQty = await getCurrentQuantity(page);

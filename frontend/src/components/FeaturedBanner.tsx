@@ -12,7 +12,7 @@ const FeaturedBanner = ({ product }: Props) => {
     <Flex
       mb={{ base: 6, md: 10 }}
       p={{ base: 6, md: 8 }}
-      bg="bg.surface"
+      bg="bg.card"
       rounded="lg"
       border="1px solid"
       borderColor="border.subtle"
@@ -47,7 +47,7 @@ const FeaturedBanner = ({ product }: Props) => {
       {/* Right: Image */}
       <Box flex="1" w="100%" maxW={{ base: "300px", md: "400px" }}>
         <AspectRatio ratio={1}>
-          <Box bg="bg.subtle" rounded="md" p={6}>
+          <Box bg="bg.image" rounded="md" p={6}>
             <Image
               src={getImageUrl(product)}
               alt={product.title}

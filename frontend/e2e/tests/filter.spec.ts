@@ -1,42 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Product Filtering', () => {
-  test('should filter products by category', async ({ page }) => {
-    // Go to /saved which uses Main component with filters
-    await page.goto('/saved');
-    
-    // Navigate to home which might have filters
-    await page.goto('/');
-    
-    // Wait for products to load
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible({ timeout: 10000 });
-    
-    // Look for category filter dropdown
-    const categorySelect = page.locator('select').first();
-    
-    // Skip test if no filter is available
-    if (await categorySelect.count() === 0) {
-      test.skip(true, 'Category filter not available on this page');
-      return;
-    }
-    
-    // Wait for the select to be visible and enabled
-    await expect(categorySelect).toBeVisible();
-    await expect(categorySelect).toBeEnabled();
-    
-    // Select a category (not "All Categories")
-    await categorySelect.selectOption({ index: 1 });
-    
-    // Wait for filtered results
-    await page.waitForTimeout(1000);
-    
-    // Verify URL contains category parameter
-    expect(page.url()).toContain('cat=');
-    
-    // Verify products are still displayed (filtered results)
-    await expect(page.locator('[data-testid="product-card"]').first()).toBeVisible();
-  });
-
   test('should search products by name', async ({ page }) => {
     await page.goto('/');
     

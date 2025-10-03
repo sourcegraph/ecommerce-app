@@ -13,7 +13,6 @@ import {
   Image,
   Tag,
   Text,
-  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaShoppingCart } from "react-icons/fa";
@@ -47,7 +46,6 @@ const Product = () => {
   
   // Get the url parameter (/:id) value
   const { id } = useParams();
-  const toast = useToast();
 
   // Fetch individual product with delivery options
   const fetchProductWithDelivery = async (productId: string) => {
@@ -98,9 +96,9 @@ const Product = () => {
   }, [isLoading, fetchProducts]);
   
   const product = products.find(product => product.id.toString() === id);
-  // Use the product with delivery options if available, but merge with cart state from context
+  // Use the product with delivery options if available, but merge with cart state and saved state from context
   const displayProduct = productWithDelivery 
-    ? { ...productWithDelivery, inCart: product?.inCart, quantity: product?.inCart ? product.quantity : undefined }
+    ? { ...productWithDelivery, inCart: product?.inCart, quantity: product?.inCart ? product.quantity : undefined, isSaved: product?.isSaved }
     : product;
 
 
@@ -256,17 +254,7 @@ const Product = () => {
                   borderColor: "ink.600",
                   bg: displayProduct.isSaved ? "ink.700" : "bg.subtle",
                 }}
-                onClick={() => {
-                  toast({
-                    title: displayProduct.isSaved
-                      ? "Product successfully removed from your saved items"
-                      : "Product successfully added to your saved items",
-                    status: "success",
-                    duration: 1500,
-                    isClosable: true,
-                  });
-                  toggleSaved(displayProduct.id);
-                }}
+                onClick={() => toggleSaved(displayProduct.id)}
                 data-testid="save-button"
                 aria-pressed={displayProduct.isSaved}
                 aria-label={displayProduct.isSaved ? "Unsave" : "Save"}
