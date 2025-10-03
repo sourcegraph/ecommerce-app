@@ -1,14 +1,14 @@
-# Amp Demo
+# E-commerce Amp Demo App
 
-This is a demo repo that is carefully crafted to showcase the capabilities of Amp centered around an example e-commerce platform with a FastAPI backend and React frontend. Data is stored in SQLite so it is self contained and easy to run.
+This repository is a carefully crafted demo that showcases the capabilities of Amp, centered around an example e-commerce platform featuring a FastAPI backend and a React frontend. Data is stored in SQLite, so it is self-contained and easy to run.
 
 For more information about Amp visit the [Amp manual](https://ampcode.com/manual).
 
 ## How to use this repo
 
-Follow the [Quick Start](#quick-start) guide to get started. Once the front and back ends are running, then you can open your browser on one side of the screen with Amp up on the other (in VS Code or the CLI).
+Follow the [Quick Start](#quick-start) guide to get started. Once the front and back ends are running (with the `just dev` command), then you can open your browser on one side of the screen with Amp up on the other (in VS Code or the CLI).
 
-See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from fixes an issue with a PR to advanced refactors.
+See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from issue to PR to advanced feature adds.
 
 <img width="1658" height="993" alt="image" src="https://github.com/user-attachments/assets/c60855c7-b843-4779-8dc0-3a3acf67f35f" />
 
@@ -28,14 +28,26 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 │   └── store.db        # SQLite database file
 ├── frontend/           # React frontend (TypeScript/Vite)
 │   ├── src/            # React components and pages
+│   │   ├── api/        # API client and types
+│   │   ├── components/ # Reusable UI components
+│   │   ├── context/    # React Context providers
+│   │   ├── hooks/      # Custom React hooks
+│   │   ├── mockDB/     # Mock data for development
+│   │   ├── pages/      # Page-level components
+│   │   └── theme/      # Chakra UI theme configuration
 │   ├── e2e/            # Playwright E2E tests
 │   ├── public/         # Static assets
 │   ├── package.json    # Node.js dependencies
 │   ├── vite.config.ts  # Vite configuration
+│   ├── eslint.config.js # ESLint configuration
 │   ├── AGENTS.md       # Agent documentation for frontend
 │   └── playwright.config.ts # Playwright test configuration
+├── specs/              # Project specifications
+├── logs/               # Service logs (dev-headless mode)
+├── test-results/       # Test output and reports
 ├── justfile            # Development automation commands
 ├── package.json        # Root package.json for shared dependencies
+├── settings.json       # Workspace settings
 ├── AGENTS.md           # Agent documentation for overall project
 ├── DEMO.md             # Demo usage guide
 └── README.md           # README
@@ -66,8 +78,8 @@ node --version
 ```
 
 ```bash
-git clone https://github.com/sourcegraph/amp-demo.git
-cd amp-demo
+git clone https://github.com/sourcegraph/ecommerce-app.git
+cd ecommerce-app
 ```
 
 3. Install dependencies and setup testing:
@@ -92,7 +104,9 @@ Access the application:
 ### Lifecycle Commands
 
 ```bash
-just dev              # Start both services (native hot-reload)
+just dev              # Start both services (native hot-reload, interactive)
+just dev-headless     # Start both services in background (for agentic development)
+just stop             # Stop headless services
 just dev-backend      # Start only backend
 just dev-frontend     # Start only frontend
 ```
@@ -125,18 +139,20 @@ just setup-e2e        # Install Playwright browsers
 
 #### Running Tests
 ```bash
-# Backend tests (native)
+# Backend tests
 just test-local                        # Backend tests
 just test-cov-local                    # Backend tests with coverage
 just test-local-single TEST            # Run single test
 
-# E2E tests
+# E2E tests (Playwright)
 just test-e2e         # E2E tests (headless)
 just test-e2e-headed  # E2E tests (headed - for debugging)
 
 # Combined test suites
 just test-all-local   # All tests (backend + E2E)
 ```
+
+**Note:** Frontend has no unit tests - only E2E tests with Playwright that test the full application.
 
 #### Code Quality
 ```bash
@@ -191,6 +207,9 @@ just health           # Check service health
 just logs             # View last 100 lines from backend and frontend logs
 just logs-follow      # Follow both logs live (Ctrl+C to exit)
 ```
+
+**Headless Development Workflow:**  
+When using `just dev-headless` for agentic development, services run in the background and log to `logs/backend.log` and `logs/frontend.log`. Use `just logs` to inspect output and `just stop` to stop the services.
 
 ### Source
 
