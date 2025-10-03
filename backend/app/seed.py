@@ -56,12 +56,19 @@ def seed_products(session: Session, products: list, category_map: dict):
     """Create products with image download and storage"""
     print(f"\nSeeding {len(products)} products...")
     
-    for product_data in products:
+    # Sort products by ID for deterministic featured and sales_count assignment
+    sorted_products = sorted(products, key=lambda p: p['id'])
+    
+    for idx, product_data in enumerate(sorted_products):
         # Check if product already exists
         existing_product = session.get(Product, product_data['id'])
         if existing_product:
             print(f"Product '{product_data['title']}' already exists (ID: {product_data['id']})")
             continue
+        
+        # Deterministic featured and sales assignment
+        is_featured = idx < 3
+        sales_count = max(0, 100 - (idx * 5))
         
         # Create new product
         new_product = Product(
@@ -70,7 +77,9 @@ def seed_products(session: Session, products: list, category_map: dict):
             description=product_data['description'],
             price=float(product_data['price']),
             category_id=category_map[product_data['category']],
-            is_saved=False
+            is_saved=False,
+            is_featured=is_featured,
+            sales_count=sales_count
         )
         
         session.add(new_product)

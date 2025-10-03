@@ -405,6 +405,83 @@ def delete_product(
     
     return {"message": "Product deleted successfully"}
 
+@app.get("/api/products/featured", response_model=List[ProductRead])
+def get_featured_products(
+    limit: int = Query(5, ge=1, le=10),
+    session: Session = Depends(get_session)
+):
+    """Get featured products with fallback to top-selling and newest"""
+    chosen: List[Product] = []
+    chosen_ids: set[int] = set()
+    
+    # 1) Explicit featured products
+    stmt_featured = (
+        select(Product)
+        .where(Product.is_featured)
+        .order_by(
+            cast(ColumnElement, Product.updated_at).desc(),
+            cast(ColumnElement, Product.created_at).desc()
+        )
+        .limit(limit)
+        .options(selectinload(cast(Any, Product.category)))
+    )
+    featured = session.exec(stmt_featured).all()
+    chosen_ids = {p.id for p in featured if p.id}
+    chosen.extend(featured)
+    
+    # 2) Top-selling fallback
+    if len(chosen) < limit:
+        remaining = limit - len(chosen)
+        stmt_top = select(Product).order_by(
+            cast(ColumnElement[int], Product.sales_count).desc(),
+            cast(ColumnElement, Product.created_at).desc()
+        ).limit(remaining).options(selectinload(cast(Any, Product.category)))
+        
+        if chosen_ids:
+            stmt_top = stmt_top.where(cast(ColumnElement[int], Product.id).notin_(chosen_ids))
+        
+        top_selling = session.exec(stmt_top).all()
+        chosen_ids.update(p.id for p in top_selling if p.id)
+        chosen.extend(top_selling)
+    
+    # 3) Newest fallback
+    if len(chosen) < limit:
+        remaining = limit - len(chosen)
+        stmt_newest = select(Product).order_by(
+            cast(ColumnElement, Product.created_at).desc()
+        ).limit(remaining).options(selectinload(cast(Any, Product.category)))
+        
+        if chosen_ids:
+            stmt_newest = stmt_newest.where(cast(ColumnElement[int], Product.id).notin_(chosen_ids))
+        
+        newest = session.exec(stmt_newest).all()
+        chosen.extend(newest)
+    
+    # Format results with image_url
+    result = []
+    for product in chosen:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image" if product.image_data else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            } if product.category else None,
+            "delivery_summary": None
+        }
+        result.append(product_dict)
+    
+    return result
+
 @app.get("/products/{product_id}/image")
 def get_product_image(
     product_id: int,
