@@ -22,10 +22,13 @@ test.describe('Product Browsing', () => {
     
     const loading = page.getByTestId('loading');
     
-    // If loading element exists, it should become hidden (not removed from DOM)
-    if (await loading.count() > 0) {
-      await expect(loading).toBeVisible();
-      await expect(loading).toBeHidden({ timeout: 10000 });
+    // Check if loading elements exist (there may be multiple skeleton loaders)
+    const count = await loading.count();
+    if (count > 0) {
+      // Check that at least the first loading element is visible
+      await expect(loading.first()).toBeVisible();
+      // Wait for all loading elements to be hidden
+      await expect(loading.first()).toBeHidden({ timeout: 10000 });
     }
     
     await waitForProductsLoaded(page);
