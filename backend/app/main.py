@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import func
 from typing import List, Optional, cast, Any
 from sqlalchemy.sql.elements import ColumnElement
 import io
@@ -200,24 +201,24 @@ def get_products_api(
     
     if sort == "delivery_fastest":
         if deliveryOptionId:
-            delivery_stmt = select(DeliveryOption).where(DeliveryOption.id == deliveryOptionId)
-            delivery_option = session.exec(delivery_stmt).first()
-            if delivery_option:
-                if delivery_option.speed.value == "express":
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
-                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                        cast(ColumnElement[float], Product.price).asc()
-                    )
-                else:
-                    stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
-                        cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                        cast(ColumnElement[float], Product.price).asc()
-                    )
-            else:
-                stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
-        else:
-            stmt = stmt.join(ProductDeliveryLink).join(DeliveryOption).order_by(
+            stmt = stmt.join(DeliveryOption, DeliveryOption.id == ProductDeliveryLink.delivery_option_id).order_by(
                 cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
+                cast(ColumnElement[float], Product.price).asc()
+            )
+        else:
+            fastest_subq = (
+                select(
+                    ProductDeliveryLink.product_id.label("pid"),
+                    func.min(DeliveryOption.estimated_days_min).label("fastest_days")
+                )
+                .join(DeliveryOption, DeliveryOption.id == ProductDeliveryLink.delivery_option_id)
+                .where(DeliveryOption.is_active == True)
+                .group_by(ProductDeliveryLink.product_id)
+                .subquery()
+            )
+            
+            stmt = stmt.outerjoin(fastest_subq, fastest_subq.c.pid == Product.id).order_by(
+                func.coalesce(fastest_subq.c.fastest_days, 999999).asc(),
                 cast(ColumnElement[float], Product.price).asc()
             )
     elif sort == "price_asc":

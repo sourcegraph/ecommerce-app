@@ -301,3 +301,218 @@ def test_product_search_functionality(client: TestClient, session: Session):
     else:
         # Search not implemented, skip this test
         pytest.skip("Search functionality not implemented")
+
+
+def test_fastest_delivery_sort_returns_unique_products(client: TestClient, session: Session):
+    """Test that sorting by fastest delivery returns no duplicate products"""
+    from tests.factories import create_test_delivery_option
+    from app.models import ProductDeliveryLink, DeliverySpeed
+    
+    category = create_test_category(session)
+    
+    same_day = create_test_delivery_option(
+        session, 
+        name="Same Day", 
+        speed=DeliverySpeed.SAME_DAY,
+        estimated_days_min=0,
+        estimated_days_max=0,
+        price=24.99
+    )
+    express = create_test_delivery_option(
+        session,
+        name="Express",
+        speed=DeliverySpeed.EXPRESS,
+        estimated_days_min=1,
+        estimated_days_max=2,
+        price=9.99
+    )
+    standard = create_test_delivery_option(
+        session,
+        name="Standard",
+        speed=DeliverySpeed.STANDARD,
+        estimated_days_min=3,
+        estimated_days_max=5,
+        price=0.0
+    )
+    
+    product1 = create_test_product(session, category.id, "Product with Same Day", 29.99)
+    product2 = create_test_product(session, category.id, "Product with Express", 39.99)
+    product3 = create_test_product(session, category.id, "Product with Multiple Options", 49.99)
+    product4 = create_test_product(session, category.id, "Product without Delivery", 19.99)
+    
+    session.add(ProductDeliveryLink(product_id=product1.id, delivery_option_id=same_day.id))
+    session.add(ProductDeliveryLink(product_id=product2.id, delivery_option_id=express.id))
+    session.add(ProductDeliveryLink(product_id=product3.id, delivery_option_id=same_day.id))
+    session.add(ProductDeliveryLink(product_id=product3.id, delivery_option_id=express.id))
+    session.add(ProductDeliveryLink(product_id=product3.id, delivery_option_id=standard.id))
+    session.commit()
+    
+    response = client.get("/api/products?sort=delivery_fastest")
+    assert response.status_code == 200
+    products = response.json()
+    
+    product_ids = [p["id"] for p in products]
+    assert len(product_ids) == len(set(product_ids)), "Products should be unique (no duplicates)"
+    
+    product1_idx = next(i for i, p in enumerate(products) if p["id"] == product1.id)
+    product2_idx = next(i for i, p in enumerate(products) if p["id"] == product2.id)
+    product3_idx = next(i for i, p in enumerate(products) if p["id"] == product3.id)
+    product4_idx = next((i for i, p in enumerate(products) if p["id"] == product4.id), None)
+    
+    assert product1_idx < product2_idx, "Same day should come before express"
+    assert product3_idx < product2_idx, "Product with same day should come before express-only"
+    if product4_idx is not None:
+        products_with_delivery = [p for p in products if p.get("delivery_summary")]
+        products_without_delivery = [p for p in products if not p.get("delivery_summary")]
+        if products_without_delivery:
+            first_no_delivery_idx = next(i for i, p in enumerate(products) if not p.get("delivery_summary"))
+            last_with_delivery_idx = next((len(products) - 1 - i for i, p in enumerate(reversed(products)) if p.get("delivery_summary")), -1)
+            assert product4_idx > last_with_delivery_idx, "Product without delivery should come after products with delivery"
+
+
+def test_fastest_delivery_with_category_filter_returns_unique_products(client: TestClient, session: Session):
+    """Test that fastest delivery with category filter returns unique products"""
+    from tests.factories import create_test_delivery_option
+    from app.models import ProductDeliveryLink, DeliverySpeed
+    
+    category1 = create_test_category(session)
+    category2 = create_test_category(session)
+    
+    express = create_test_delivery_option(
+        session,
+        name="Express",
+        speed=DeliverySpeed.EXPRESS,
+        estimated_days_min=1,
+        estimated_days_max=2
+    )
+    standard = create_test_delivery_option(
+        session,
+        name="Standard",
+        speed=DeliverySpeed.STANDARD,
+        estimated_days_min=3,
+        estimated_days_max=5
+    )
+    
+    electronics1 = create_test_product(session, category1.id, "Laptop", 999.99)
+    electronics2 = create_test_product(session, category1.id, "Mouse", 29.99)
+    clothing1 = create_test_product(session, category2.id, "T-Shirt", 19.99)
+    
+    session.add(ProductDeliveryLink(product_id=electronics1.id, delivery_option_id=express.id))
+    session.add(ProductDeliveryLink(product_id=electronics1.id, delivery_option_id=standard.id))
+    session.add(ProductDeliveryLink(product_id=electronics2.id, delivery_option_id=standard.id))
+    session.add(ProductDeliveryLink(product_id=clothing1.id, delivery_option_id=express.id))
+    session.commit()
+    
+    response = client.get(f"/api/products?categoryId={category1.id}&sort=delivery_fastest")
+    assert response.status_code == 200
+    products = response.json()
+    
+    product_ids = [p["id"] for p in products]
+    assert len(product_ids) == len(set(product_ids)), "Products should be unique (no duplicates)"
+    
+    for product in products:
+        assert product["category_id"] == category1.id, "All products should be in the selected category"
+    
+    electronics1_idx = next((i for i, p in enumerate(products) if p["id"] == electronics1.id), None)
+    electronics2_idx = next((i for i, p in enumerate(products) if p["id"] == electronics2.id), None)
+    
+    assert electronics1_idx is not None and electronics2_idx is not None
+    assert electronics1_idx < electronics2_idx, "Express delivery should come before standard"
+
+
+def test_fastest_delivery_with_delivery_filter_returns_unique_products(client: TestClient, session: Session):
+    """Test that fastest delivery with deliveryOptionId filter returns unique products"""
+    from tests.factories import create_test_delivery_option
+    from app.models import ProductDeliveryLink, DeliverySpeed
+    
+    category = create_test_category(session)
+    
+    express = create_test_delivery_option(
+        session,
+        name="Express",
+        speed=DeliverySpeed.EXPRESS,
+        estimated_days_min=1,
+        estimated_days_max=2,
+        price=9.99
+    )
+    standard = create_test_delivery_option(
+        session,
+        name="Standard",
+        speed=DeliverySpeed.STANDARD,
+        estimated_days_min=3,
+        estimated_days_max=5,
+        price=0.0
+    )
+    
+    product1 = create_test_product(session, category.id, "Product A", 29.99)
+    product2 = create_test_product(session, category.id, "Product B", 19.99)
+    product3 = create_test_product(session, category.id, "Product C", 39.99)
+    
+    session.add(ProductDeliveryLink(product_id=product1.id, delivery_option_id=express.id))
+    session.add(ProductDeliveryLink(product_id=product2.id, delivery_option_id=express.id))
+    session.add(ProductDeliveryLink(product_id=product2.id, delivery_option_id=standard.id))
+    session.add(ProductDeliveryLink(product_id=product3.id, delivery_option_id=standard.id))
+    session.commit()
+    
+    response = client.get(f"/api/products?deliveryOptionId={express.id}&sort=delivery_fastest")
+    assert response.status_code == 200
+    products = response.json()
+    
+    product_ids = [p["id"] for p in products]
+    assert len(product_ids) == len(set(product_ids)), "Products should be unique (no duplicates)"
+    assert len(products) == 2, "Should only return products with express delivery"
+    
+    returned_ids = set(product_ids)
+    assert product1.id in returned_ids and product2.id in returned_ids
+    assert product3.id not in returned_ids
+
+
+def test_fastest_delivery_ignores_inactive_options(client: TestClient, session: Session):
+    """Test that inactive delivery options don't affect fastest-days computation"""
+    from tests.factories import create_test_delivery_option
+    from app.models import ProductDeliveryLink, DeliverySpeed
+    
+    category = create_test_category(session)
+    
+    same_day_inactive = create_test_delivery_option(
+        session,
+        name="Same Day (Inactive)",
+        speed=DeliverySpeed.SAME_DAY,
+        estimated_days_min=0,
+        estimated_days_max=0,
+        is_active=False
+    )
+    express_active = create_test_delivery_option(
+        session,
+        name="Express (Active)",
+        speed=DeliverySpeed.EXPRESS,
+        estimated_days_min=1,
+        estimated_days_max=2,
+        is_active=True
+    )
+    standard_active = create_test_delivery_option(
+        session,
+        name="Standard (Active)",
+        speed=DeliverySpeed.STANDARD,
+        estimated_days_min=3,
+        estimated_days_max=5,
+        is_active=True
+    )
+    
+    product_with_inactive = create_test_product(session, category.id, "Product with Inactive", 29.99)
+    product_standard = create_test_product(session, category.id, "Product Standard Only", 19.99)
+    
+    session.add(ProductDeliveryLink(product_id=product_with_inactive.id, delivery_option_id=same_day_inactive.id))
+    session.add(ProductDeliveryLink(product_id=product_with_inactive.id, delivery_option_id=express_active.id))
+    session.add(ProductDeliveryLink(product_id=product_standard.id, delivery_option_id=standard_active.id))
+    session.commit()
+    
+    response = client.get("/api/products?sort=delivery_fastest")
+    assert response.status_code == 200
+    products = response.json()
+    
+    product_with_inactive_idx = next(i for i, p in enumerate(products) if p["id"] == product_with_inactive.id)
+    product_standard_idx = next(i for i, p in enumerate(products) if p["id"] == product_standard.id)
+    
+    assert product_with_inactive_idx < product_standard_idx, \
+        "Product with active express should come before standard-only (inactive same-day shouldn't affect order)"

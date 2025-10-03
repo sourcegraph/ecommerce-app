@@ -1,6 +1,6 @@
 export const semanticTokens = {
   colors: {
-    "bg.page": "sand.50",
+    "bg.page": "blue.500",
     "bg.surface": "sand.50",
     "bg.card": "sand.100",
     "bg.image": "sand.100",
