@@ -1,13 +1,10 @@
 import { Box, Text } from "@chakra-ui/react";
 import { DeliverySummary } from "../../context/GlobalState";
+import { useCurrency } from "../../hooks/useCurrency";
 
 interface DeliveryOptionsSummaryProps {
   summary?: DeliverySummary | null;
 }
-
-const formatPrice = (price: number): string => {
-  return price === 0 ? "Free" : `$${price.toFixed(2)}`;
-};
 
 const formatEta = (min: number, max: number): string => {
   if (min === max) {
@@ -17,6 +14,12 @@ const formatEta = (min: number, max: number): string => {
 };
 
 export const DeliveryOptionsSummary = ({ summary }: DeliveryOptionsSummaryProps) => {
+  const { format } = useCurrency();
+  
+  const formatPrice = (price: number): string => {
+    return price === 0 ? "Free" : format(price);
+  };
+  
   if (!summary) return null;
 
   if (summary.has_free) {

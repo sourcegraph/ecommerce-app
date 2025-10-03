@@ -5,12 +5,11 @@ import CartItem from "../components/CartItem/CartItem";
 import CartItemMobile from "../components/CartItem/CartItemMobile";
 import MotionBox from "../components/MotionBox";
 import { useGlobalContext } from "../context/useGlobalContext";
-
-const formatUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+import { useCurrency } from "../hooks/useCurrency";
 
 const Cart = () => {
   const { products, totalPrice } = useGlobalContext();
+  const { format } = useCurrency();
   const productsInCart = products.flatMap(product =>
     product.inCart === true ? product : []
   );
@@ -87,7 +86,7 @@ const Cart = () => {
                 <VStack spacing={3} mb={4} align="stretch">
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Text color="charcoal.700" fontSize="sm">Subtotal</Text>
-                    <Text color="ink.900" fontWeight="medium">{formatUSD(totalPrice)}</Text>
+                    <Text color="ink.900" fontWeight="medium">{format(totalPrice)}</Text>
                   </Box>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Text color="charcoal.700" fontSize="sm">Shipping</Text>
@@ -117,7 +116,7 @@ const Cart = () => {
                     fontWeight="semibold"
                     data-testid="cart-total"
                   >
-                    {formatUSD(totalPrice)}
+                    {format(totalPrice)}
                   </Text>
                 </Box>
 

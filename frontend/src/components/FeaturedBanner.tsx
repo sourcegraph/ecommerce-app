@@ -1,12 +1,14 @@
 import { Box, Button, Flex, Image, Text, AspectRatio } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductType, getImageUrl } from "../context/GlobalState";
+import { useCurrency } from "../hooks/useCurrency";
 
 type Props = {
   product: ProductType;
 };
 
 const FeaturedBanner = ({ product }: Props) => {
+  const { format } = useCurrency();
 
   return (
     <Flex
@@ -31,7 +33,7 @@ const FeaturedBanner = ({ product }: Props) => {
         </Text>
         <Flex align="baseline" gap={3} mb={4}>
           <Text fontSize="2xl" fontWeight="bold" color="text.primary">
-            ${product.price}
+            {format(+product.price)}
           </Text>
         </Flex>
         <Button

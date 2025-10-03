@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { Route, Link as RouterLink, Routes, useLocation } from "react-router-dom";
 import { useGlobalContext } from "../context/useGlobalContext";
+import { CurrencySelector } from "./CurrencySelector";
 import Logo from "./Logo";
 import MUIBadge from "./MUI/MUIBadge";
 import SearchBar from "./SearchBar";
@@ -71,6 +72,9 @@ const Header = () => {
         <SearchBar display={{ base: "none", sm: "block" }} />
         <Flex justify="space-between" align="center">
           <HStack spacing={{ base: 3, sm: 5 }}>
+            <Box display={{ base: "none", sm: "block" }}>
+              <CurrencySelector />
+            </Box>
             <Link
               as={RouterLink}
               to={location.pathname === "/login" ? "/register" : "/login"}

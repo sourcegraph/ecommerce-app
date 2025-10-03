@@ -162,16 +162,21 @@ def get_mock_product(overrides: dict = None) -> Product:
 ```
 backend/
 ├── app/
-│   ├── models/           # SQLModel database models
-│   ├── schemas/          # Pydantic request/response models
-│   ├── routers/          # FastAPI route handlers
-│   ├── services/         # Business logic layer
-│   ├── repositories/     # Database access layer
-│   ├── dependencies.py   # FastAPI dependencies
-│   └── database.py       # Database connection setup
+│   ├── currency.py       # FX rates service, models, schemas
+│   ├── models.py         # SQLModel database models (Product, Category, DeliveryOption, FxRates)
+│   ├── schemas.py        # Pydantic request/response models
+│   ├── crud.py           # Database operations
+│   ├── db.py             # Database connection setup
+│   ├── main.py           # FastAPI routes and app entry point
+│   └── seed.py           # Database seeding script
 ├── tests/
-│   ├── test_products.py  # Product API tests
-│   ├── test_orders.py    # Order API tests
+│   ├── api/
+│   │   ├── test_products.py      # Product API tests
+│   │   ├── test_currency.py      # Currency/FX rates tests
+│   │   ├── test_categories.py    # Category API tests
+│   │   ├── test_delivery_options.py # Delivery options tests
+│   │   └── test_images.py        # Image handling tests
+│   ├── factories.py      # Test data factories
 │   └── conftest.py       # Pytest fixtures
 ├── alembic/
 │   └── versions/         # Database migrations
@@ -210,6 +215,16 @@ class Order(SQLModel, table=True):
 - `PUT /products/{id}` - Update product (full)
 - `PATCH /products/{id}` - Partial update
 - `DELETE /products/{id}` - Delete product
+- `GET /fx/rates` - Get currency exchange rates
+
+### Currency/FX Rates
+- **Endpoint:** `GET /fx/rates`
+- **Base Currency:** USD (all prices stored in USD)
+- **Supported Currencies:** USD, GBP, EUR, AUD, MXN, JPY
+- **Caching:** 6-hour TTL with 3-tier caching (memory → DB → fallback)
+- **Provider:** frankfurter.app (free, no auth required)
+- **Response:** Includes rates, fetched_at, ttl_seconds, stale flag
+- **Graceful Degradation:** Serves stale rates when provider unavailable
 
 ### Response Format
 ```python

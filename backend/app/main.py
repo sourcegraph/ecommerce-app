@@ -19,6 +19,7 @@ from .schemas import (
 )
 from . import crud
 from .models import Product, DeliveryOption, Category, ProductDeliveryLink
+from .currency import FxService, RatesResponse
 
 def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Optional[DeliverySummary]:
     """Calculate delivery summary from a list of delivery options"""
@@ -426,6 +427,11 @@ def get_product_image(
             "Cache-Control": "public, max-age=86400",
         }
     )
+
+@app.get("/fx/rates", response_model=RatesResponse)
+def get_fx_rates(session: Session = Depends(get_session)):
+    service = FxService(session)
+    return service.get_rates()
 
 if __name__ == "__main__":
     import uvicorn

@@ -12,6 +12,15 @@ Follow the [Quick Start](#quick-start) guide to get started. Once the front and 
 
 See the [DEMO.md](DEMO.md) for more information about how to effectively use this repo for an array of different demo purposes ranging from issue to PR to advanced feature adds.
 
+## Features
+
+- **Full-stack E-commerce:** Product catalog, cart, delivery options
+- **Multi-Currency Support:** USD, GBP, EUR, AUD, MXN, JPY with live FX rates
+- **Image Management:** BLOB storage with SQLite, efficient retrieval
+- **Delivery Options:** Configurable shipping with cost calculations
+- **Modern Stack:** FastAPI + React TypeScript + SQLite
+- **Test-Driven:** 100% coverage requirement, Playwright E2E tests
+
 ## Project Structure
 
 ```
@@ -19,6 +28,10 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 ├── .github/            # GitHub workflows and CI configuration
 ├── backend/            # FastAPI backend
 │   ├── app/            # Application source code
+│   │   ├── currency.py # FX rates service and models
+│   │   ├── models.py   # SQLModel database models
+│   │   ├── schemas.py  # Pydantic request/response schemas
+│   │   └── main.py     # FastAPI routes and app
 │   ├── tests/          # Backend tests
 │   ├── alembic/        # Database migrations
 │   ├── pyproject.toml  # Python dependencies (managed by uv)
@@ -30,8 +43,11 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 │   ├── src/            # React components and pages
 │   │   ├── api/        # API client and types
 │   │   ├── components/ # Reusable UI components
+│   │   │   └── CurrencySelector.tsx # Currency picker
 │   │   ├── context/    # React Context providers
+│   │   │   └── CurrencyContext.tsx  # Currency state management
 │   │   ├── hooks/      # Custom React hooks
+│   │   │   └── useCurrency.ts       # Currency hook
 │   │   ├── mockDB/     # Mock data for development
 │   │   ├── pages/      # Page-level components
 │   │   └── theme/      # Chakra UI theme configuration
