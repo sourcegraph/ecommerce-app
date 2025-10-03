@@ -176,9 +176,10 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen, and auto-populate the correct cu
  Implement multi-currency support using Oracle's suggestion, using sub-agents
 ```
 
-- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-5c2a0c8d-41cf-464f-9e33-acb0040634ec) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
-- Alternatively, there is a [multiple-currency-conversion](https://github.com/sourcegraph/ecommerce-app/tree/multiple-currency-conversion) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have the option to select a currency from a dropdown on the page:
-  <img width="240" height="316" alt="image" src="https://github.com/user-attachments/assets/9dbfdfcf-be5d-4133-a5e3-33f1c42556ca" />
+- This execution will take a long time as its a fairly large change, key points; highlight the use of Amp using subagents to speed up execution, each subagent has its own context window and switch over to [this thread](https://ampcode.com/threads/T-bcaec5de-87d9-4fc9-a498-bf4bfed807bc) where we these prompts were executed before to walk the user through the end result if you don't want to wait for 10 mins for the thread to finish executing.
+- Alternatively, there is a [feature/multi-currency-support](https://github.com/sourcegraph/ecommerce-app/tree/feature/multi-currency-support) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have the option to select a currency from a dropdown on the page:
+<img width="346" height="317" alt="image" src="https://github.com/user-attachments/assets/fcd4dd7b-5303-47c2-b8af-8883a685b1ad" />
+
 
 ## IDE diagnostics and testing
 
