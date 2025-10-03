@@ -36,6 +36,8 @@ class Product(SQLModel, table=True):
     image_mime_type: Optional[str] = Field(default=None)  # e.g., "image/jpeg"
     image_filename: Optional[str] = Field(default=None)   # Original filename
     is_saved: bool = Field(default=False)
+    is_featured: bool = Field(default=False, index=True)
+    sales_count: int = Field(default=0, ge=0, index=True)
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

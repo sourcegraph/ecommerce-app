@@ -27,7 +27,9 @@ def create_test_product(
     category_id: Optional[int] = None,
     title: Optional[str] = None,
     price: Optional[float] = None,
-    with_image: bool = False
+    with_image: bool = False,
+    is_featured: bool = False,
+    sales_count: int = 0
 ) -> Product:
     """Create a test product with configurable options"""
     if category_id is None:
@@ -49,7 +51,9 @@ def create_test_product(
         description=f"Description for {title}",
         price=price,
         category_id=category_id,
-        is_saved=False
+        is_saved=False,
+        is_featured=is_featured,
+        sales_count=sales_count
     )
     
     if with_image:
