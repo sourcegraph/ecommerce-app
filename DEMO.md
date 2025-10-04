@@ -263,7 +263,6 @@ Explain that we are going to refactor the authentication system in the Amp CLI G
 Amp will figure out vulnerabilities, consult Oracle on how to fix and refactor code (as per screenshot).
 
 <img width="700" height="400" alt="Screenshot 2025-09-23 at 17 00 50" src="https://github.com/user-attachments/assets/671e0bb6-3709-41aa-909c-0b2fe20346c8" />
-[thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3)
 
 This takes a while to execute, so go to this [thread](https://ampcode.com/threads/T-47caa855-56e6-49a6-a1f6-703a5a584fd3) and walk the audience through the execution.
 
