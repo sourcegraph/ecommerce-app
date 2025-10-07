@@ -76,9 +76,6 @@ uv python install 3.13 --default
 # Install node
 brew install node
 
-# Install vite
-brew install vite
-
 # Install gh CLI and authenticate
 brew install gh
 gh auth login
