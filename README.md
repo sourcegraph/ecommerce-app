@@ -60,17 +60,33 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 2. Install the prerequisites and clone the project:
 
 ```bash
+# Install homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 # Install just
 brew install just
-# Install uv and python
+
+# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-uv python install
+source $HOME/.local/bin/env
+
+# Install python
+uv python install 3.13 --default
+
 # Install node
 brew install node
+
+# Install vite
+brew install vite
+
+# Install gh CLI and authenticate
+brew install gh
+gh auth login
 ```
 
 ```bash
-# Verify you have required tools
+# Verify you have the required tools
+source $HOME/.local/bin/env
 just --version
 python --version
 uv --version
