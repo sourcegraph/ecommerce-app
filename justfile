@@ -18,7 +18,7 @@ install:
 
 # Install frontend dependencies
 install-frontend:
-    cd frontend && npm ci
+    cd frontend && npm install
 
 # Install E2E test dependencies
 install-e2e:
