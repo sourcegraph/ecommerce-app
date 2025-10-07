@@ -15,20 +15,19 @@ import { BiTrash } from "react-icons/bi";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
+import { useCurrency } from "../../hooks/useCurrency";
 import MotionBox from "../MotionBox";
 
 type Props = {
   product: ProductInCart;
 };
 
-const formatUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
 const CartItemMobile = ({ product }: Props) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const subTotal = +product.price * +product.quantity;
 
   const { deleteFromCart, incrementQty, decrementQty, toggleSaved } = useGlobalContext();
+  const { format } = useCurrency();
 
   return (
     <MotionBox
@@ -95,11 +94,11 @@ const CartItemMobile = ({ product }: Props) => {
             </Link>
 
             <Text color="ink.900" fontWeight="medium" fontSize="md">
-              {formatUSD(subTotal)}
+              {format(subTotal)}
             </Text>
 
             <Text fontSize="xs" color="charcoal.600">
-              {formatUSD(+product.price)} each
+              {format(+product.price)} each
             </Text>
           </VStack>
         </HStack>

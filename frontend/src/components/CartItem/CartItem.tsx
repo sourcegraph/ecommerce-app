@@ -17,18 +17,17 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { ProductInCart, getImageUrl } from "../../context/GlobalState";
 import { useGlobalContext } from "../../context/useGlobalContext";
+import { useCurrency } from "../../hooks/useCurrency";
 import MotionBox from "../MotionBox";
 
 type Props = {
   product: ProductInCart;
 };
 
-const formatUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
 const CartItem = ({ product }: Props) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const { setQuantity, deleteFromCart, toggleSaved } = useGlobalContext();
+  const { format } = useCurrency();
   const subTotal = +product.price * +product.quantity;
 
   const handleQuantityChange = (_: string, valueAsNumber: number) => {
@@ -124,7 +123,7 @@ const CartItem = ({ product }: Props) => {
 
         <VStack minW="140px" align="flex-end" spacing={3}>
           <Text color="ink.900" fontWeight="medium" fontSize="md">
-            {formatUSD(subTotal)}
+            {format(subTotal)}
           </Text>
 
           <NumberInput
@@ -160,7 +159,7 @@ const CartItem = ({ product }: Props) => {
           </NumberInput>
 
           <Text fontSize="xs" color="charcoal.600">
-            {formatUSD(+product.price)} each
+            {format(+product.price)} each
           </Text>
         </VStack>
       </HStack>

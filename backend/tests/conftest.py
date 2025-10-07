@@ -14,6 +14,7 @@ from app.main import app  # noqa: E402
 from app.db import get_session  # noqa: E402
 from app.models import SQLModel  # noqa: E402
 from app.seed import seed_database  # noqa: E402
+from app.currency import FxRates  # noqa: E402, F401
 
 @pytest.fixture(scope="session")
 def test_db():

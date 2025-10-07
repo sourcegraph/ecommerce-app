@@ -21,6 +21,7 @@ import ProgressLine from "../components/Loading/ProgressLine";
 import MUIRating from "../components/MUI/MUIRating";
 import { DeliveryOptionsSelector } from "../components/Delivery";
 import { useGlobalContext } from "../context/useGlobalContext";
+import { useCurrency } from "../hooks/useCurrency";
 import { getImageUrl, ProductType, DeliveryOption } from "../context/GlobalState";
 import { BookmarkIcon } from "../components/Icons/BookmarkIcon";
 
@@ -40,6 +41,7 @@ interface ProductWithDelivery {
 const Product = () => {
   const { fetchProducts, isLoading, products, addToCart, toggleSaved } =
     useGlobalContext();
+  const { format } = useCurrency();
   const [productWithDelivery, setProductWithDelivery] = useState<ProductWithDelivery | null>(null);
   const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<string>("");
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
@@ -188,7 +190,7 @@ const Product = () => {
             {/* Price */}
             <Flex align="center" mb={4}>
               <Text fontSize="3xl" fontWeight="bold" color="text.primary" data-testid="product-price">
-                ${displayProduct.price}
+                {format(+displayProduct.price)}
               </Text>
             </Flex>
 

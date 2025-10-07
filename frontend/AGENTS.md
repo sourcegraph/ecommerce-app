@@ -5,7 +5,8 @@
 **Purpose:** React TypeScript frontend for e-commerce demo with strict TDD practices  
 **Stack:** React 18, TypeScript, Vite, Chakra UI, React Testing Library, Playwright  
 **Design System:** Modular theme with semantic tokens (sand/ink/charcoal colors, Inter font)  
-**Architecture:** Component-based with Context API for state management
+**Architecture:** Component-based with Context API for state management  
+**Multi-Currency:** Supports USD, GBP, EUR, AUD, MXN, JPY with live FX rates from backend
 
 ## Essential Commands
 
@@ -271,6 +272,44 @@ export const CartProvider: FC<{ children: ReactNode }> = ({ children }) => {
 }
 ```
 
+### Currency Management
+
+**Context:** `CurrencyContext` manages currency selection, FX rates, and price formatting.
+
+**Hook:** `useCurrency()` provides:
+- `currency` - Currently selected currency (USD/GBP/EUR/AUD/MXN/JPY)
+- `setCurrency(code)` - Change currency preference
+- `rates` - Exchange rates from backend
+- `convert(usdAmount)` - Convert USD to selected currency
+- `format(usdAmount)` - Convert and format with proper symbol/decimals
+- `fetchedAt`, `stale` - Rate freshness indicators
+
+**Storage:** 
+- Selected currency persisted in localStorage
+- Auto-detects from navigator.language on first visit
+- FX rates cached in localStorage with 6hr TTL
+
+**Price Display:**
+- All prices stored/calculated in USD
+- Conversion happens only for display purposes
+- Use `format(price)` instead of `${price}` in all components
+- Intl.NumberFormat handles currency-specific formatting (JPY=0 decimals)
+
+**Component Integration:**
+```typescript
+import { useCurrency } from '../hooks/useCurrency'
+
+export const ProductCard = ({ product }) => {
+  const { format } = useCurrency()
+  
+  return (
+    <Box>
+      <Text>{format(product.price)}</Text>
+    </Box>
+  )
+}
+```
+
 ## UI Component Standards
 
 ### Chakra UI Integration
@@ -507,12 +546,25 @@ frontend/src/
 │   ├── ProductCard/
 │   │   ├── ProductCard.tsx
 │   │   └── ProductCard.test.tsx
+│   ├── CurrencySelector.tsx        # Currency picker dropdown
+│   ├── CurrencySelector.test.tsx
+│   ├── CartItem/        # Cart item display
+│   ├── Delivery/        # Delivery option components
+│   └── Header.tsx       # App header with currency selector
 ├── pages/               # Page-level components
+│   ├── Cart.tsx         # Shopping cart (uses currency formatting)
+│   ├── Product.tsx      # Product detail page
+│   └── Home.tsx         # Homepage
 ├── hooks/               # Custom React hooks
+│   └── useCurrency.ts   # Currency context hook
 ├── context/             # React Context providers
+│   ├── CurrencyContext.tsx  # Currency state, FX rates, formatting
+│   ├── GlobalState.tsx      # Cart and product state
+│   └── index.ts         # Context exports
 ├── api/                 # API client and types
 ├── types/               # TypeScript type definitions
 ├── utils/               # Helper functions
+│   └── currency.test.ts # Currency utility tests
 └── __tests__/           # Test utilities and global mocks
 ```
 

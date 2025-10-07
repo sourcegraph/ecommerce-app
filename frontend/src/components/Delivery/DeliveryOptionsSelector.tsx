@@ -7,6 +7,7 @@ import {
   RadioGroup,
 } from "@chakra-ui/react";
 import { DeliveryOption } from "../../context/GlobalState";
+import { useCurrency } from "../../hooks/useCurrency";
 import { DeliverySpeedIcon } from "./DeliverySpeedIcon";
 
 interface DeliveryOptionsSelectorProps {
@@ -15,10 +16,6 @@ interface DeliveryOptionsSelectorProps {
   value?: string;
   onChange: (id: string) => void;
 }
-
-const formatPrice = (price: number): string => {
-  return price === 0 ? "Free" : `$${price.toFixed(2)}`;
-};
 
 const formatEta = (min: number, max: number): string => {
   if (min === max) {
@@ -33,6 +30,12 @@ export const DeliveryOptionsSelector = ({
   value,
   onChange,
 }: DeliveryOptionsSelectorProps) => {
+  const { format } = useCurrency();
+  
+  const formatPrice = (price: number): string => {
+    return price === 0 ? "Free" : format(price);
+  };
+  
   // Filter and sort options
   const activeOptions = options.filter(o => o.is_active);
   const speedOrder = { standard: 0, express: 1, next_day: 2, same_day: 3 };

@@ -13,6 +13,7 @@ import {
 import { FaShoppingCart } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
 import { useGlobalContext } from "../context/useGlobalContext";
+import { useCurrency } from "../hooks/useCurrency";
 import MUIRating from "./MUI/MUIRating";
 import MotionBox from "./MotionBox";
 import { DeliveryOptionsSummary } from "./Delivery";
@@ -27,6 +28,7 @@ type Props = {
 
 const ProductCard = ({ product }: Props) => {
   const { addToCart, toggleSaved } = useGlobalContext();
+  const { format } = useCurrency();
   const [imgLoaded, setImgLoaded] = useState(false);
 
   return (
@@ -127,7 +129,7 @@ const ProductCard = ({ product }: Props) => {
 
           <Flex align="baseline" gap={2}>
             <Text fontSize="xl" fontWeight="bold" color="ink.900" data-testid="product-price">
-              ${product.price}
+              {format(+product.price)}
             </Text>
           </Flex>
 
