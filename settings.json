@@ -1,6 +1,5 @@
 {
-  "amp.notifications.enabled": true,
-  "amp.internal.oracleModel": "O3",
+  "amp.internal.showCost": false,
   "amp.mcpServers": {
     "playwright": {
       "command": "npx",
@@ -11,92 +10,56 @@
         "--isolated"
       ],
       "_target": "global"
-    },
-    "local-test": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/Users/asridhar/Desktop"
-      ],
-      "env": {},
-      "_target": "global"
     }
   },
-  "amp.commands.allowlist": [
-    "git",
-    "glab",
-    "java",
-    "curl",
-    "chmod",
-    "cd",
-    "cp",
-    "~/gerrit_testsite/bin/gerrit.sh",
-    "pip3"
-  ],
-  "amp.permissions": [
+   "amp.permissions": [
     {
       "tool": "Bash",
+      "action": "ask",
       "matches": {
-        "cmd": "git"
-      },
-      "action": "allow"
+        "cmd": [
+          "*rm*-rf*",
+          "*rm*-r*--force*",
+          "*rm*--force*-r*"
+        ]
+      }
     },
     {
       "tool": "Bash",
+      "action": "ask",
       "matches": {
-        "cmd": "glab"
-      },
-      "action": "allow"
+        "cmd": [
+          "*find*-exec*",
+          "*find*-delete*"
+        ]
+      }
     },
     {
       "tool": "Bash",
+      "action": "ask",
       "matches": {
-        "cmd": "java"
-      },
-      "action": "allow"
+        "cmd": [
+          "*git*push*--force*",
+          "*git*push*-f*"
+        ]
+      }
     },
     {
       "tool": "Bash",
+      "action": "ask",
       "matches": {
-        "cmd": "curl"
-      },
-      "action": "allow"
+        "cmd": [
+          "sudo*",
+          "su*",
+          "*chmod*777*",
+          "*chown*root*"
+        ]
+      }
     },
     {
-      "tool": "Bash",
-      "matches": {
-        "cmd": "chmod"
-      },
-      "action": "allow"
-    },
-    {
-      "tool": "Bash",
-      "matches": {
-        "cmd": "cd"
-      },
-      "action": "allow"
-    },
-    {
-      "tool": "Bash",
-      "matches": {
-        "cmd": "cp"
-      },
-      "action": "allow"
-    },
-    {
-      "tool": "Bash",
-      "matches": {
-        "cmd": "~/gerrit_testsite/bin/gerrit.sh"
-      },
-      "action": "allow"
-    },
-    {
-      "tool": "Bash",
-      "matches": {
-        "cmd": "pip3"
-      },
-      "action": "allow"
+      "tool": "*",
+      "action": "allow",
+      "matches": {}
     }
   ]
 }

@@ -51,7 +51,7 @@ If you want to quickly demo Amp in under 2 minutes, you can make a small change,
 ### Fixing GitHub Issue Bug
 
 **Purpose**  
-Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
+Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt. If you don't want Amp to create a PR (may be an issue for some if you don't have permissions to create a PR on the repo), just omit the last line of the prompt and ask it to stop for your review after its commits.
 
 **Steps:**
 
@@ -62,7 +62,7 @@ Demonstrate how you can use Amp to fix a bug from Issue to PR in one prompt
 Fix bug https://github.com/sourcegraph/amp-demo/issues/35 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request
 ```
 
-- While Amp is executing, you can optionally show a previous [thread](https://ampcode.com/threads/T-d3e778f1-914d-46e3-a8a8-a9f077946010) that was run to fix this issue. Or you can switch to [_fix/duplicate-items-fastest-delivery_](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery) branch locally and run this branch, which has the fix in case something goes wrong.
+- While Amp is executing, you can optionally show a previous [thread](https://ampcode.com/threads/T-d3e778f1-914d-46e3-a8a8-a9f077946010) that was run to fix this issue. Or you can switch to [fix/duplicate-items-fastest-delivery](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery) branch locally and run this branch, which has the fix in case something goes wrong.
 - Once it's fixed, only unique products will be displayed when the "Fastest Delivery" filter is chosen in the UI.
 
 ### Implementing a new feature
