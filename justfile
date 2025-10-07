@@ -38,7 +38,7 @@ dev:
     cd frontend && npx concurrently \
       --names "backend,frontend" \
       --prefix-colors "blue,green" \
-      "cd ../backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001" \
+      "cd ../backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001" \
       "npm run dev -- --host 0.0.0.0 --port 3001"
 
 # Run backend + frontend in background (detached for agentic tools)
@@ -48,7 +48,7 @@ dev-headless: _ensure-logs-dir
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
     # backend
-    cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
+    cd backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
     # frontend
     cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 &
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
@@ -62,7 +62,7 @@ stop:
 
 # Independent servers (sometimes handy)
 dev-backend:
-    cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+    cd backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001
 
 dev-frontend:
     cd frontend && npm run dev -- --host 0.0.0.0 --port 3001
