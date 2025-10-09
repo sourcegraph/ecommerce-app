@@ -3,17 +3,23 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import theme from "./theme";
-// Remove blue outline from buttons and links
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ToastProvider } from "./components/ToastProvider";
+import { setupGlobalErrorHandlers } from "./setupGlobalErrorHandlers";
 import "focus-visible/dist/focus-visible";
-// Lazy load images
 import "lazysizes";
-// import a plugin
 import "lazysizes/plugins/parent-fit/ls.parent-fit";
+
+setupGlobalErrorHandlers();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <ChakraProvider theme={theme}>
-      <App />
-    </ChakraProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <ChakraProvider theme={theme}>
+          <App />
+        </ChakraProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

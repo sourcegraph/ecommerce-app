@@ -1,6 +1,15 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import logging_config  # noqa: F401
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
@@ -52,6 +61,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+from middleware.trace import TraceContextMiddleware  # noqa: E402
+from errors import (  # noqa: E402
+    http_exception_handler,
+    validation_exception_handler,
+    generic_exception_handler,
+)
+
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(ValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
+
+app.add_middleware(TraceContextMiddleware)
+
 # CORS middleware for frontend integration
 origins = os.getenv(
     "CORS_ALLOW_ORIGINS", 
@@ -62,8 +85,8 @@ app.add_middleware(
     allow_origins=[o.strip() for o in origins if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_headers=["Content-Type", "Authorization", "traceparent", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "traceparent", "Content-Type"],
 )
 
 @app.get("/health")

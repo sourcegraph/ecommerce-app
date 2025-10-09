@@ -7,10 +7,16 @@ import sys
 from pathlib import Path
 from sqlmodel import Session
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from .db import engine, create_db_and_tables
 from .models import Product, DeliveryOption, DeliverySpeed
 from .crud import get_category_by_name, create_category, download_and_store_image
 from .schemas import CategoryCreate
+
+from logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def load_products_json():
@@ -23,13 +29,11 @@ def load_products_json():
     
     for products_path in possible_paths:
         if products_path.exists():
-            print(f"Loading products from: {products_path}")
+            logger.info("loading_products", path=str(products_path))
             with open(products_path, 'r') as f:
                 return json.load(f)
     
-    print("Products file not found in any of these locations:")
-    for path in possible_paths:
-        print(f"   - {path}")
+    logger.error("products_file_not_found", paths=[str(p) for p in possible_paths])
     sys.exit(1)
 
 def seed_categories(session: Session, products: list) -> dict:
@@ -43,24 +47,24 @@ def seed_categories(session: Session, products: list) -> dict:
         existing_category = get_category_by_name(session, category_name)
         if existing_category:
             category_map[category_name] = existing_category.id
-            print(f"Category '{category_name}' already exists (ID: {existing_category.id})")
+            logger.debug("category_already_exists", category_name=category_name, category_id=existing_category.id)
         else:
             # Create new category
             new_category = create_category(session, CategoryCreate(name=category_name))
             category_map[category_name] = new_category.id
-            print(f"Created category '{category_name}' (ID: {new_category.id})")
+            logger.info("category_created", category_name=category_name, category_id=new_category.id)
     
     return category_map
 
 def seed_products(session: Session, products: list, category_map: dict):
     """Create products with image download and storage"""
-    print(f"\nSeeding {len(products)} products...")
+    logger.info("seeding_products", count=len(products))
     
     for product_data in products:
         # Check if product already exists
         existing_product = session.get(Product, product_data['id'])
         if existing_product:
-            print(f"Product '{product_data['title']}' already exists (ID: {product_data['id']})")
+            logger.debug("product_already_exists", product_title=product_data['title'], product_id=product_data['id'])
             continue
         
         # Create new product
@@ -77,18 +81,18 @@ def seed_products(session: Session, products: list, category_map: dict):
         session.commit()
         session.refresh(new_product)
         
-        print(f"Created product '{product_data['title']}' (ID: {product_data['id']})")
+        logger.info("product_created", product_title=product_data['title'], product_id=product_data['id'])
         
         # Download and store image
         image_url = product_data.get('image')
         if image_url:
-            print(f"Downloading image from: {image_url}")
+            logger.info("downloading_image", image_url=image_url)
             if download_and_store_image(session, new_product, image_url):
-                print(f"Successfully stored image for product {product_data['id']}")
+                logger.info("image_stored", product_id=product_data['id'])
             else:
-                print(f"Failed to download/store image for product {product_data['id']}")
+                logger.warning("image_storage_failed", product_id=product_data['id'])
         else:
-            print(f"No image URL found for product {product_data['id']}")
+            logger.debug("no_image_url", product_id=product_data['id'])
 
 def seed_delivery_options(session: Session) -> list[DeliveryOption]:
     """Create common delivery options"""
@@ -139,14 +143,14 @@ def seed_delivery_options(session: Session) -> list[DeliveryOption]:
         from sqlmodel import select
         existing = session.exec(select(DeliveryOption).where(DeliveryOption.name == option.name)).first()
         if existing:
-            print(f"Delivery option '{option.name}' already exists")
+            logger.debug("delivery_option_already_exists", option_name=option.name)
             created_options.append(existing)
         else:
             session.add(option)
             session.commit()
             session.refresh(option)
             created_options.append(option)
-            print(f"Created delivery option: {option.name} - ${option.price}")
+            logger.info("delivery_option_created", option_name=option.name, price=option.price)
     
     return created_options
 
@@ -194,7 +198,7 @@ def assign_delivery_options_to_products(session: Session, delivery_options: list
         session.add(product)
         
         option_names = [opt.name for opt in selected_options]
-        print(f"Assigned delivery options to '{product.title}': {', '.join(option_names)}")
+        logger.info("delivery_options_assigned", product_title=product.title, options=", ".join(option_names))
     
     session.commit()
 

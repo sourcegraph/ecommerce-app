@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from sqlmodel import Session, select
 from typing import List, Optional, Union
 from .models import Product, Category
@@ -5,6 +10,10 @@ from .schemas import ProductCreate, ProductUpdate, CategoryCreate
 import requests
 from PIL import Image
 import io
+
+from logging_config import get_logger
+
+logger = get_logger(__name__)
 
 def create_category(session: Session, category: CategoryCreate) -> Category:
     db_category = Category.model_validate(category)
@@ -122,7 +131,11 @@ def create_placeholder_image(session: Session, product: Product) -> bool:
         return True
         
     except Exception as e:
-        print(f"Error creating placeholder image for product {product.id}: {e}")
+        logger.error(
+            "placeholder_image_error",
+            product_id=product.id,
+            error=str(e),
+        )
         return False
 
 def download_and_store_image(session: Session, product: Product, image_url: str) -> bool:
@@ -155,6 +168,11 @@ def download_and_store_image(session: Session, product: Product, image_url: str)
         return True
         
     except Exception as e:
-        print(f"Error downloading image for product {product.id}: {e}")
-        print("Creating placeholder image instead...")
+        logger.warning(
+            "image_download_failed",
+            product_id=product.id,
+            image_url=image_url,
+            error=str(e),
+            fallback="placeholder",
+        )
         return create_placeholder_image(session, product)

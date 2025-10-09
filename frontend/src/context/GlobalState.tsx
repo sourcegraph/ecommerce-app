@@ -1,5 +1,8 @@
 import { FC, ReactNode, createContext, useEffect, useState } from "react";
 import seed from "./products.json";
+import { useToast } from "../components/ToastProvider";
+import { ApiError } from "../api/client";
+import { formatUserMessage } from "../lib/errors";
 
 type DeliverySpeed = "standard" | "express" | "next_day" | "same_day";
 
@@ -84,6 +87,7 @@ export const GlobalContext = createContext<ContextType | null>(null);
 
 // Provider component
 export const Provider: FC<Props> = ({ children }) => {
+  const { showToast } = useToast();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartItemCount, setCartItemCount] = useState(0);
@@ -97,6 +101,7 @@ export const Provider: FC<Props> = ({ children }) => {
       return savedCart ? JSON.parse(savedCart) : {};
     } catch (error) {
       console.error('Failed to load cart state:', error);
+      showToast('Failed to load cart state', 'error');
       return {};
     }
   };
@@ -108,6 +113,7 @@ export const Provider: FC<Props> = ({ children }) => {
       return savedState ? JSON.parse(savedState) : {};
     } catch (error) {
       console.error('Failed to load saved state:', error);
+      showToast('Failed to load saved items', 'error');
       return {};
     }
   };
@@ -127,6 +133,7 @@ export const Provider: FC<Props> = ({ children }) => {
       localStorage.setItem('cart-state', JSON.stringify(cartState));
     } catch (error) {
       console.error('Failed to save cart state:', error);
+      showToast('Failed to save cart state', 'error');
     }
   };
 
@@ -142,6 +149,7 @@ export const Provider: FC<Props> = ({ children }) => {
       localStorage.setItem('saved-state', JSON.stringify(savedState));
     } catch (error) {
       console.error('Failed to save saved state:', error);
+      showToast('Failed to save item', 'error');
     }
   };
 
@@ -176,6 +184,13 @@ export const Provider: FC<Props> = ({ children }) => {
       setProducts(formattedProducts);
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      
+      if (error instanceof ApiError) {
+        showToast(formatUserMessage(error.problem), 'error');
+      } else {
+        showToast('Failed to load products. Using offline data.', 'error');
+      }
+      
       // Fallback to seed data if API is not available
       console.log("Using fallback seed data");
       const savedCartState = loadCartState();
