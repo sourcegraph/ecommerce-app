@@ -201,7 +201,8 @@ We have specs/ERROR_HANDLING_AND_LOGGING_STANDARDS.md that defines our company s
 Once you have a plan, implement the changes, ensure all tests pass, and make sure CI checks pass (linting, type checking, etc.) Then make a concise commit summarizing the changes.
 ```
 
-- This execution will take around 15-20 minutes, key points; highlight the use of Amp first plan with the oracle, implement complex changes with the use of subagents to search effectively and efficiently manage context and then use all of the feedback looks to self correct and verify.
+- This execution will take around 15-20 minutes, key points; highlight the use of Amp first plan with the oracle, implement complex changes with the use of subagents to search effectively and efficiently manage context and then use all of the feedback looks to self correct and verify. Switch over to [this thread](https://ampcode.com/threads/T-40010e07-cece-4206-802e-7fa80f8cb127) if you want to talk over the thread without it executing or waiting for it to finish.
+- Alternatively, there is a [error-logging-modernization](https://github.com/sourcegraph/ecommerce-app/tree/error-logging-modernization) branch with the solution, you can switch over to this branch and show what the end result looks like.
 
 ## IDE diagnostics and testing
 
