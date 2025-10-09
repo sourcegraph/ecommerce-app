@@ -35,7 +35,7 @@
 
 **Error Handling:**
 - If build fails, ensure ports 3001/8001 are available
-- For test failures, check `frontend/test-results/` directory for detailed logs
+- For E2E test failures, check `frontend/test-results/` directory for detailed logs
 
 
 ## Testing Guidelines
@@ -166,7 +166,6 @@ def process_payment(payment_data: dict) -> Result:
 
 ### Testing Architecture
 - **Backend:** pytest with async support, factory-boy for test data
-- **Frontend:** React Testing Library + Jest, testing behavior not implementation
 - **E2E:** Playwright for full user journey testing
 - **Coverage:** 100% coverage requirement for all business logic
 
