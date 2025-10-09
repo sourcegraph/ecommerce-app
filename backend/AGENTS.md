@@ -80,7 +80,7 @@ def test_product_repository_creates_product(db_session):
 ### Type Safety Requirements
 - **Type hints:** Required for ALL functions, methods, and variables
 - **SQLModel:** For database models and Pydantic validation
-- **Strict mypy:** No `Any`, `type: ignore` requires justification
+- **Strict mypy:** No `Any` types allowed. NEVER use `# type: ignore` comments - fix the underlying type issue instead
 
 ```python
 from typing import Optional
