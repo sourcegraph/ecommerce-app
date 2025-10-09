@@ -104,6 +104,7 @@ const getMockUser = (overrides?: Partial<User>): User => ({
 - HTTPException for error handling
 - Async/await patterns with FastAPI Depends()
 - Factory pattern for test data creation
+- NEVER use `# type: ignore` comments - always fix the underlying type issue instead
 
 ### General Code Quality
 **No Comments in Code:** Code should be self-documenting through clear naming and structure. Comments indicate code isn't clear enough.

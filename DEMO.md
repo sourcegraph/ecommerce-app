@@ -198,10 +198,10 @@ Our production logs are really hard to debug, we can't trace requests from front
 
 We have specs/ERROR_HANDLING_AND_LOGGING_STANDARDS.md that defines our company standards. Consult the oracle to plan how to modernize this repos codebase to comply with these standards. Make sure to augment the existing tests and add new tests as needed (backend and e2e).
 
-Once you have a plan, implement the changes, ensure all tests pass, and make sure CI checks pass (linting, type checking, etc.)
+Once you have a plan, implement the changes, ensure all tests pass, and make sure CI checks pass (linting, type checking, etc.) Then make a concise commit summarizing the changes.
 ```
 
-- This execution will take around 10 minutes, key points; highlight the use of Amp first plan with the oracle, implement complex changes and then use all of the feedback looks to self correct and verify.
+- This execution will take around 15-20 minutes, key points; highlight the use of Amp first plan with the oracle, implement complex changes with the use of subagents to search effectively and efficiently manage context and then use all of the feedback looks to self correct and verify.
 
 ## IDE diagnostics and testing
 
