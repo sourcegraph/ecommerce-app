@@ -21,7 +21,8 @@ Note that all blocks listed under VS Code can also be displayed in the CLI if de
 - [PR review bot](#pr-review-bot)
 - [Understanding prompts](#understanding-prompts)
 - [Oracle planning prompts](#oracle-planning-prompts)
-- [Complex subagent change with Oracle](#complex-subagent-change-with-oracle)
+- [Complex subagent change with the oracle](#complex-subagent-change-with-oracle)
+- [Complex code modernization of error handling with the oracle](#complex-code-modernization-of-error-handling-with-the-oracle)
 - [IDE diagnostics and testing](#ide-diagnostics-and-testing)
 - [AGENTS.md / Multiple AGENTS.md](#agentsmd--multiple-agentsmd)
 - [Sourcegraph Search MCP and tool calling](#mcp-and-tool-calling)
@@ -150,7 +151,7 @@ Debugging Complex Issue:
 There are intermittent race conditions in the order processing workflow when multiple users try to purchase the same item simultaneously. Consult the oracle to debug and plan a solution.
 ```
 
-## Complex subagent change with Oracle
+## Complex subagent change with the oracle
 
 **Purpose**  
 Demonstrate Amp's advanced capability of Amp leveraging Oracle and subagents. Right now, the web app only displays one currency. We will instruct Amp to:
@@ -180,6 +181,27 @@ Add GBP, EURO, AUD, Mexican Peso, Japanese Yen, and auto-populate the correct cu
 - Alternatively, there is a [feature/multi-currency-support](https://github.com/sourcegraph/ecommerce-app/tree/feature/multi-currency-support) branch with the solution, you can switch over to this branch and show what the end result looks like. Essentially, you have the option to select a currency from a dropdown on the page:
 <img width="346" height="317" alt="image" src="https://github.com/user-attachments/assets/fcd4dd7b-5303-47c2-b8af-8883a685b1ad" />
 
+## Complex code modernization of error handling with the oracle
+
+**Purpose**
+Demonstrate Amp's ability to modernize a codebase according to a company's best practices spec using the oracle to plan and then implement.
+
+Right now the error handling of the ecommerce-app is not standardized in the frontend, backend or across the two. This demo will show how Amp can help to standardize error handling and logging across the frontend and backend and correlate requests throughout. This is a very common pattern for software developers to implement for supportability.
+
+**Steps**
+
+- Show the mock company's error handling [best practices spec](specs/ERROR_HANDLING_AND_LOGGING_STANDARDS.md) we need to follow.
+- Start a new thread and invoke the Oracle with the following prompt:
+
+```
+Our production logs are really hard to debug, we can't trace requests from frontend to backend, and error handling is inconsistent across the app. 
+
+We have specs/ERROR_HANDLING_AND_LOGGING_STANDARDS.md that defines our company standards. Consult the oracle to plan how to modernize this repos codebase to comply with these standards. Make sure to augment the existing tests and add new tests as needed (backend and e2e).
+
+Once you have a plan, implement the changes, ensure all tests pass, and make sure CI checks pass (linting, type checking, etc.)
+```
+
+- This execution will take around 10 minutes, key points; highlight the use of Amp first plan with the oracle, implement complex changes and then use all of the feedback looks to self correct and verify.
 
 ## IDE diagnostics and testing
 
