@@ -110,7 +110,7 @@ def test_create_category_empty_name(client: TestClient):
     
     for category_data in test_cases:
         response = client.post("/categories", json=category_data)
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 400  # Validation error
 
 
 def test_get_category_with_products_includes_image_urls(client: TestClient, session: Session):

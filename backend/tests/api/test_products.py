@@ -176,7 +176,7 @@ def test_create_product_validation_errors(client: TestClient, session: Session, 
     invalid_product["category_id"] = category.id
     
     response = client.post("/products", json=invalid_product)
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 def test_create_product_with_very_long_fields(client: TestClient, session: Session):

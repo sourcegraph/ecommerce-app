@@ -10,6 +10,9 @@ import io
 import os
 
 from .db import get_session, create_db_and_tables
+from .logging_setup import setup_logging
+from .middleware.tracing import TracingMiddleware
+from .errors import add_exception_handlers
 
 from .schemas import (
     ProductRead, ProductCreate, ProductUpdate,
@@ -41,6 +44,10 @@ def calculate_delivery_summary(delivery_options: List[DeliveryOption]) -> Option
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    service_name = os.getenv("SERVICE_NAME", "linea-api")
+    service_version = os.getenv("SERVICE_VERSION", "1.0.0")
+    environment = os.getenv("ENVIRONMENT", "development")
+    setup_logging(service_name, service_version, environment)
     create_db_and_tables()
     yield
     # Shutdown (if needed)
@@ -52,6 +59,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Tracing middleware
+app.add_middleware(TracingMiddleware)
+
 # CORS middleware for frontend integration
 origins = os.getenv(
     "CORS_ALLOW_ORIGINS", 
@@ -62,9 +72,12 @@ app.add_middleware(
     allow_origins=[o.strip() for o in origins if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_headers=["Content-Type", "Authorization", "traceparent", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "traceparent", "Content-Type"],
 )
+
+# Error handlers
+add_exception_handlers(app)
 
 @app.get("/health")
 def health_check():
