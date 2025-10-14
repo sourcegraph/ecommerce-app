@@ -81,6 +81,11 @@ Run through the GitHub auth flow one time (it will persist):
 gh auth login
 ```
 
+Ensure Amp is authenticated
+
+- VS Code should automatically authenticate if you have on your local machine
+- Run `amp` in the terminal and follow the one time login flow
+
 Click "Reopen in Container" when prompted. First build takes ~3-5 minutes, then it will be cached, then:
 
 ```bash
