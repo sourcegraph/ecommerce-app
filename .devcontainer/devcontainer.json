@@ -1,0 +1,217 @@
+{
+  // ─────────────────────────────────────────────────────────────────
+  // Linea Supply - Full Stack Development Container
+  // ─────────────────────────────────────────────────────────────────
+  // Pre-baked Python 3.13 + Node 20 environment with zero startup time
+  // Open container → immediately run 'just dev' with no waiting
+  
+  "name": "Linea Supply",
+  
+  // ─────────────────────────────────────────────────────────────────
+  // Build Configuration
+  // ─────────────────────────────────────────────────────────────────
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Context is parent directory so Dockerfile can COPY backend/ and frontend/
+    "context": ".."
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // Workspace Configuration
+  // ─────────────────────────────────────────────────────────────────
+  // Set to match the path used in Dockerfile for dependency installation
+  "workspaceFolder": "/workspaces/app",
+  
+  // Bind mount the local workspace into the container
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/app,type=bind,consistency=cached",
+
+  // ─────────────────────────────────────────────────────────────────
+  // Volume Mounts
+  // ─────────────────────────────────────────────────────────────────
+  // node_modules must be a volume to preserve pre-built dependencies with correct architecture
+  "mounts": [
+    "source=linea-supply-node-modules,target=/workspaces/app/node_modules,type=volume",
+    // Volume for Playwright browsers (matches PLAYWRIGHT_BROWSERS_PATH)
+    "type=volume,target=/ms-playwright",
+    // Named volumes for caching (Podman compatible)
+    "source=linea-supply-uv-cache,target=/root/.cache/uv,type=volume",
+    "source=linea-supply-npm-cache,target=/root/.npm,type=volume",
+    // Share Amp authentication from host
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/amp,target=/root/.config/amp,type=bind,consistency=cached"
+    // Share GitHub CLI auth from host - DISABLED due to Podman bind mount issues
+    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/gh,target=/root/.config/gh,type=bind,consistency=cached"
+  ],
+
+  // ─────────────────────────────────────────────────────────────────
+  // Dev Container Features
+  // ─────────────────────────────────────────────────────────────────
+  // Note: GitHub CLI feature disabled due to Podman permission issues
+  // Install manually: apt-get install gh
+  // "features": {},
+
+  // ─────────────────────────────────────────────────────────────────
+  // Port Forwarding
+  // ─────────────────────────────────────────────────────────────────
+  // Automatically forward application ports to localhost
+  "forwardPorts": [3001, 8001],
+  
+  "portsAttributes": {
+    "3001": {
+      "label": "Frontend (Vite)",
+      "onAutoForward": "notify"
+    },
+    "8001": {
+      "label": "Backend (FastAPI)",
+      "onAutoForward": "notify"
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // Container Environment Variables
+  // ─────────────────────────────────────────────────────────────────
+  // Ensure Python venv is activated for all shell sessions
+  "containerEnv": {
+    "VIRTUAL_ENV": "/opt/venvs/backend",
+    "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
+  },
+  
+  // ─────────────────────────────────────────────────────────────────
+  // VS Code Customizations
+  // ─────────────────────────────────────────────────────────────────
+  "customizations": {
+    "vscode": {
+      // Editor and tool settings
+      "settings": {
+        // ─── Python Configuration ───
+        "python.defaultInterpreterPath": "/opt/venvs/backend/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "python.testing.cwd": "backend",
+        "python.analysis.typeCheckingMode": "basic",
+        "python.linting.enabled": true,
+        "python.formatting.provider": "none",
+        
+        // ─── Mypy Type Checker (matches CI: just check) ───
+        "mypy-type-checker.importStrategy": "fromEnvironment",
+        "mypy-type-checker.args": ["--config-file=backend/pyproject.toml"],
+        
+        // ─── Ruff (Python Linter/Formatter) ───
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+          },
+          "editor.tabSize": 4
+        },
+        
+        // ─── TypeScript/JavaScript Configuration ───
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "javascript.updateImportsOnFileMove.enabled": "always",
+        
+        // ─── ESLint Configuration ───
+        "eslint.enable": true,
+        "eslint.format.enable": false,
+        "eslint.workingDirectories": [
+          { "mode": "auto" }
+        ],
+        
+        // ─── TypeScript/JavaScript Formatting ───
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        
+        // ─── Editor Settings ───
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "editor.tabSize": 2,
+        
+        // ─── File Management ───
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/*.pyc": true,
+          "**/.pytest_cache": true,
+          "**/.mypy_cache": true,
+          "**/.ruff_cache": true
+        },
+        
+        // File watching performance optimization
+        "files.watcherExclude": {
+          "**/node_modules/**": true,
+          "**/.venv/**": true,
+          "**/dist/**": true,
+          "**/build/**": true,
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true
+        },
+        
+        // ─── Git Configuration ───
+        "git.autofetch": true,
+        "git.confirmSync": false,
+        
+        // ─── Terminal Configuration ───
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "zsh",
+            "icon": "terminal"
+          }
+        }
+      },
+      
+      // VS Code extensions to install in the container
+      "extensions": [
+        // ─── Python Development ───
+        "ms-python.python",              // Python language support
+        "ms-python.vscode-pylance",      // Fast Python language server
+        "ms-python.mypy-type-checker",   // Type checking (matches CI)
+        "charliermarsh.ruff",            // Fast Python linter/formatter
+        
+        // ─── Frontend Development (TypeScript/React) ───
+        "dbaeumer.vscode-eslint",        // ESLint integration
+        "esbenp.prettier-vscode",        // Code formatter
+        "bradlc.vscode-tailwindcss",     // Tailwind CSS IntelliSense
+        
+        // ─── Testing ───
+        "ms-playwright.playwright",      // Playwright E2E test runner
+        
+        // ─── Utilities ───
+        "mikestead.dotenv",              // .env file syntax highlighting
+        "streetsidesoftware.code-spell-checker",  // Spell checker
+        
+        // ─── AI Assistant ───
+        "sourcegraph.amp",               // Amp AI coding assistant
+      ]
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // Container Runtime Configuration
+  // ─────────────────────────────────────────────────────────────────
+  // Run as root to avoid permission issues with mounted volumes
+  // (Alternative: create a vscode user with matching host UID/GID)
+  "remoteUser": "root",
+  
+  // Enable init process to handle zombie processes
+  "init": true,
+  
+  // Don't override the default command (allows container to start normally)
+  "overrideCommand": false,
+  
+  // Keep container running when VS Code window is closed
+  "shutdownAction": "stopContainer"
+}

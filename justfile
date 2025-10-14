@@ -38,7 +38,7 @@ dev:
     cd frontend && npx concurrently \
       --names "backend,frontend" \
       --prefix-colors "blue,green" \
-      "cd ../backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001" \
+      "cd ../backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001" \
       "npm run dev -- --host 0.0.0.0 --port 3001"
 
 # Run backend + frontend in background (detached for agentic tools)
@@ -48,7 +48,7 @@ dev-headless: _ensure-logs-dir
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
     # backend
-    cd backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
+    cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
     # frontend
     cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 &
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
@@ -62,7 +62,7 @@ stop:
 
 # Independent servers (sometimes handy)
 dev-backend:
-    cd backend && uv run uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001
+    cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001
 
 dev-frontend:
     cd frontend && npm run dev -- --host 0.0.0.0 --port 3001
@@ -84,22 +84,22 @@ logs-follow:
 
 # Seed the database with products and images
 seed:
-    cd backend && uv run python -m app.seed
+    cd backend && uv run --active python -m app.seed
 
 
 
 # ─── testing ──────────────────────
 # Run backend tests locally (requires: uv sync)
 test-local:
-    cd backend && uv run pytest
+    cd backend && uv run --active pytest
 
 # Run backend tests with coverage locally
 test-cov-local:
-    cd backend && uv run pytest --cov=app --cov-report=html --cov-report=term
+    cd backend && uv run --active pytest --cov=app --cov-report=html --cov-report=term
 
 # Run single test locally
 test-local-single TEST:
-    cd backend && uv run pytest {{TEST}}
+    cd backend && uv run --active pytest {{TEST}}
 
 # Run E2E tests natively (headless - default)
 test-e2e:
@@ -134,12 +134,12 @@ ci:
 
 # Check backend code quality
 check:
-    cd backend && uv run ruff check .
-    cd backend && uv run mypy .
+    cd backend && uv run --active ruff check .
+    cd backend && uv run --active mypy .
 
 # Format backend code
 format:
-    cd backend && uv run ruff format .
+    cd backend && uv run --active ruff format .
 
 lint:
     cd frontend && npm run lint
@@ -164,13 +164,13 @@ db-shell:
 
 # Database migration commands
 migrate-create MESSAGE:
-    cd backend && uv run alembic revision --autogenerate -m "{{MESSAGE}}"
+    cd backend && uv run --active alembic revision --autogenerate -m "{{MESSAGE}}"
 
 migrate-up:
-    cd backend && uv run alembic upgrade head
+    cd backend && uv run --active alembic upgrade head
 
 migrate-down:
-    cd backend && uv run alembic downgrade -1
+    cd backend && uv run --active alembic downgrade -1
 
 migrate-history:
-    cd backend && uv run alembic history
+    cd backend && uv run --active alembic history
