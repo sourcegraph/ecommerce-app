@@ -58,12 +58,20 @@
   "portsAttributes": {
     "3001": {
       "label": "Frontend (Vite)",
-      "onAutoForward": "notify"
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "protocol": "http"
     },
     "8001": {
       "label": "Backend (FastAPI)",
-      "onAutoForward": "notify"
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "protocol": "http"
     }
+  },
+  
+  "otherPortsAttributes": {
+    "onAutoForward": "ignore"
   },
 
   // ─────────────────────────────────────────────────────────────────
@@ -162,6 +170,10 @@
         // ─── Git Configuration ───
         "git.autofetch": true,
         "git.confirmSync": false,
+        
+        // ─── Port Forwarding Configuration ───
+        "remote.autoForwardPorts": false,
+        "remote.restoreForwardedPorts": false,
         
         // ─── Terminal Configuration ───
         "terminal.integrated.defaultProfile.linux": "zsh",
