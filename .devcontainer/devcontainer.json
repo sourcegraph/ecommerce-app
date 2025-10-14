@@ -36,8 +36,10 @@
     // Named volumes for caching (Podman compatible)
     "source=linea-supply-uv-cache,target=/root/.cache/uv,type=volume",
     "source=linea-supply-npm-cache,target=/root/.npm,type=volume",
-    // Share Amp authentication from host
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/amp,target=/root/.config/amp,type=bind,consistency=cached",
+    // Amp CLI settings (committed to repo)
+    "source=${localWorkspaceFolder}/.devcontainer/amp-settings.json,target=/root/.config/amp/settings.json,type=bind,consistency=cached",
+    // Amp CLI authentication (from local machine)
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.local/share/amp/secrets.json,target=/root/.local/share/amp/secrets.json,type=bind,consistency=cached",
     // GitHub CLI auth persisted in named volume (run 'gh auth login' once inside container)
     "source=linea-supply-gh-config,target=/root/.config/gh,type=volume"
   ],
@@ -182,6 +184,12 @@
             "path": "zsh",
             "icon": "terminal"
           }
+        },
+
+        // ─── Extension Runtime Configuration ───
+        // Force Amp extension to run in container (not local UI) so it uses container settings
+        "remote.extensionKind": {
+          "sourcegraph.amp": ["workspace"]
         },
 
         // Amp Settings

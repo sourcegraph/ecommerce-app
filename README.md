@@ -81,6 +81,8 @@ Run through the GitHub auth flow one time (it will persist):
 gh auth login
 ```
 
+Ensure VS Code Amp extension and Amp CLI are authenticated. You might need to authenticate the first time you bring up the devcontainer.
+
 Click "Reopen in Container" when prompted. First build takes ~3-5 minutes, then it will be cached, then:
 
 ```bash
