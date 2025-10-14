@@ -2,7 +2,7 @@
   // ─────────────────────────────────────────────────────────────────
   // Linea Supply - Full Stack Development Container
   // ─────────────────────────────────────────────────────────────────
-  // Pre-baked Python 3.13 + Node 20 environment with zero startup time
+  // Pre-baked Python 3.13 + Node 22 environment with zero startup time
   // Open container → immediately run 'just dev' with no waiting
   
   "name": "Linea Supply",
