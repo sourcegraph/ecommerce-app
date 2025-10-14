@@ -1,12 +1,7 @@
 {
-  "name": "ecommerce-demo-root",
+  "name": "ecommerce-app-root",
   "private": true,
-  "workspaces": ["frontend"],
-  "devDependencies": {
-    "eslint": "^9.36.0",
-    "@typescript-eslint/eslint-plugin": "^8.44.1",
-    "@typescript-eslint/parser": "^8.44.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.21"
-  }
+  "workspaces": [
+    "frontend"
+  ]
 }

@@ -16,6 +16,7 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 
 ```
 .
+├── .devcontainer/      # VS Code Dev Container configuration
 ├── .github/            # GitHub workflows and CI configuration
 ├── backend/            # FastAPI backend
 │   ├── app/            # Application source code
@@ -55,6 +56,52 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 
 ## Quick Start
 
+### Option 1: Dev Container
+
+The fastest way to get started! No local installation beyond Podman required.
+
+**What you need:**
+
+- Podman Desktop ([download](https://podman-desktop.io/)) or Podman CLI (`brew install podman`)
+  - Make sure you dedicate enough resources (CPU, RAM, etc.) in your podman virtual machine in [settings](https://podman-desktop.io/docs/podman/creating-a-podman-machine)
+- VS Code with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- VS Code setting: `"dev.containers.dockerPath": "podman"`
+
+**Setup:**
+
+```bash
+git clone https://github.com/sourcegraph/ecommerce-app.git
+cd ecommerce-app
+code .
+```
+
+Run through the GitHub auth flow one time (it will persist):
+
+```bash
+gh auth login
+```
+
+Ensure VS Code Amp extension and Amp CLI are authenticated. You might need to authenticate the first time you bring up the devcontainer.
+
+Click "Reopen in Container" when prompted. First build takes ~3-5 minutes, then it will be cached, then:
+
+```bash
+just dev    # Start both frontend and backend
+```
+
+Access the application on your local browser (ports will automatically be forwarded):
+
+- Frontend: http://localhost:3001
+- Backend API: http://localhost:8001
+
+**What's included:** Python 3.13, Node.js 22, all dependencies, Playwright browsers, GitHub CLI, Amp CLI, and all VS Code extensions pre-configured. Amp is set to run in Autonomous mode (most non-destructive commands allowed by default) with Playwright MCP and internal cost display **disabled**.
+
+See [.devcontainer/README.md](.devcontainer/README.md) for detailed documentation and troubleshooting.
+
+### Option 2: Local Installation
+
+For direct installation on your host machine:
+
 1. [Install Amp](https://ampcode.com/) (VS Code extension and/or CLI)
 
 2. Install the prerequisites and clone the project:
@@ -87,7 +134,7 @@ source $HOME/.local/bin/env
 just --version
 python --version
 uv --version
-node --version 
+node --version
 ```
 
 ```bash
@@ -133,11 +180,13 @@ just seed             # Populate database with sample data (only needed if datab
 ### Manual Development (individual services)
 
 Install dependencies (if not already done):
+
 ```bash
 just install-all      # All dependencies (backend, frontend, E2E browsers)
 ```
 
 Run services individually (if needed):
+
 ```bash
 just dev-backend      # Start only backend
 just dev-frontend     # Start only frontend
@@ -146,11 +195,13 @@ just dev-frontend     # Start only frontend
 ### Testing & Quality
 
 #### Setup E2E Testing (Required First Time)
+
 ```bash
 just setup-e2e        # Install Playwright browsers
 ```
 
 #### Running Tests
+
 ```bash
 # Backend tests
 just test-local                        # Backend tests
@@ -168,6 +219,7 @@ just test-all-local   # All tests (backend + E2E)
 **Note:** Frontend has no unit tests - only E2E tests with Playwright that test the full application.
 
 #### Code Quality
+
 ```bash
 # backend
 just check            # Run linting (ruff) and type checking (mypy)
