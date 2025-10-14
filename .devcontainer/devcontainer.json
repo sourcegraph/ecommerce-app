@@ -37,9 +37,9 @@
     "source=linea-supply-uv-cache,target=/root/.cache/uv,type=volume",
     "source=linea-supply-npm-cache,target=/root/.npm,type=volume",
     // Share Amp authentication from host
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/amp,target=/root/.config/amp,type=bind,consistency=cached"
-    // Share GitHub CLI auth from host - DISABLED due to Podman bind mount issues
-    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/gh,target=/root/.config/gh,type=bind,consistency=cached"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config/amp,target=/root/.config/amp,type=bind,consistency=cached",
+    // GitHub CLI auth persisted in named volume (run 'gh auth login' once inside container)
+    "source=linea-supply-gh-config,target=/root/.config/gh,type=volume"
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -170,7 +170,73 @@
             "path": "zsh",
             "icon": "terminal"
           }
-        }
+        },
+
+        // Amp Settings
+        "amp.internal.showCost": false,
+        "amp.experimental.diffView": false,
+        "amp.mcpServers": {
+          "playwright": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@playwright/mcp@latest",
+              "--headless",
+              "--isolated"
+            ],
+            "_target": "global"
+          }
+        },
+        "amp.permissions": [
+          {
+            "tool": "Bash",
+            "action": "ask",
+            "matches": {
+              "cmd": [
+                "*rm*-rf*",
+                "*rm*-r*--force*",
+                "*rm*--force*-r*"
+              ]
+            }
+          },
+          {
+            "tool": "Bash",
+            "action": "ask",
+            "matches": {
+              "cmd": [
+                "*find*-exec*",
+                "*find*-delete*"
+              ]
+            }
+          },
+          {
+            "tool": "Bash",
+            "action": "ask",
+            "matches": {
+              "cmd": [
+                "*git*push*--force*",
+                "*git*push*-f*"
+              ]
+            }
+          },
+          {
+            "tool": "Bash",
+            "action": "ask",
+            "matches": {
+              "cmd": [
+                "sudo*",
+                "su*",
+                "*chmod*777*",
+                "*chown*root*"
+              ]
+            }
+          },
+          {
+            "tool": "*",
+            "action": "allow",
+            "matches": {}
+          }
+        ]
       },
       
       // VS Code extensions to install in the container

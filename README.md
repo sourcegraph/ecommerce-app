@@ -75,6 +75,12 @@ cd ecommerce-app
 code .
 ```
 
+Run through the GitHub auth flow one time (it will persist):
+
+```bash
+gh auth login
+```
+
 Click "Reopen in Container" when prompted. First build takes ~3-5 minutes, then it will be cached, then:
 
 ```bash
@@ -86,7 +92,7 @@ Access the application on your local browser (ports will automatically be forwar
 - Frontend: http://localhost:3001
 - Backend API: http://localhost:8001
 
-**What's included:** Python 3.13, Node.js 22, all dependencies, Playwright browsers, GitHub CLI, Amp CLI, and all VS Code extensions pre-configured.
+**What's included:** Python 3.13, Node.js 22, all dependencies, Playwright browsers, GitHub CLI, Amp CLI, and all VS Code extensions pre-configured. Amp is set to run in Autonomous mode (most non-destructive commands allowed by default) with Playwright MCP and internal cost display **disabled**.
 
 See [.devcontainer/README.md](.devcontainer/README.md) for detailed documentation and troubleshooting.
 
