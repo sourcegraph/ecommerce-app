@@ -38,8 +38,7 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install frontend deps
-        run: |
-          cd frontend && npm ci
+        run: npm ci
 
       - name: Frontend lint
         run: cd frontend && npm run lint
@@ -81,8 +80,7 @@ jobs:
       - uses: extractions/setup-just@v3
 
       - name: Install frontend deps
-        run: |
-          cd frontend && npm ci
+        run: npm ci
 
       - name: Build frontend
         run: just build
@@ -121,8 +119,7 @@ jobs:
           cache-dependency-path: "package-lock.json"
 
       - name: Install frontend deps
-        run: |
-          cd frontend && npm ci
+        run: npm ci
 
       - name: Download frontend build
         uses: actions/download-artifact@v4
