@@ -81,7 +81,7 @@ If you have any of these preinstalled, make sure to update them before proceedin
   - Type in the search box `dev.containers.dockerPath`
   - Change the box "Dev > Containers: Docker Path" from `docker` to `podman`: <img width="462" height="100" alt="image" src="https://github.com/user-attachments/assets/48673050-6f63-4760-bb54-4af7cc83242c" />
 
-- Homebrew (optional if you want it to install podman and/or GitHub CLI) `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+- Homebrew (optional if you want to install the GitHub CLI) `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 - GitHub CLI `gh` (optional) if you would like to reference issues, push PRs, etc. directly from Amp `brew install gh`
 
 **Code Setup:**
