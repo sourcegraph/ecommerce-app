@@ -56,45 +56,87 @@ See the [DEMO.md](DEMO.md) for more information about how to effectively use thi
 
 ## Quick Start
 
-### Option 1: Dev Container
+### Option 1: Dev Container (recommended)
 
-The fastest way to get started! No local installation beyond Podman required.
+The fastest way to get started! No local installation beyond Podman required. If you encounter any errors, get the logs and feed them into Amp to help resolve. If that doesn't work, please ask an SE.
 
 **What you need:**
 
-- Podman Desktop ([download](https://podman-desktop.io/)) or Podman CLI (`brew install podman`)
-  - Make sure you dedicate enough resources (CPU, RAM, etc.) in your podman virtual machine in [settings](https://podman-desktop.io/docs/podman/creating-a-podman-machine)
-- VS Code with [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-- VS Code setting: `"dev.containers.dockerPath": "podman"`
+If you have any of these preinstalled, make sure to update them before proceeding!
 
-**Setup:**
+- VS Code [download](https://code.visualstudio.com/download)
+  
+- Amp VS Code extension and/or CLI [download](https://ampcode.com/install)
+  
+- Podman Desktop ([download](https://podman-desktop.io/))
+  - Once installed, open it up and follow through the prompts to install `podman`
+  - When you get to the [virtual machine](https://podman-desktop.io/docs/podman/creating-a-podman-machine) setup, make sure you dedicate at least 4 cores and 10gb of RAM
+  - Once installed and ready, you should see this in your Mac menu bar:
+    <img width="233" height="124" alt="image" src="https://github.com/user-attachments/assets/bf18d324-e182-496d-91a3-696b05c3dbd7" />
+    
+- VS Code [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+- Change the VS Code setting: `"dev.containers.dockerPath": "docker"` to `"dev.containers.dockerPath": "podman"`
+  - Access settings in VS Code: <img width="316" height="276" alt="image" src="https://github.com/user-attachments/assets/4ae8e373-3d92-45ae-a9e5-ef59c25c0aa0" />  
+  - Type in the search box `dev.containers.dockerPath`
+  - Change the box "Dev > Containers: Docker Path" from `docker` to `podman`: <img width="462" height="100" alt="image" src="https://github.com/user-attachments/assets/48673050-6f63-4760-bb54-4af7cc83242c" />
+
+- Homebrew (optional if you want it to install podman and/or GitHub CLI) `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+- GitHub CLI `gh` (optional) if you would like to reference issues, push PRs, etc. directly from Amp `brew install gh`
+
+**Code Setup:**
+
+- Open VS Code
+- Ensure VS Code Amp extension and/or Amp CLI are authenticated. You might need to authenticate the first time you bring up the devcontainer.
+- Open the terminal:
+  <img width="281" height="57" alt="image" src="https://github.com/user-attachments/assets/c8f9f2b3-36e0-42ed-915a-71321c3a42cc" />
+- Enter the command below:
 
 ```bash
 git clone https://github.com/sourcegraph/ecommerce-app.git
-cd ecommerce-app
-code .
 ```
 
-Run through the GitHub auth flow one time (it will persist):
+- From File -> Open Folder, open the `ecommerce-app` folder in VS Code: <img width="296" height="181" alt="image" src="https://github.com/user-attachments/assets/85ffef79-a913-4ed1-850f-cdffadec5d0c" />
+
+- Authenticate to GitHub (optional)
 
 ```bash
 gh auth login
 ```
 
-Ensure VS Code Amp extension and Amp CLI are authenticated. You might need to authenticate the first time you bring up the devcontainer.
 
-Click "Reopen in Container" when prompted. First build takes ~3-5 minutes, then it will be cached, then:
+- Click the remote window menu in the lower left corner:
+  <img width="360" height="131" alt="image" src="https://github.com/user-attachments/assets/e1635d07-9162-4126-b889-6c0a40d4753a" />
+- In the menu that pops up, select "Reopen in Container":
+  <img width="624" height="274" alt="image" src="https://github.com/user-attachments/assets/07d17a3d-0101-4eeb-93dc-08c53ead9926" />
+- Wait a few minutes, the first build takes a few minutes, then it will be cached and near instant in the future
 
-```bash
-just dev    # Start both frontend and backend
-```
+- To start the demo app instances, either open the terminal and run `just dev` or ask Amp to `start all services in the background`
 
 Access the application on your local browser (ports will automatically be forwarded):
 
-- Frontend: http://localhost:3001
-- Backend API: http://localhost:8001
+- Frontend: [http://localhost:3001](http://localhost:3001)
+- Backend API: [http://localhost:8001](http://localhost:8001)
 
-**What's included:** Python 3.13, Node.js 22, all dependencies, Playwright browsers, GitHub CLI, Amp CLI, and all VS Code extensions pre-configured. Amp is set to run in Autonomous mode (most non-destructive commands allowed by default) with Playwright MCP and internal cost display **disabled**.
+**Reverting Changes**
+
+As you work with this repo, you can revert any changes made by selecting all files changed and discarding them (indicated by a number showing in the source control sidebar:
+
+<img width="49" height="153" alt="image" src="https://github.com/user-attachments/assets/11c34995-cfca-4395-8fa5-cadacb048d6f" />
+
+The most foolproof way to reset is to delete the entire `ecommerce-app` repo and run `git clone https://github.com/sourcegraph/ecommerce-app.git` again.
+
+**Demo Flow**
+
+Once your setup is working and you can see the UI on [http://localhost:3001](http://localhost:3001). Go to the [DEMO.md](DEMO.md) page to learn about the different demo modules to use.
+
+In the future, to use this repo, just open VS Code, open the `ecommerce-app` folder, and click "Reopen in Container," and you should be ready to go.
+
+**What's Included in the Dev Container**
+
+Python 3.13, Node.js 22, all dependencies, Playwright browsers, GitHub CLI, Amp CLI, and all VS Code extensions pre-configured.
+Amp is set to run in Autonomous mode (most non-destructive commands allowed by default) with Playwright MCP
+Internal cost display is **disabled**.
 
 See [.devcontainer/README.md](.devcontainer/README.md) for detailed documentation and troubleshooting.
 
