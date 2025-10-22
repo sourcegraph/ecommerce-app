@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     unzip \
     zsh \
-    direnv \
  && rm -rf /var/lib/apt/lists/*
 
 # ─────────────────────────────────────────────────────────────────
