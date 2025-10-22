@@ -121,6 +121,8 @@ cat package.json | amp -x "What dependencies need updating and why?"
 
 Show how easy a developer can manage multiple threads in VS Code. Make sure you are on a thread in VS Code that already has some messages and active the command palette with `CMD + Shift + A`.
 
+<img width="800" height="410" alt="CleanShot 2025-10-22 at 10 15 37@2x" src="https://github.com/user-attachments/assets/3e5af488-1a91-47c0-a3d0-63edc561b329" />
+
 Most of the "general commands" shown in the screenshot in red are used to create and move between threads.
 
 The "custom / commands" shown in the screenshot in blue are the custom commands saved within this project under `.agents/commands/`, you can also put them in a user directory for use across projects in `~/.config/amp/commands/`. More information in the [Custom slash commands demo block](#custom-slash-commands).
@@ -174,7 +176,7 @@ Fix bug https://github.com/sourcegraph/amp-demo/issues/35 in a new branch, test 
 
 **[Thread](https://ampcode.com/threads/T-d3e778f1-914d-46e3-a8a8-a9f077946010) | [Branch](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery)**
 
-<img width="1446" height="627" alt="image" src="https://github.com/user-attachments/assets/e31d03ff-35d5-4017-8468-87e547da8e28" />
+<img width="1400" height="818" alt="CleanShot 2025-10-22 at 10 55 50@2x" src="https://github.com/user-attachments/assets/e0e4aa43-d552-4b6c-b210-dcac6d0dfb79" />
 
 ---
 
@@ -321,6 +323,8 @@ Execute the @NEW_FEATURE.md plan, test and validate. CI checks must all pass. Th
 7. Show the new PR on GitHub (click the direct PR link in the `gh` command run or go to the [PR list here](https://github.com/sourcegraph/ecommerce-app/pulls)). Note the code review bot automatically runs and makes suggestions.
 
 **[Thread](https://ampcode.com/threads/T-fee44ba4-ea71-48af-8144-e84de8063b8c) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/featured-carousel)**
+
+<img width="1200" height="693" alt="new-feature-implementation" src="https://github.com/user-attachments/assets/76b8df01-cd13-47e0-952b-c99b3ea71282" />
 
 ---
 
