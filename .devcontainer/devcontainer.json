@@ -96,7 +96,7 @@
       "settings": {
         // ─── Python Configuration ───
         "python.defaultInterpreterPath": "/opt/venvs/backend/bin/python",
-        "python.terminal.activateEnvironment": true,
+        "python.terminal.activateEnvironment": false,
         "python.testing.pytestEnabled": true,
         "python.testing.pytestArgs": ["tests"],
         "python.testing.cwd": "backend",
