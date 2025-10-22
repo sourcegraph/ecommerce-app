@@ -14,7 +14,7 @@ def test_product_with_delivery_options_includes_options_in_response(client: Test
     # Assign delivery options to product
     product.delivery_options = delivery_options
     session.add(product)
-    session.commit()
+    session.flush()
     
     # Get the product
     response = client.get(f"/products/{product.id}")
@@ -61,7 +61,7 @@ def test_products_list_includes_delivery_summary_when_requested(client: TestClie
     
     summary = test_product["delivery_summary"]
     assert summary["has_free"] is True
-    assert summary["cheapest_price"] == 0.0
+    assert summary["cheapest_price"] is 0.0
     assert summary["fastest_days_min"] == 0  # Same day option
     assert summary["fastest_days_max"] == 0
     assert summary["options_count"] == 4

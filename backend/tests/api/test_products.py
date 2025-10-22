@@ -28,7 +28,7 @@ def test_get_products_by_category(client: TestClient):
     category_id = categories[0]["id"]
     
     # Get products for specific category
-    response = client.get(f"/products?category_id={category_id}")
+    response = client.get(f"/products?categoryId={category_id}")
     assert response.status_code == 200
     products = response.json()
     
@@ -297,7 +297,7 @@ def test_product_search_functionality(client: TestClient, session: Session):
         # If search is implemented
         products = search_response.json()
         widget_products = [p for p in products if "widget" in p["title"].lower()]
-        assert len(widget_products) >= 2
+        assert len(widget_products) > 2
     else:
         # Search not implemented, skip this test
         pytest.skip("Search functionality not implemented")
