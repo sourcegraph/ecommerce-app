@@ -168,6 +168,9 @@ brew install node
 # Install gh CLI and authenticate
 brew install gh
 gh auth login
+
+# Install direnv for toolboxes to work
+brew install direnv
 ```
 
 ```bash
@@ -177,6 +180,7 @@ just --version
 python --version
 uv --version
 node --version
+direnv --version
 ```
 
 ```bash

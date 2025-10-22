@@ -1,0 +1,156 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import { execSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+function showDescription() {
+  process.stdout.write(
+    JSON.stringify({
+      name: "run_ci",
+      description: 'Run the complete CI pipeline locally to verify all checks pass before pushing. Runs checks, tests with coverage, linting, build, and e2e tests in sequence. Use this tool for comprehensive pre-commit validation or to simulate what CI will run. Always prefer this tool over running CI commands directly via Bash.',
+      args: { 
+        stopOnError: ['string', 'Whether to stop at first failure. Options: "true" (default, stops at first failure), "false" (continues and reports all failures at end)'],
+        help: ['string', 'Set to any value to show available options']
+      },
+    }),
+  )
+}
+
+function execute() {
+  const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
+  const stopOnError = params['stopOnError'] !== 'false'
+  const showHelp = params['help']
+
+  if (showHelp) {
+    console.log(`
+CI Pipeline Tool
+
+This tool runs the complete CI pipeline locally, matching the steps in justfile:
+  1. Backend checks (ruff + mypy)
+  2. Backend tests
+  3. Frontend lint
+  4. Frontend build
+  5. E2E tests
+
+Parameters:
+  stopOnError: "true" (default) - stops at first failure
+               "false" - runs all steps and reports all failures
+
+Examples:
+  {"stopOnError": "true"}   - Stop at first failure (default behavior)
+  {"stopOnError": "false"}  - Run all steps, collect all failures
+    `.trim())
+    return
+  }
+
+  const steps = [
+    { name: "Backend checks (ruff + mypy)", command: "just check" },
+    { name: "Backend tests", command: "just test-local" },
+    { name: "Frontend lint", command: "just lint" },
+    { name: "Frontend build", command: "just build" },
+    { name: "E2E tests", command: "just test-e2e" }
+  ]
+
+  const results = []
+  const startTime = Date.now()
+
+  console.log("Starting CI pipeline...\n")
+  console.log(`Mode: ${stopOnError ? "Stop on first error" : "Run all steps"}\n`)
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i]
+    const stepNum = i + 1
+    const stepStartTime = Date.now()
+    
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`Step ${stepNum}/${steps.length}: ${step.name}`)
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+    console.log(`Running: ${step.command}\n`)
+
+    try {
+      const output = execSync(step.command, { 
+        encoding: 'utf-8', 
+        stdio: 'pipe',
+        cwd: process.cwd()
+      })
+      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2)
+      console.log(output)
+      console.log(`\n✅ Step ${stepNum}/${steps.length} passed (${elapsed}s)\n`)
+      results.push({ step: stepNum, name: step.name, status: 'passed', elapsed })
+    } catch (error) {
+      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2)
+      const errorOutput = error.stdout || error.stderr || error.message
+      console.error(`\n❌ Step ${stepNum}/${steps.length} failed (${elapsed}s)`)
+      console.error(errorOutput)
+      console.error("")
+      
+      results.push({ step: stepNum, name: step.name, status: 'failed', elapsed, error: errorOutput })
+      
+      if (stopOnError) {
+        console.error(`\n⛔ Stopping at first failure (step ${stepNum}/${steps.length})\n`)
+        printSummary(results, startTime, false)
+        process.exit(1)
+      }
+    }
+  }
+
+  const allPassed = results.every(r => r.status === 'passed')
+  printSummary(results, startTime, true)
+  
+  if (!allPassed) {
+    process.exit(1)
+  }
+}
+
+function printSummary(results, startTime, showAll) {
+  const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(2)
+  
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+  console.log(`CI PIPELINE SUMMARY`)
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`)
+
+  const passed = results.filter(r => r.status === 'passed').length
+  const failed = results.filter(r => r.status === 'failed').length
+  const total = showAll ? results.length : results.length + (5 - results.length)
+
+  for (const result of results) {
+    const icon = result.status === 'passed' ? '✅' : '❌'
+    console.log(`${icon} Step ${result.step}: ${result.name} (${result.elapsed}s)`)
+  }
+
+  if (!showAll) {
+    const remaining = 5 - results.length
+    for (let i = 0; i < remaining; i++) {
+      console.log(`⏭️  Step ${results.length + i + 1}: (skipped)`)
+    }
+  }
+
+  console.log(`\n${'─'.repeat(50)}`)
+  console.log(`Passed: ${passed}/${total}  Failed: ${failed}/${total}`)
+  console.log(`Total time: ${totalElapsed}s`)
+  console.log(`${'─'.repeat(50)}`)
+
+  if (failed > 0) {
+    console.log(`\n❌ CI pipeline failed with ${failed} error(s)`)
+  } else {
+    console.log(`\n✅ CI pipeline passed! Ready to commit.`)
+  }
+}

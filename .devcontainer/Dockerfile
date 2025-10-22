@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     unzip \
     zsh \
+    direnv \
  && rm -rf /var/lib/apt/lists/*
 
 # ─────────────────────────────────────────────────────────────────
@@ -67,6 +68,13 @@ RUN set -eux; \
 RUN set -eux; \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh; \
     uv --version
+
+# ─────────────────────────────────────────────────────────────────
+# Install Bun (JavaScript runtime for Amp toolbox)
+# ─────────────────────────────────────────────────────────────────
+RUN curl -fsSL https://bun.sh/install | bash \
+ && ln -sf /root/.bun/bin/bun /usr/local/bin/bun \
+ && bun --version
 
 # ─────────────────────────────────────────────────────────────────
 # Configure Python virtual environment path

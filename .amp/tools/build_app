@@ -1,0 +1,57 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import { execSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
+function showDescription() {
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "build_app",
+   description: 'Build the frontend application for production to verify TypeScript compilation and catch build-time errors. Use this tool to run production builds, verify TypeScript compilation, or validate that the app builds successfully. Always prefer this tool over running build commands directly via Bash.',
+   args: {},
+  }),
+ )
+}
+
+function execute() {
+ console.log("Building frontend for production...")
+ try {
+   const output = execSync('just build', { encoding: 'utf-8', stdio: 'pipe' })
+   console.log(output)
+   console.log("\n✅ Frontend build successful!")
+ } catch (error) {
+   console.error("\n❌ Frontend build failed:\n")
+   console.error(error.stdout || error.stderr || error.message)
+   process.exit(1)
+ }
+}

@@ -42,3 +42,9 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#51afef'
+
+# Hook direnv into shell
+eval "$(direnv hook zsh)"
+
+# Auto-allow .envrc in workspace (required for AMP_TOOLBOX)
+direnv allow /workspaces/app 2>/dev/null || true
