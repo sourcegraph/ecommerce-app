@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import fs from "node:fs"
+import path from "node:path"
 import { execSync } from "node:child_process"
 
 /**
@@ -47,13 +48,34 @@ function showDescription() {
  )
 }
 
+function getWorkspaceRoot() {
+  const cwd = process.cwd()
+  const inAmpTools = path.basename(cwd) === 'tools' && path.basename(path.dirname(cwd)) === '.amp'
+  let candidate = inAmpTools ? path.resolve(cwd, '..', '..') : cwd
+  
+  // Verify by finding justfile
+  let dir = cwd
+ while (true) {
+   if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
+     return dir
+    }
+    const parent = path.dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  
+  return candidate
+}
+
 function execute() {
- // parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
- const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
- let action = params['action']
- const path = params['path']
- const pattern = params['pattern']
- action = action && action.length > 0 ? action : 'help'
+// parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
+const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
+let action = params['action']
+const testPath = params['path']
+const pattern = params['pattern']
+action = action && action.length > 0 ? action : 'help'
+  
+  const workspaceRoot = getWorkspaceRoot()
 
  // output goes directly to the model
  switch (action) {
@@ -63,8 +85,8 @@ function execute() {
        console.warn("Warning: 'path' and 'pattern' options are ignored when action is 'all'")
      }
      try {
-       const output = execSync('just test-all-local', { encoding: 'utf-8', stdio: 'pipe' })
-       console.log(output)
+     const output = execSync('just test-all-local', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     console.log(output)
        console.log("\n✅ All tests passed!")
      } catch (error) {
        console.error("\n❌ Tests failed:\n")
@@ -76,16 +98,16 @@ function execute() {
    case "backend":
      console.log("Running backend tests...")
      try {
-       let cmd = 'cd backend && uv run --active pytest'
-       if (path) {
-         cmd += ` ${path}`
-         console.log(`  → Testing specific file: ${path}`)
-       }
-       if (pattern) {
-         cmd += ` -k "${pattern}"`
-         console.log(`  → Filtering by pattern: ${pattern}`)
-       }
-       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
+     let cmd = 'cd backend && uv run --active pytest'
+     if (testPath) {
+     cmd += ` ${testPath}`
+     console.log(`  → Testing specific file: ${testPath}`)
+     }
+     if (pattern) {
+     cmd += ` -k "${pattern}"`
+     console.log(`  → Filtering by pattern: ${pattern}`)
+     }
+       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
        console.log(output)
        console.log("\n✅ Backend tests passed!")
      } catch (error) {
@@ -98,16 +120,16 @@ function execute() {
    case "e2e":
      console.log("Running e2e tests (headless)...")
      try {
-       let cmd = 'cd frontend && npx playwright test'
-       if (path) {
-         cmd += ` ${path}`
-         console.log(`  → Testing specific file: ${path}`)
-       }
-       if (pattern) {
-         cmd += ` -g "${pattern}"`
-         console.log(`  → Filtering by pattern: ${pattern}`)
-       }
-       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
+     let cmd = 'cd frontend && npx playwright test'
+     if (testPath) {
+     cmd += ` ${testPath}`
+     console.log(`  → Testing specific file: ${testPath}`)
+     }
+     if (pattern) {
+     cmd += ` -g "${pattern}"`
+     console.log(`  → Filtering by pattern: ${pattern}`)
+     }
+       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
        console.log(output)
        console.log("\n✅ E2E tests passed!")
      } catch (error) {

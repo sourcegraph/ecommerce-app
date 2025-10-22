@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import fs from "node:fs"
+import path from "node:path"
 import { execSync } from "node:child_process"
 
 /**
@@ -45,19 +46,40 @@ function showDescription() {
  )
 }
 
-function execute() {
- // parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
- const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
- let target = params['target']
- target = target && target.length > 0 ? target : 'both'
+function getWorkspaceRoot() {
+  const cwd = process.cwd()
+  const inAmpTools = path.basename(cwd) === 'tools' && path.basename(path.dirname(cwd)) === '.amp'
+  let candidate = inAmpTools ? path.resolve(cwd, '..', '..') : cwd
+  
+ // Verify by finding justfile
+  let dir = cwd
+ while (true) {
+    if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
+      return dir
+    }
+    const parent = path.dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  
+  return candidate
+}
 
- // output goes directly to the model
+function execute() {
+// parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
+const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
+let target = params['target']
+target = target && target.length > 0 ? target : 'both'
+  
+  const workspaceRoot = getWorkspaceRoot()
+
+  // output goes directly to the model
  switch (target) {
    case "backend":
      console.log("Running backend checks (ruff + mypy)...\n")
      try {
-       const output = execSync('just check', { encoding: 'utf-8', stdio: 'pipe' })
-       console.log(output)
+     const output = execSync('just check', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     console.log(output)
        console.log("\n✅ Backend checks passed!")
      } catch (error) {
        console.error("\n❌ Backend checks failed:\n")
@@ -69,8 +91,8 @@ function execute() {
    case "frontend":
      console.log("Running frontend lint checks...\n")
      try {
-       const output = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe' })
-       console.log(output)
+     const output = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     console.log(output)
        console.log("\n✅ Frontend lint passed!")
      } catch (error) {
        console.error("\n❌ Frontend lint failed:\n")
@@ -91,8 +113,8 @@ function execute() {
      console.log("=".repeat(60) + "\n")
      
      try {
-       backendOutput = execSync('just check', { encoding: 'utf-8', stdio: 'pipe' })
-       console.log(backendOutput)
+     backendOutput = execSync('just check', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     console.log(backendOutput)
        console.log("\n✅ Backend checks passed!")
      } catch (error) {
        backendFailed = true
@@ -106,8 +128,8 @@ function execute() {
      console.log("=".repeat(60) + "\n")
      
      try {
-       frontendOutput = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe' })
-       console.log(frontendOutput)
+     frontendOutput = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     console.log(frontendOutput)
        console.log("\n✅ Frontend lint passed!")
      } catch (error) {
        frontendFailed = true

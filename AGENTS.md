@@ -8,11 +8,14 @@
 **Design System:** Monochrome palette (sand/ink/charcoal) with subtle slate blue accents  
 **URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
 
-## Essential Commands
+## Essential Tools
 
-**Pass CI:** `just ci` (runs lint, tests, build, e2e)  
-**Run app:** `just dev` (ports 3001/8001)  
-**Run tests:** `just test-all-local` (backend + e2e tests)
+Amp provides custom tools for common development tasks. Always use these instead of just commands or Bash:
+
+**Pass CI:** Use `run_ci` tool (runs lint, tests, build, e2e)  
+**Run tests:** Use `run_tests` tool with action "all" (backend + e2e tests)  
+**Lint & check:** Use `lint_and_check` tool for backend/frontend  
+**Build:** Use `build_app` tool for production builds
 
 ## Development Commands
 
@@ -22,16 +25,16 @@
 - `just logs` - View last 100 lines from both service logs (use for troubleshooting)
 - `just logs-follow` - Follow both logs live (Ctrl+C to exit)
 - `just seed` - Add sample data to the sqlite database
-- `just check` - Lint & type check backend
-- `just lint` - Lint frontend
 
-**Testing Commands:**
-- `just test` - Backend tests only
-- `just test-e2e` - End-to-end tests (native Playwright)
+**Testing:**
+- Use `run_tests` tool with action: "all", "backend", or "e2e"
+- Optional parameters: path (specific test file), pattern (test name filter)
 - `just test-e2e-headed` - E2E tests with browser UI for debugging
 - `just setup-e2e` - Install Playwright browsers
-- `just test-all` - Backend + E2E tests (native)
-- `just test-all-local` - All tests locally (same as test-all now)
+
+**Code Quality:**
+- Use `lint_and_check` tool with target: "backend", "frontend", or "both"
+- Use `build_app` tool to verify TypeScript compilation
 
 **Error Handling:**
 - If build fails, ensure ports 3001/8001 are available
@@ -182,9 +185,9 @@ def process_payment(payment_data: dict) -> Result:
 ## Development Workflow
 
 ### Pre-commit Checklist
-1. All tests pass (`just test-all-local`)
+1. All tests pass (use `run_tests` tool with action "all")
 2. Code follows TDD process (tests written first)
-3. Linting passes (`just check` + `just lint`)
+3. Linting passes (use `lint_and_check` tool with target "both")
 4. No type errors in TypeScript
 5. Factory functions used for all test data
 6. Business behavior documented through tests
