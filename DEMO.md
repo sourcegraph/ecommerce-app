@@ -286,12 +286,18 @@ git checkout feature/featured-carousel
 
 The CLI has a `$` mode which allows for shell commands to be run with the output put in the context window so Amp can address errors there directly (versus needing to copy and paste). It is good to point out that `$$` runs commands also but does NOT put the output in the context window.
 
-1. Run `amp` in the terminal
-2. Run local backend tests `$just test-local`
-3. Amp prompt: `Fix these failures so the tests pass`
-4. Point out Amp fixed and verified the fix by running the test suite
+1. Checkout the `broken-tests` branch first:
 
-**[Thread](https://ampcode.com/threads/T-ee9a2da8-0048-479d-8ecb-19edd94739cf)**
+```
+git checkout broken-tests
+```
+
+2. Run `amp` in the terminal
+3. Run local backend tests `$just test-local`
+4. Amp prompt: `Fix these failures so the tests pass`
+5. Point out Amp fixed and verified the fix by running the test suite
+
+**[Thread](https://ampcode.com/threads/T-8d3988e3-29e6-4fe9-be40-19539fc85408)**
 
 ---
 
