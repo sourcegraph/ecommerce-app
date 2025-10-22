@@ -35,23 +35,37 @@ function showDescription() {
   )
 }
 
-function getWorkspaceRoot() {
-  const cwd = process.cwd()
-  const inAmpTools = path.basename(cwd) === 'tools' && path.basename(path.dirname(cwd)) === '.amp'
-  let candidate = inAmpTools ? path.resolve(cwd, '..', '..') : cwd
-  
-  // Verify by finding justfile
-  let dir = cwd
+function findRoot(start) {
+  let dir = start
   while (true) {
     if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
       return dir
     }
     const parent = path.dirname(dir)
-    if (parent === dir) break
+    if (parent === dir) return null
     dir = parent
   }
+}
+
+function resolveWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
+    return process.env.WORKSPACE_ROOT
+  }
+  const fromCwd = findRoot(process.cwd())
+  if (fromCwd) return fromCwd
   
-  return candidate
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  const fromScript = findRoot(scriptDir)
+  if (fromScript) return fromScript
+  
+  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
+}
+
+function runJust(recipe) {
+  const root = resolveWorkspaceRoot()
+  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
+  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
+  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
 }
 
 function execute() {
@@ -106,11 +120,8 @@ Examples:
     console.log(`Running: ${step.command}\n`)
 
     try {
-      const output = execSync(step.command, { 
-        encoding: 'utf-8', 
-        stdio: 'pipe',
-        cwd: getWorkspaceRoot()
-      })
+      const recipe = step.command.replace('just ', '')
+      const output = runJust(recipe)
       const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2)
       console.log(output)
       console.log(`\n✅ Step ${stepNum}/${steps.length} passed (${elapsed}s)\n`)

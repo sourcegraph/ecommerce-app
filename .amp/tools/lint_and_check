@@ -46,23 +46,37 @@ function showDescription() {
  )
 }
 
-function getWorkspaceRoot() {
-  const cwd = process.cwd()
-  const inAmpTools = path.basename(cwd) === 'tools' && path.basename(path.dirname(cwd)) === '.amp'
-  let candidate = inAmpTools ? path.resolve(cwd, '..', '..') : cwd
-  
- // Verify by finding justfile
-  let dir = cwd
- while (true) {
+function findRoot(start) {
+  let dir = start
+  while (true) {
     if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
       return dir
     }
     const parent = path.dirname(dir)
-    if (parent === dir) break
+    if (parent === dir) return null
     dir = parent
   }
+}
+
+function resolveWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
+    return process.env.WORKSPACE_ROOT
+  }
+  const fromCwd = findRoot(process.cwd())
+  if (fromCwd) return fromCwd
   
-  return candidate
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  const fromScript = findRoot(scriptDir)
+  if (fromScript) return fromScript
+  
+  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
+}
+
+function runJust(recipe) {
+  const root = resolveWorkspaceRoot()
+  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
+  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
+  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
 }
 
 function execute() {
@@ -71,14 +85,12 @@ const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
 let target = params['target']
 target = target && target.length > 0 ? target : 'both'
   
-  const workspaceRoot = getWorkspaceRoot()
-
   // output goes directly to the model
  switch (target) {
    case "backend":
      console.log("Running backend checks (ruff + mypy)...\n")
      try {
-     const output = execSync('just check', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     const output = runJust('check')
      console.log(output)
        console.log("\n✅ Backend checks passed!")
      } catch (error) {
@@ -91,7 +103,7 @@ target = target && target.length > 0 ? target : 'both'
    case "frontend":
      console.log("Running frontend lint checks...\n")
      try {
-     const output = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     const output = runJust('lint')
      console.log(output)
        console.log("\n✅ Frontend lint passed!")
      } catch (error) {
@@ -113,7 +125,7 @@ target = target && target.length > 0 ? target : 'both'
      console.log("=".repeat(60) + "\n")
      
      try {
-     backendOutput = execSync('just check', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     backendOutput = runJust('check')
      console.log(backendOutput)
        console.log("\n✅ Backend checks passed!")
      } catch (error) {
@@ -128,7 +140,7 @@ target = target && target.length > 0 ? target : 'both'
      console.log("=".repeat(60) + "\n")
      
      try {
-     frontendOutput = execSync('just lint', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     frontendOutput = runJust('lint')
      console.log(frontendOutput)
        console.log("\n✅ Frontend lint passed!")
      } catch (error) {

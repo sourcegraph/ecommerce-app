@@ -48,23 +48,37 @@ function showDescription() {
  )
 }
 
-function getWorkspaceRoot() {
-  const cwd = process.cwd()
-  const inAmpTools = path.basename(cwd) === 'tools' && path.basename(path.dirname(cwd)) === '.amp'
-  let candidate = inAmpTools ? path.resolve(cwd, '..', '..') : cwd
-  
-  // Verify by finding justfile
-  let dir = cwd
- while (true) {
-   if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
-     return dir
+function findRoot(start) {
+  let dir = start
+  while (true) {
+    if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
+      return dir
     }
     const parent = path.dirname(dir)
-    if (parent === dir) break
+    if (parent === dir) return null
     dir = parent
   }
+}
+
+function resolveWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
+    return process.env.WORKSPACE_ROOT
+  }
+  const fromCwd = findRoot(process.cwd())
+  if (fromCwd) return fromCwd
   
-  return candidate
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  const fromScript = findRoot(scriptDir)
+  if (fromScript) return fromScript
+  
+  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
+}
+
+function runJust(recipe) {
+  const root = resolveWorkspaceRoot()
+  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
+  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
+  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
 }
 
 function execute() {
@@ -75,7 +89,7 @@ const testPath = params['path']
 const pattern = params['pattern']
 action = action && action.length > 0 ? action : 'help'
   
-  const workspaceRoot = getWorkspaceRoot()
+  const workspaceRoot = resolveWorkspaceRoot()
 
  // output goes directly to the model
  switch (action) {
@@ -85,7 +99,7 @@ action = action && action.length > 0 ? action : 'help'
        console.warn("Warning: 'path' and 'pattern' options are ignored when action is 'all'")
      }
      try {
-     const output = execSync('just test-all-local', { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+     const output = runJust('test-all-local')
      console.log(output)
        console.log("\n✅ All tests passed!")
      } catch (error) {
