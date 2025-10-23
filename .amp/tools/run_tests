@@ -118,7 +118,7 @@ function runBackendTests(path, pattern) {
     args.push("-k", pattern);
   }
 
-  const result = spawnSync("uv", args, {
+  const result = spawnSync("/usr/local/bin/uv", args, {
     cwd: "backend",
     stdio: "inherit",
   });
@@ -153,7 +153,7 @@ function runE2ETests(path, pattern) {
     args.push("--grep", pattern);
   }
 
-  const result = spawnSync("npx", args, {
+  const result = spawnSync("/usr/bin/npx", args, {
     cwd: "frontend",
     stdio: "inherit",
   });

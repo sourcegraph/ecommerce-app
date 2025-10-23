@@ -62,15 +62,15 @@ function execute() {
    console.log("→ Running backend checks (ruff + mypy)...")
    
    // Run ruff check
-   const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
+   const ruffCheck = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'check', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
    })
    
    // Run mypy
-   const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
+   const mypy = spawnSync('/usr/local/bin/uv', ['run', '--active', 'mypy', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
    })
    
    if (ruffCheck.status !== 0 || mypy.status !== 0) {
@@ -81,12 +81,12 @@ function execute() {
   }
 
   case "frontend": {
-   console.log("→ Running frontend lint (ESLint)...")
-   
-   const lint = spawnSync('npm', ['run', 'lint'], {
-    cwd: 'frontend',
-    stdio: 'inherit',
-   })
+  console.log("→ Running frontend lint (ESLint)...")
+  
+  const lint = spawnSync('/usr/bin/npm', ['run', 'lint'], {
+  cwd: 'frontend',
+  stdio: 'inherit',
+  })
    
    if (lint.status !== 0) {
     process.exit(lint.status || 1)
@@ -102,22 +102,22 @@ function execute() {
   
   // Backend checks
   console.log("\n=== Backend (ruff + mypy) ===")
-  const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
-   cwd: 'backend',
-   stdio: 'inherit',
+  const ruffCheck = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'check', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit',
   })
   if (ruffCheck.status !== 0) failures.push('ruff check')
   
-  const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-   cwd: 'backend',
-   stdio: 'inherit',
+  const mypy = spawnSync('/usr/local/bin/uv', ['run', '--active', 'mypy', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit',
   })
   if (mypy.status !== 0) failures.push('mypy')
   
   // Frontend checks
   console.log("\n=== Frontend (ESLint) ===")
-  const lint = spawnSync('npm', ['run', 'lint'], {
-   cwd: 'frontend',
+  const lint = spawnSync('/usr/bin/npm', ['run', 'lint'], {
+  cwd: 'frontend',
   stdio: 'inherit',
   })
   if (lint.status !== 0) failures.push('ESLint')

@@ -60,7 +60,7 @@ function execute() {
  switch (action) {
 	case "frontend":
 	 console.log('→ Building frontend application...')
-	 const result = spawnSync('npm', ['run', 'build'], { cwd: 'frontend', stdio: 'inherit' })
+	 const result = spawnSync('/usr/bin/npm', ['run', 'build'], { cwd: 'frontend', stdio: 'inherit' })
 	 if (result.status !== 0) {
 	  process.exit(result.status || 1)
 	 }

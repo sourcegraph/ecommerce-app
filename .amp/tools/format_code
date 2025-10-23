@@ -59,12 +59,12 @@ function execute() {
  // output goes directly to the model
  switch (target) {
   case "backend": {
-   console.log("→ Formatting backend code (ruff format)...")
-   
-   const format = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
+  console.log("→ Formatting backend code (ruff format)...")
+  
+  const format = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'format', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit',
+  })
    
    if (format.status !== 0) {
     process.exit(format.status || 1)
@@ -74,12 +74,12 @@ function execute() {
   }
 
   case "frontend": {
-   console.log("→ Formatting frontend code (Prettier)...")
-   
-   const format = spawnSync('npm', ['run', 'format'], {
-    cwd: 'frontend',
-    stdio: 'inherit',
-   })
+  console.log("→ Formatting frontend code (Prettier)...")
+  
+  const format = spawnSync('/usr/bin/npm', ['run', 'format'], {
+  cwd: 'frontend',
+  stdio: 'inherit',
+  })
    
    if (format.status !== 0) {
     process.exit(format.status || 1)
@@ -93,14 +93,14 @@ function execute() {
   
   // Backend
   console.log("\n=== Backend (ruff format) ===")
-  const backendFormat = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
+  const backendFormat = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'format', '.'], {
   cwd: 'backend',
   stdio: 'inherit',
   })
   
   // Frontend
   console.log("\n=== Frontend (Prettier) ===")
-  const frontendFormat = spawnSync('npm', ['run', 'format'], {
+  const frontendFormat = spawnSync('/usr/bin/npm', ['run', 'format'], {
   cwd: 'frontend',
   stdio: 'inherit',
   })

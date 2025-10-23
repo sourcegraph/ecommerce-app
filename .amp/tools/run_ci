@@ -48,71 +48,71 @@ function execute() {
 
  // 1. Backend format check
  console.log('→ Checking backend formatting...')
- let result = spawnSync('uv', ['run', '--active', 'ruff', 'format', '--check', '.'], {
-  cwd: 'backend',
-  stdio: 'inherit'
+ let result = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'format', '--check', '.'], {
+ cwd: 'backend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 2. Backend linting and type checking
  console.log('→ Checking backend code quality...')
- result = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
-  cwd: 'backend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/local/bin/uv', ['run', '--active', 'ruff', 'check', '.'], {
+ cwd: 'backend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
- result = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-  cwd: 'backend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/local/bin/uv', ['run', '--active', 'mypy', '.'], {
+ cwd: 'backend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 3. Backend tests
  console.log('→ Running backend tests...')
- result = spawnSync('uv', ['run', '--active', 'pytest'], {
-  cwd: 'backend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/local/bin/uv', ['run', '--active', 'pytest'], {
+ cwd: 'backend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 4. Frontend format check
  console.log('→ Checking frontend formatting...')
- result = spawnSync('npx', ['prettier', '--check', '.'], {
-  cwd: 'frontend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/bin/npx', ['prettier', '--check', '.'], {
+ cwd: 'frontend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 5. Frontend linting
  console.log('→ Running frontend lint...')
- result = spawnSync('npm', ['run', 'lint'], {
-  cwd: 'frontend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/bin/npm', ['run', 'lint'], {
+ cwd: 'frontend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 6. Frontend type checking
  console.log('→ Checking frontend types...')
- result = spawnSync('npx', ['tsc', '--noEmit'], {
-  cwd: 'frontend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/bin/npx', ['tsc', '--noEmit'], {
+ cwd: 'frontend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 7. Frontend build
  console.log('→ Building frontend...')
- result = spawnSync('npm', ['run', 'build'], {
-  cwd: 'frontend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/bin/npm', ['run', 'build'], {
+ cwd: 'frontend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
  // 8. E2E tests
  console.log('→ Running E2E tests...')
- result = spawnSync('npx', ['playwright', 'test'], {
-  cwd: 'frontend',
-  stdio: 'inherit'
+ result = spawnSync('/usr/bin/npx', ['playwright', 'test'], {
+ cwd: 'frontend',
+ stdio: 'inherit'
  })
  if (result.status !== 0) process.exit(result.status || 1)
 
