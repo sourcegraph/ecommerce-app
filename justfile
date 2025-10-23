@@ -47,30 +47,22 @@ dev-headless: _ensure-logs-dir
     # truncate old logs so each run starts fresh
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
-    # backend (use setsid for process group to handle reload spawned processes)
-    ( cd backend; \
-      setsid sh -c 'exec uv run --active uvicorn app.main:app --reload --reload-exclude .venv/* --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1' & \
-      pid=$$!; sleep 0.5; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
-      echo "$$pid" > ../{{LOG_DIR}}/backend.pid; echo "$$pgid" > ../{{LOG_DIR}}/backend.pgid )
+    # backend
+    cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 & echo $$! > {{LOG_DIR}}/backend.pid
     # frontend
-    ( cd frontend; \
-      setsid sh -c 'exec npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1' & \
-      pid=$$!; sleep 0.5; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
-      echo "$$pid" > ../{{LOG_DIR}}/frontend.pid; echo "$$pgid" > ../{{LOG_DIR}}/frontend.pgid )
+    cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 & echo $$! > {{LOG_DIR}}/frontend.pid
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    -@test -f {{LOG_DIR}}/backend.pgid && kill -TERM -`cat {{LOG_DIR}}/backend.pgid` 2>/dev/null || true
-    -@test -f {{LOG_DIR}}/frontend.pgid && kill -TERM -`cat {{LOG_DIR}}/frontend.pgid` 2>/dev/null || true
     -@test -f {{LOG_DIR}}/backend.pid && kill -TERM `cat {{LOG_DIR}}/backend.pid` 2>/dev/null || true
     -@test -f {{LOG_DIR}}/frontend.pid && kill -TERM `cat {{LOG_DIR}}/frontend.pid` 2>/dev/null || true
     @sleep 2
     -@lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -TERM 2>/dev/null || true
     @sleep 2
     -@lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -KILL 2>/dev/null || true
-    @rm -f {{LOG_DIR}}/backend.pid {{LOG_DIR}}/backend.pgid {{LOG_DIR}}/frontend.pid {{LOG_DIR}}/frontend.pgid
+    @rm -f {{LOG_DIR}}/backend.pid {{LOG_DIR}}/frontend.pid
     @echo "Services stopped."
 
 # Independent servers (sometimes handy)
