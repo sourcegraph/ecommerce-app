@@ -62,27 +62,14 @@ dev-headless: _ensure-logs-dir
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    @for name in backend frontend; do \
-      if [ -f {{LOG_DIR}}/$$name.pgid ]; then \
-        PGID="$$(cat {{LOG_DIR}}/$$name.pgid)"; kill -TERM -"$${PGID}" 2>/dev/null || true; \
-      elif [ -f {{LOG_DIR}}/$$name.pid ]; then \
-        PID="$$(cat {{LOG_DIR}}/$$name.pid)"; PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
-        if [ -n "$${PGID}" ]; then kill -TERM -"$${PGID}" 2>/dev/null || kill -TERM "$${PID}" 2>/dev/null || true; \
-        else kill -TERM "$${PID}" 2>/dev/null || true; fi; \
-      fi; \
-    done
+    -@test -f {{LOG_DIR}}/backend.pgid && kill -TERM -`cat {{LOG_DIR}}/backend.pgid` 2>/dev/null || true
+    -@test -f {{LOG_DIR}}/frontend.pgid && kill -TERM -`cat {{LOG_DIR}}/frontend.pgid` 2>/dev/null || true
+    -@test -f {{LOG_DIR}}/backend.pid && kill -TERM `cat {{LOG_DIR}}/backend.pid` 2>/dev/null || true
+    -@test -f {{LOG_DIR}}/frontend.pid && kill -TERM `cat {{LOG_DIR}}/frontend.pid` 2>/dev/null || true
     @sleep 2
-    @for PORT in 8001 3001; do \
-      for PID in $$(lsof -ti :$${PORT} -sTCP:LISTEN 2>/dev/null || true); do \
-        PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
-        if [ -n "$${PGID}" ]; then kill -TERM -"$${PGID}" 2>/dev/null || true; else kill -TERM "$${PID}" 2>/dev/null || true; fi; \
-      done; \
-    done
+    -@lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null | xargs -r kill -TERM 2>/dev/null || true
     @sleep 2
-    @for PID in $$(lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null || true); do \
-      PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
-      if [ -n "$${PGID}" ]; then kill -KILL -"$${PGID}" 2>/dev/null || true; else kill -KILL "$${PID}" 2>/dev/null || true; fi; \
-    done
+    -@lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null | xargs -r kill -KILL 2>/dev/null || true
     @rm -f {{LOG_DIR}}/backend.pid {{LOG_DIR}}/backend.pgid {{LOG_DIR}}/frontend.pid {{LOG_DIR}}/frontend.pgid
     @echo "Services stopped."
 
