@@ -7,5 +7,7 @@ coverage
 *.min.js
 *.min.css
 test-results
+test-results.json
+test-results.xml
 playwright-report
 package-lock.json
