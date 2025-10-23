@@ -18,8 +18,6 @@ just test-local
 just test-local-single tests/test_products.py::test_create_product
 ```
 
-For Amp agents, use the `run_tests` tool with action "backend" instead of just commands.
-
 ## Architecture
 - FastAPI framework with async/await patterns
 - SQLModel for database models
