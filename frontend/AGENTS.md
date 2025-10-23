@@ -15,7 +15,8 @@ Amp provides custom tools in `.amp/tools/` for common development tasks. Always 
 **Run tests:** Use `run_tests` tool with action "e2e" for frontend E2E tests  
 **Lint & check:** Use `lint_and_check` tool with target "frontend"  
 **Format:** Use `format_code` tool with target "frontend" for code formatting  
-**Build:** Use `build_app` tool to verify production builds
+**Build:** Use `build_app` tool to verify production builds  
+**Run CI:** Use `run_ci` tool to run complete CI pipeline (format checks, linting, type checking, all tests, build)
 
 ## Essential Commands
 
@@ -34,8 +35,8 @@ Amp provides custom tools in `.amp/tools/` for common development tasks. Always 
 
 - `npm run lint` - ESLint checking
 - `npm run lint:fix` - Fix linting issues
-- `npm run type-check` - TypeScript type checking
-- `npm run build` - Production build
+- `npm run build` - Production build (includes TypeScript type checking)
+- `npx tsc --noEmit` - TypeScript type checking only
 
 **Playwright:**
 

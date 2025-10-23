@@ -11,7 +11,8 @@ Amp provides custom tools in `.amp/tools/` for common development tasks. Always 
 
 **Run tests:** Use `run_tests` tool with action "backend" for backend tests  
 **Lint & check:** Use `lint_and_check` tool with target "backend"  
-**Format:** Use `format_code` tool with target "backend" for code formatting
+**Format:** Use `format_code` tool with target "backend" for code formatting  
+**Run CI:** Use `run_ci` tool to run complete CI pipeline (format checks, linting, type checking, all tests, build)
 
 ## Essential Commands
 
