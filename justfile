@@ -119,13 +119,18 @@ test-all-local:
 # Run CI checks locally (mirrors CI pipeline)
 ci:
     @echo "Running full CI pipeline locally..."
+    @just stop
+    @sleep 2
     cd backend && uv run --active ruff format --check .
     @just check
     @just test-local
     cd frontend && npx prettier --check .
     cd frontend && npm run lint
     @just build
+    @just dev-headless
+    @sleep 5
     @just test-e2e
+    @just stop
     @echo "All CI checks passed!"
 
 
