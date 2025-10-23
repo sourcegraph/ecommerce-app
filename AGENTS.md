@@ -37,6 +37,7 @@ Amp provides custom tools for common development tasks. Always use these instead
 
 - Use `lint_and_check` tool with target: "backend", "frontend", or "both"
 - Use `build_app` tool to verify TypeScript compilation
+- `just format` - Format backend (ruff) and frontend (prettier) code
 
 **Error Handling:**
 
@@ -83,6 +84,13 @@ const getMockUser = (overrides?: Partial<User>): User => ({
 ```
 
 ## Code Style & Quality
+
+### Formatting
+
+**Backend:** Ruff for formatting (Black-compatible)  
+**Frontend:** Prettier for formatting, ESLint for code quality
+
+**Always run `just format` after making code changes** to ensure consistent formatting across backend and frontend. ESLint is configured with `eslint-config-prettier` to disable conflicting style rules.
 
 ### TypeScript Guidelines (Frontend)
 
@@ -202,12 +210,13 @@ def process_payment(payment_data: dict) -> Result:
 
 ### Pre-commit Checklist
 
-1. All tests pass (use `run_tests` tool with action "all")
-2. Code follows TDD process (tests written first)
-3. Linting passes (use `lint_and_check` tool with target "both")
-4. No type errors in TypeScript
-5. Factory functions used for all test data
-6. Business behavior documented through tests
+1. Run `just format` to format all code changes
+2. All tests pass (use `run_tests` tool with action "all")
+3. Code follows TDD process (tests written first)
+4. Linting passes (use `lint_and_check` tool with target "both")
+5. No type errors in TypeScript
+6. Factory functions used for all test data
+7. Business behavior documented through tests
 
 ### GitHub Workflow
 

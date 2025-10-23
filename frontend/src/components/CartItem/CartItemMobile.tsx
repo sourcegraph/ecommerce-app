@@ -1,4 +1,4 @@
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { AddIcon, MinusIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -9,37 +9,37 @@ import {
   Text,
   Skeleton,
   IconButton,
-} from "@chakra-ui/react";
-import { useState } from "react";
-import { BiTrash } from "react-icons/bi";
-import { Link as RouterLink } from "react-router-dom";
-import { ProductInCart, getImageUrl } from "../../context/GlobalState";
-import { useGlobalContext } from "../../context/useGlobalContext";
-import MotionBox from "../MotionBox";
+} from '@chakra-ui/react'
+import { useState } from 'react'
+import { BiTrash } from 'react-icons/bi'
+import { Link as RouterLink } from 'react-router-dom'
+import { ProductInCart, getImageUrl } from '../../context/GlobalState'
+import { useGlobalContext } from '../../context/useGlobalContext'
+import MotionBox from '../MotionBox'
 
 type Props = {
-  product: ProductInCart;
-};
+  product: ProductInCart
+}
 
 const formatUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
 
 const CartItemMobile = ({ product }: Props) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const subTotal = +product.price * +product.quantity;
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const subTotal = +product.price * +product.quantity
 
-  const { deleteFromCart, incrementQty, decrementQty, toggleSaved } = useGlobalContext();
+  const { deleteFromCart, incrementQty, decrementQty, toggleSaved } = useGlobalContext()
 
   return (
     <MotionBox
-      display={{ base: "block", bigTablet: "none" }}
+      display={{ base: 'block', bigTablet: 'none' }}
       opacity={0}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{
         duration: 0.3,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       }}
       mb={4}
     >
@@ -88,7 +88,7 @@ const CartItemMobile = ({ product }: Props) => {
               color="ink.900"
               fontWeight="semibold"
               fontSize="md"
-              _hover={{ textDecoration: "underline" }}
+              _hover={{ textDecoration: 'underline' }}
               noOfLines={2}
             >
               {product.title}
@@ -104,7 +104,13 @@ const CartItemMobile = ({ product }: Props) => {
           </VStack>
         </HStack>
 
-        <HStack justify="space-between" align="center" pt={3} borderTop="1px solid" borderColor="charcoal.200">
+        <HStack
+          justify="space-between"
+          align="center"
+          pt={3}
+          borderTop="1px solid"
+          borderColor="charcoal.200"
+        >
           <HStack spacing={3}>
             <IconButton
               icon={<MinusIcon />}
@@ -114,11 +120,17 @@ const CartItemMobile = ({ product }: Props) => {
               borderColor="sand.300"
               isDisabled={+product.quantity === 1}
               onClick={() => decrementQty(product.id)}
-              _hover={{ bg: "sand.100" }}
-              _disabled={{ opacity: 0.4, cursor: "not-allowed" }}
+              _hover={{ bg: 'sand.100' }}
+              _disabled={{ opacity: 0.4, cursor: 'not-allowed' }}
               data-testid="decrement-qty"
             />
-            <Text fontSize="md" minW="24px" textAlign="center" fontWeight="medium" data-testid="quantity-display">
+            <Text
+              fontSize="md"
+              minW="24px"
+              textAlign="center"
+              fontWeight="medium"
+              data-testid="quantity-display"
+            >
               {product.quantity}
             </Text>
             <IconButton
@@ -129,8 +141,8 @@ const CartItemMobile = ({ product }: Props) => {
               borderColor="sand.300"
               isDisabled={+product.quantity === 10}
               onClick={() => incrementQty(product.id)}
-              _hover={{ bg: "sand.100" }}
-              _disabled={{ opacity: 0.4, cursor: "not-allowed" }}
+              _hover={{ bg: 'sand.100' }}
+              _disabled={{ opacity: 0.4, cursor: 'not-allowed' }}
               data-testid="increment-qty"
             />
           </HStack>
@@ -141,12 +153,12 @@ const CartItemMobile = ({ product }: Props) => {
               size="sm"
               color="charcoal.700"
               fontWeight="normal"
-              _hover={{ color: "ink.900" }}
+              _hover={{ color: 'ink.900' }}
               onClick={() => {
-                toggleSaved(product.id);
+                toggleSaved(product.id)
               }}
             >
-              {product.isSaved ? "Unsave" : "Save"}
+              {product.isSaved ? 'Unsave' : 'Save'}
             </Button>
             <Button
               variant="link"
@@ -154,7 +166,7 @@ const CartItemMobile = ({ product }: Props) => {
               color="charcoal.700"
               fontWeight="normal"
               leftIcon={<BiTrash />}
-              _hover={{ color: "ink.900" }}
+              _hover={{ color: 'ink.900' }}
               onClick={() => deleteFromCart(product.id)}
               data-testid="remove-item"
             >
@@ -164,7 +176,7 @@ const CartItemMobile = ({ product }: Props) => {
         </HStack>
       </Box>
     </MotionBox>
-  );
-};
+  )
+}
 
-export default CartItemMobile;
+export default CartItemMobile

@@ -167,9 +167,9 @@
 // ];
 
 export const searchTags = [
-  "Free shipping",
-  "Casual shirts",
-  "jewellery",
-  "hard drive",
+  'Free shipping',
+  'Casual shirts',
+  'jewellery',
+  'hard drive',
   "women's clothing",
-];
+]

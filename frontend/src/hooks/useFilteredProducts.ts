@@ -16,21 +16,21 @@ export const useFilteredProducts = (): UseFilteredProductsResult => {
   const [error, setError] = useState<string | null>(null)
   const [searchParams] = useSearchParams()
 
-  const cat = searchParams.get("cat") || ""
-  const deliv = searchParams.get("deliv") || ""
-  const sort = searchParams.get("sort") || "created_desc"
+  const cat = searchParams.get('cat') || ''
+  const deliv = searchParams.get('deliv') || ''
+  const sort = searchParams.get('sort') || 'created_desc'
 
   const fetchProducts = async () => {
     try {
       setLoading(true)
       setError(null)
-      
+
       const params: {
         categoryId?: string
         deliveryOptionId?: string
         sort?: string
       } = {}
-      
+
       if (cat) params.categoryId = cat
       if (deliv) params.deliveryOptionId = deliv
       if (sort) params.sort = sort
@@ -49,18 +49,17 @@ export const useFilteredProducts = (): UseFilteredProductsResult => {
     fetchProducts()
   }, [cat, deliv, sort])
 
-  
   const products = useMemo(() => {
-    if (sort !== "price_asc" && sort !== "price_desc") return rawProducts
-    
+    if (sort !== 'price_asc' && sort !== 'price_desc') return rawProducts
+
     const clone = [...rawProducts]
-    
-    if (sort === "price_asc") {
+
+    if (sort === 'price_asc') {
       clone.sort((a: any, b: any) => a.price - b.price)
-    } else if (sort === "price_desc") {
+    } else if (sort === 'price_desc') {
       clone.sort((a: any, b: any) => b.price - a.price)
     }
-    
+
     return clone
   }, [rawProducts, sort])
 

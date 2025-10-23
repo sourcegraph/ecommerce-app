@@ -1,5 +1,5 @@
-import { defineConfig } from '@playwright/test';
-import baseConfig from './playwright.config';
+import { defineConfig } from '@playwright/test'
+import baseConfig from './playwright.config'
 
 export default defineConfig(baseConfig, {
   use: {
@@ -7,4 +7,4 @@ export default defineConfig(baseConfig, {
     baseURL: 'http://localhost:3001',
     headless: true,
   },
-});
+})

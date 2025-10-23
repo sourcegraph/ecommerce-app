@@ -1,18 +1,18 @@
 const breakpoints = {
   // 375px and above
-  mobileM: "23.4375em",
+  mobileM: '23.4375em',
   // 567px and above
-  smallTablet: "35.4375em",
+  smallTablet: '35.4375em',
   //   768px and above
-  bigTablet: "48em",
+  bigTablet: '48em',
   //   865px and above
-  sm: "54.0625em",
+  sm: '54.0625em',
   //   1017px and above
-  md: "63.5625em",
+  md: '63.5625em',
   //   1280px and above
-  lg: "80em",
+  lg: '80em',
   //   1440px and above
-  xl: "90em",
-};
+  xl: '90em',
+}
 
-export default breakpoints;
+export default breakpoints

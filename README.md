@@ -269,10 +269,13 @@ just test-all-local   # All tests (backend + E2E)
 ```bash
 # backend
 just check            # Run linting (ruff) and type checking (mypy)
-just format           # Format backend code
+
+# formatting
+just format           # Format backend (ruff) and frontend (prettier) code
 
 # frontend
 just lint             # Lint frontend TypeScript
+cd frontend && npm run format:check  # Check frontend formatting without changes
 ```
 
 #### Pre-Push Validation (Recommended)

@@ -1,17 +1,17 @@
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Text } from "@chakra-ui/react";
-import { Link as RouterLink, useParams } from "react-router-dom";
-import ProductCard from "../components/ProductCard";
-import ProductsGrid from "../components/ProductsGrid";
+import { ChevronRightIcon } from '@chakra-ui/icons'
+import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Text } from '@chakra-ui/react'
+import { Link as RouterLink, useParams } from 'react-router-dom'
+import ProductCard from '../components/ProductCard'
+import ProductsGrid from '../components/ProductsGrid'
 
-import { AnimatePresence } from "framer-motion";
-import { useGlobalContext } from "../context/useGlobalContext";
+import { AnimatePresence } from 'framer-motion'
+import { useGlobalContext } from '../context/useGlobalContext'
 
 const SearchResults = () => {
-  const { products } = useGlobalContext();
-  const { name } = useParams();
+  const { products } = useGlobalContext()
+  const { name } = useParams()
   const foundProducts = products.filter(
-    product =>
+    (product) =>
       (name &&
         product &&
         product.title &&
@@ -19,7 +19,7 @@ const SearchResults = () => {
       (name &&
         product.description &&
         product.description.toLowerCase().includes(name.toLowerCase()))
-  );
+  )
   return (
     <Box>
       <Breadcrumb
@@ -43,16 +43,14 @@ const SearchResults = () => {
       <ProductsGrid>
         <AnimatePresence>
           {foundProducts.length > 0 ? (
-            foundProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))
+            foundProducts.map((product) => <ProductCard key={product.id} product={product} />)
           ) : (
             <Text>No products found</Text>
           )}
         </AnimatePresence>
       </ProductsGrid>
     </Box>
-  );
-};
+  )
+}
 
-export default SearchResults;
+export default SearchResults

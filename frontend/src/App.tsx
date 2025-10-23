@@ -1,28 +1,28 @@
-import loadable from "@loadable/component";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Container from "./components/Container";
-import ProgressLine from "./components/Loading/ProgressLine";
-import { Provider } from "./context/GlobalState";
-import Saved from "./pages/Saved";
+import loadable from '@loadable/component'
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import Container from './components/Container'
+import ProgressLine from './components/Loading/ProgressLine'
+import { Provider } from './context/GlobalState'
+import Saved from './pages/Saved'
 
-const Home = loadable(() => import("./pages/Home"), {
+const Home = loadable(() => import('./pages/Home'), {
   fallback: <ProgressLine />,
-});
-const Product = loadable(() => import("./pages/Product"), {
+})
+const Product = loadable(() => import('./pages/Product'), {
   fallback: <ProgressLine />,
-});
-const SearchResults = loadable(() => import("./pages/SearchResults"), {
+})
+const SearchResults = loadable(() => import('./pages/SearchResults'), {
   fallback: <ProgressLine />,
-});
-const Cart = loadable(() => import("./pages/Cart"), {
+})
+const Cart = loadable(() => import('./pages/Cart'), {
   fallback: <ProgressLine />,
-});
-const Login = loadable(() => import("./pages/Login"), {
+})
+const Login = loadable(() => import('./pages/Login'), {
   fallback: <ProgressLine />,
-});
-const Register = loadable(() => import("./pages/Register"), {
+})
+const Register = loadable(() => import('./pages/Register'), {
   fallback: <ProgressLine />,
-});
+})
 
 const App = () => {
   return (
@@ -43,7 +43,7 @@ const App = () => {
         </Routes>
       </Router>
     </Provider>
-  );
-};
+  )
+}
 
-export default App;
+export default App

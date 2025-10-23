@@ -9,15 +9,15 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react'
 
-import ContactDetails from "../ContactDetails";
+import ContactDetails from '../ContactDetails'
 
 const FooterMobile = () => {
   return (
     <Flex
       as="footer"
-      display={{ base: "flex", smallTablet: "none" }}
+      display={{ base: 'flex', smallTablet: 'none' }}
       bg="bg.footer"
       color="text.footer"
       pb={8}
@@ -27,10 +27,7 @@ const FooterMobile = () => {
     >
       <Accordion allowToggle mb={8}>
         <AccordionItem borderTop="none" py={2}>
-          <AccordionButton
-            color="text.footerMuted"
-            _expanded={{ color: "text.footer" }}
-          >
+          <AccordionButton color="text.footerMuted" _expanded={{ color: 'text.footer' }}>
             <Box flex="1" textAlign="left">
               <Heading
                 as="h6"
@@ -49,35 +46,35 @@ const FooterMobile = () => {
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Home
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Product
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Pricing
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 About
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Contact
               </Link>
@@ -85,10 +82,7 @@ const FooterMobile = () => {
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem borderColor="border.footer" py={2}>
-          <AccordionButton
-            color="text.footerMuted"
-            _expanded={{ color: "text.footer" }}
-          >
+          <AccordionButton color="text.footerMuted" _expanded={{ color: 'text.footer' }}>
             <Box flex="1" textAlign="left">
               <Heading
                 as="h6"
@@ -107,70 +101,70 @@ const FooterMobile = () => {
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Eleanor Edwards
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Ted Robertson
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Annette Russell
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Jennie Mckinney
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Gloria Richards
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Philip Jones
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Product
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Colleen Russell
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Marvin Hawkins
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Bruce Simmons
               </Link>
@@ -180,7 +174,7 @@ const FooterMobile = () => {
       </Accordion>
       <ContactDetails />
     </Flex>
-  );
-};
+  )
+}
 
-export default FooterMobile;
+export default FooterMobile

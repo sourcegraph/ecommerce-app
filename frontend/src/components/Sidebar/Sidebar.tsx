@@ -9,22 +9,14 @@ import {
   Link,
   VStack,
   useBreakpointValue,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react'
 
 const Sidebar = () => {
-  const border = useBreakpointValue({ base: undefined, sm: "none" }, { ssr: false });
+  const border = useBreakpointValue({ base: undefined, sm: 'none' }, { ssr: false })
 
   return (
     <>
-      <Heading
-        as="h4"
-        color="text.secondary"
-        fontSize="md"
-        fontWeight="bold"
-        mt={2}
-        mb={4}
-        mx={4}
-      >
+      <Heading as="h4" color="text.secondary" fontSize="md" fontWeight="bold" mt={2} mb={4} mx={4}>
         All Categories
       </Heading>
       {/* Accordion start */}
@@ -177,7 +169,7 @@ const Sidebar = () => {
       </Accordion>
       {/* Accordion end */}
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

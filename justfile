@@ -137,9 +137,10 @@ check:
     cd backend && uv run --active ruff check .
     cd backend && uv run --active mypy .
 
-# Format backend code
+# Format backend and frontend code
 format:
     cd backend && uv run --active ruff format .
+    cd frontend && npm run format
 
 lint:
     cd frontend && npm run lint

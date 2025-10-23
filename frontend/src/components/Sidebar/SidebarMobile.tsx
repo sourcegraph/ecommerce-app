@@ -5,27 +5,22 @@ import {
   DrawerContent,
   DrawerOverlay,
   Link,
-} from "@chakra-ui/react";
-import { RefObject } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import Logo from "../Logo";
-import Sidebar from "./Sidebar";
+} from '@chakra-ui/react'
+import { RefObject } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
+import Logo from '../Logo'
+import Sidebar from './Sidebar'
 
 type Props = {
-  isOpen: boolean;
-  onClose: () => void;
-  hamburgerRef: RefObject<SVGSVGElement>;
-};
+  isOpen: boolean
+  onClose: () => void
+  hamburgerRef: RefObject<SVGSVGElement>
+}
 
 const SidebarMobile = ({ isOpen, onClose, hamburgerRef }: Props) => {
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement="left"
-      onClose={onClose}
-      finalFocusRef={hamburgerRef}
-    >
-      <DrawerOverlay display={{ base: "block", sm: "none" }}>
+    <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={hamburgerRef}>
+      <DrawerOverlay display={{ base: 'block', sm: 'none' }}>
         <DrawerContent pt={16} color="text.secondary">
           <DrawerCloseButton
             color="focus.ring"
@@ -37,7 +32,7 @@ const SidebarMobile = ({ isOpen, onClose, hamburgerRef }: Props) => {
           <Link
             as={RouterLink}
             to="/"
-            _hover={{ textDecoration: "none" }}
+            _hover={{ textDecoration: 'none' }}
             position="absolute"
             top="1.2rem"
             right={0}
@@ -51,7 +46,7 @@ const SidebarMobile = ({ isOpen, onClose, hamburgerRef }: Props) => {
         </DrawerContent>
       </DrawerOverlay>
     </Drawer>
-  );
-};
+  )
+}
 
-export default SidebarMobile;
+export default SidebarMobile

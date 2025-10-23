@@ -9,7 +9,7 @@ export interface DeliveryOption {
   id: number
   name: string
   description: string
-  speed: "standard" | "express" | "next_day" | "same_day"
+  speed: 'standard' | 'express' | 'next_day' | 'same_day'
   price: number
   min_order_amount?: number
   estimated_days_min: number

@@ -1,17 +1,14 @@
-import { Icon, IconProps } from "@chakra-ui/react";
+import { Icon, IconProps } from '@chakra-ui/react'
 
 interface BookmarkIconProps extends IconProps {
-  readonly filled?: boolean;
+  readonly filled?: boolean
 }
 
 export const BookmarkIcon = ({ filled = false, ...props }: BookmarkIconProps) => {
   return (
     <Icon viewBox="0 0 24 24" {...props}>
       {filled ? (
-        <path
-          fill="currentColor"
-          d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"
-        />
+        <path fill="currentColor" d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
       ) : (
         <path
           fill="currentColor"
@@ -19,5 +16,5 @@ export const BookmarkIcon = ({ filled = false, ...props }: BookmarkIconProps) =>
         />
       )}
     </Icon>
-  );
-};
+  )
+}
