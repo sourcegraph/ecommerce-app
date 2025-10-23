@@ -1,24 +1,24 @@
-import { Progress } from "@chakra-ui/react";
-import { useLocation } from "react-router-dom";
+import { Progress } from '@chakra-ui/react'
+import { useLocation } from 'react-router-dom'
 
 const ProgressLine = () => {
-  const location = useLocation();
+  const location = useLocation()
   return (
     <Progress
       mt={
-        location.pathname === "/login" || location.pathname === "/register"
-          ? { base: "120px", sm: "72px" }
+        location.pathname === '/login' || location.pathname === '/register'
+          ? { base: '120px', sm: '72px' }
           : 0
       }
       size="xs"
       sx={{
-        "& > div": {
-          bg: "focus.ring"
-        }
+        '& > div': {
+          bg: 'focus.ring',
+        },
       }}
       isIndeterminate
     />
-  );
-};
+  )
+}
 
-export default ProgressLine;
+export default ProgressLine

@@ -14,54 +14,54 @@ import {
   Link,
   Text,
   VStack,
-} from "@chakra-ui/react";
-import { Field, FieldProps, Formik, Form as FormikForm, FormikHelpers } from "formik";
-import { useState } from "react";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { BiExit } from "react-icons/bi";
-import { FaFacebook } from "react-icons/fa";
-import { object, string } from "yup";
-import Header from "./Header";
+} from '@chakra-ui/react'
+import { Field, FieldProps, Formik, Form as FormikForm, FormikHelpers } from 'formik'
+import { useState } from 'react'
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai'
+import { BiExit } from 'react-icons/bi'
+import { FaFacebook } from 'react-icons/fa'
+import { object, string } from 'yup'
+import Header from './Header'
 
 type Props = {
-  authType: string;
-};
+  authType: string
+}
 
 interface Values {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 // Give the components chakra props
-const Form = chakra(FormikForm);
-const ExitIcon = chakra(BiExit);
-const VisibleEye = chakra(AiFillEye);
-const InvisibleEye = chakra(AiFillEyeInvisible);
-const FbIcon = chakra(FaFacebook);
+const Form = chakra(FormikForm)
+const ExitIcon = chakra(BiExit)
+const VisibleEye = chakra(AiFillEye)
+const InvisibleEye = chakra(AiFillEyeInvisible)
+const FbIcon = chakra(FaFacebook)
 
 const AuthPage = ({ authType }: Props) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
 
   const validationSchema = object({
-    email: string().email("Invalid email address").required("Required"),
-    password: string().min(8, "Must be at least 8 characters").required("Required"),
-  });
+    email: string().email('Invalid email address').required('Required'),
+    password: string().min(8, 'Must be at least 8 characters').required('Required'),
+  })
 
   return (
     <>
       <Header />
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: '', password: '' }}
         // @ts-expect-error - 'values' is defined and not used just to show that it's possible
         onSubmit={(values: Values, actions: FormikHelpers<Values>) => {
           setTimeout(() => {
-            actions.setSubmitting(false);
-            actions.resetForm();
-          }, 2000);
+            actions.setSubmitting(false)
+            actions.resetForm()
+          }, 2000)
         }}
         validationSchema={validationSchema}
       >
-        {props => (
+        {(props) => (
           <Form
             action="/"
             maxW="480px"
@@ -70,7 +70,7 @@ const AuthPage = ({ authType }: Props) => {
             pb={12}
             boxShadow="lg"
             m="auto"
-            mt={{ base: "130px", smallTablet: "152px" }}
+            mt={{ base: '130px', smallTablet: '152px' }}
           >
             <VStack spacing={8}>
               <Heading fontSize="2xl" textTransform="uppercase" color="text.primary">
@@ -89,7 +89,7 @@ const AuthPage = ({ authType }: Props) => {
                       type="email"
                       placeholder="Email Address"
                       _placeholder={{
-                        color: "text.secondary",
+                        color: 'text.secondary',
                       }}
                       bg="bg.subtle"
                       py={7}
@@ -110,10 +110,10 @@ const AuthPage = ({ authType }: Props) => {
                       <Input
                         {...field}
                         id="password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
                         _placeholder={{
-                          color: "text.secondary",
+                          color: 'text.secondary',
                         }}
                         bg="bg.subtle"
                         py={7}
@@ -127,11 +127,7 @@ const AuthPage = ({ authType }: Props) => {
                           size="sm"
                           color="text.primary"
                           icon={
-                            showPassword ? (
-                              <VisibleEye size={22} />
-                            ) : (
-                              <InvisibleEye size={22} />
-                            )
+                            showPassword ? <VisibleEye size={22} /> : <InvisibleEye size={22} />
                           }
                           onClick={() => setShowPassword(!showPassword)}
                         />
@@ -145,15 +141,15 @@ const AuthPage = ({ authType }: Props) => {
                 justify="space-between"
                 w="100%"
                 fontWeight="500"
-                display={authType === "login" ? "flex" : "none"}
+                display={authType === 'login' ? 'flex' : 'none'}
               >
                 <Checkbox color="text.primary">
-                  <Text fontSize={{ base: "0.9375rem", sm: "1rem" }}>Remember me</Text>
+                  <Text fontSize={{ base: '0.9375rem', sm: '1rem' }}>Remember me</Text>
                 </Checkbox>
                 <Link
                   color="text.primary"
-                  textDecoration={{ base: "underline", sm: "none" }}
-                  fontSize={{ base: "0.9375rem", sm: "1rem" }}
+                  textDecoration={{ base: 'underline', sm: 'none' }}
+                  fontSize={{ base: '0.9375rem', sm: '1rem' }}
                 >
                   <Text>Forgot Password?</Text>
                 </Link>
@@ -169,11 +165,11 @@ const AuthPage = ({ authType }: Props) => {
               >
                 <ExitIcon size={26} flex={1} />
                 <Text flex={6} px={1}>
-                  {authType === "register" ? "Create Account" : "Login"}
+                  {authType === 'register' ? 'Create Account' : 'Login'}
                 </Text>
                 <Box visibility="hidden" flex={1} />
               </Button>
-              <Link w="100%" _hover={{ textDecoration: "none" }}>
+              <Link w="100%" _hover={{ textDecoration: 'none' }}>
                 <Button
                   textTransform="uppercase"
                   variant="solid"
@@ -186,11 +182,7 @@ const AuthPage = ({ authType }: Props) => {
                     {authType} with Facebook
                   </Text>
 
-                  <Box
-                    visibility="hidden"
-                    flex={1}
-                    display={{ base: "none", mobileM: "block" }}
-                  />
+                  <Box visibility="hidden" flex={1} display={{ base: 'none', mobileM: 'block' }} />
                 </Button>
               </Link>
             </VStack>
@@ -198,7 +190,7 @@ const AuthPage = ({ authType }: Props) => {
         )}
       </Formik>
     </>
-  );
-};
+  )
+}
 
-export default AuthPage;
+export default AuthPage

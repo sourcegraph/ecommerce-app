@@ -1,13 +1,12 @@
-import { Box, Button, Flex, Image, Text, AspectRatio } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
-import { ProductType, getImageUrl } from "../context/GlobalState";
+import { Box, Button, Flex, Image, Text, AspectRatio } from '@chakra-ui/react'
+import { Link as RouterLink } from 'react-router-dom'
+import { ProductType, getImageUrl } from '../context/GlobalState'
 
 type Props = {
-  product: ProductType;
-};
+  product: ProductType
+}
 
 const FeaturedBanner = ({ product }: Props) => {
-
   return (
     <Flex
       mb={{ base: 6, md: 10 }}
@@ -18,15 +17,21 @@ const FeaturedBanner = ({ product }: Props) => {
       borderColor="border.subtle"
       align="center"
       gap={{ base: 4, md: 8 }}
-      direction={{ base: "column", md: "row" }}
+      direction={{ base: 'column', md: 'row' }}
       boxShadow="card"
     >
       {/* Left: Content */}
       <Box flex="1">
-        <Text fontSize="sm" color="text.secondary" fontWeight="semibold" letterSpacing="wide" mb={2}>
+        <Text
+          fontSize="sm"
+          color="text.secondary"
+          fontWeight="semibold"
+          letterSpacing="wide"
+          mb={2}
+        >
           FEATURED PRODUCT
         </Text>
-        <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="text.primary" mb={3}>
+        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="bold" color="text.primary" mb={3}>
           {product.title}
         </Text>
         <Flex align="baseline" gap={3} mb={4}>
@@ -34,18 +39,13 @@ const FeaturedBanner = ({ product }: Props) => {
             ${product.price}
           </Text>
         </Flex>
-        <Button
-          as={RouterLink}
-          to={`/products/${product.id}`}
-          variant="accent"
-          size="lg"
-        >
+        <Button as={RouterLink} to={`/products/${product.id}`} variant="accent" size="lg">
           Shop Now
         </Button>
       </Box>
 
       {/* Right: Image */}
-      <Box flex="1" w="100%" maxW={{ base: "300px", md: "400px" }}>
+      <Box flex="1" w="100%" maxW={{ base: '300px', md: '400px' }}>
         <AspectRatio ratio={1}>
           <Box bg="bg.image" rounded="md" p={6}>
             <Image
@@ -59,7 +59,7 @@ const FeaturedBanner = ({ product }: Props) => {
         </AspectRatio>
       </Box>
     </Flex>
-  );
-};
+  )
+}
 
-export default FeaturedBanner;
+export default FeaturedBanner

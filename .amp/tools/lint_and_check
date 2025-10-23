@@ -1,0 +1,137 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import { spawnSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
+function showDescription() {
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "lint_and_check",
+   description: 'Use this tool (NEVER use Bash or just commands directly) to run code quality checks and linting. This handles both backend (Python with ruff/mypy) and frontend (TypeScript/React with ESLint). Always use this tool before committing code or after making changes to ensure code quality. This is read-only and does not modify files.',
+   args: { target: ['string', 'The target to check: "backend" (ruff check + mypy), "frontend" (ESLint), or "both" (backend + frontend)'] },
+  }),
+ )
+}
+
+function execute() {
+ // parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
+ let params = {}
+ try {
+  const input = fs.readFileSync(0, 'utf-8').trim()
+  params = input ? JSON.parse(input) : {}
+ } catch (e) {
+  console.error('Failed to parse parameters:', e.message)
+  process.exit(1)
+ }
+ 
+ const target = params['target'] || 'both'
+
+ // output goes directly to the model
+ switch (target) {
+  case "backend": {
+   console.log("→ Running backend checks (ruff + mypy)...")
+   
+   // Run ruff check
+   const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+    cwd: 'backend',
+    stdio: 'inherit',
+   })
+   
+   // Run mypy
+   const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
+    cwd: 'backend',
+    stdio: 'inherit',
+   })
+   
+   if (ruffCheck.status !== 0 || mypy.status !== 0) {
+    process.exit(ruffCheck.status || mypy.status || 1)
+   }
+   console.log("✓ Backend checks passed")
+   break
+  }
+
+  case "frontend": {
+   console.log("→ Running frontend lint (ESLint)...")
+   
+   const lint = spawnSync('npm', ['run', 'lint'], {
+    cwd: 'frontend',
+    stdio: 'inherit',
+   })
+   
+   if (lint.status !== 0) {
+    process.exit(lint.status || 1)
+   }
+   console.log("✓ Frontend lint passed")
+   break
+  }
+
+  case "both": {
+  console.log("→ Running all checks (backend + frontend)...")
+  
+  const failures = []
+  
+  // Backend checks
+  console.log("\n=== Backend (ruff + mypy) ===")
+  const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
+  })
+  if (ruffCheck.status !== 0) failures.push('ruff check')
+  
+  const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
+  })
+  if (mypy.status !== 0) failures.push('mypy')
+  
+  // Frontend checks
+  console.log("\n=== Frontend (ESLint) ===")
+  const lint = spawnSync('npm', ['run', 'lint'], {
+   cwd: 'frontend',
+  stdio: 'inherit',
+  })
+  if (lint.status !== 0) failures.push('ESLint')
+  
+   if (failures.length > 0) {
+     console.error(`\n✗ Failed checks: ${failures.join(', ')}`)
+     process.exit(1)
+    }
+    console.log("\n✓ All checks passed")
+    break
+   }
+
+  default:
+   process.stderr.write(`Unknown target: ${target}. Use "backend", "frontend", or "both"\n`)
+   process.exit(1)
+ }
+}

@@ -21,6 +21,9 @@ jobs:
         run: |
           cd backend && uv sync --locked
 
+      - name: Backend format check
+        run: cd backend && uv run --active ruff format --check .
+
       - name: Backend lint & types
         run: just check
 
@@ -38,6 +41,9 @@ jobs:
 
       - name: Install frontend deps
         run: npm ci
+
+      - name: Frontend format check
+        run: cd frontend && npx prettier --check .
 
       - name: Frontend lint
         run: just lint

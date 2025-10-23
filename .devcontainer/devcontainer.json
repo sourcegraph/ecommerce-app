@@ -83,7 +83,8 @@
   "containerEnv": {
     "VIRTUAL_ENV": "/opt/venvs/backend",
     "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright"
+    "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
+    "AMP_TOOLBOX": "/workspaces/app/.amp/tools:/root/.config/amp/tools"
   },
   
   // ─────────────────────────────────────────────────────────────────
@@ -95,7 +96,7 @@
       "settings": {
         // ─── Python Configuration ───
         "python.defaultInterpreterPath": "/opt/venvs/backend/bin/python",
-        "python.terminal.activateEnvironment": true,
+        "python.terminal.activateEnvironment": false,
         "python.testing.pytestEnabled": true,
         "python.testing.pytestArgs": ["tests"],
         "python.testing.cwd": "backend",

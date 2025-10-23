@@ -1,0 +1,120 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import { spawnSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
+function showDescription() {
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "run_ci",
+   description: 'Use this tool (NEVER use Bash or just commands directly) to run the complete CI pipeline before pushing code. This runs format checks, linting, type checking, all tests (backend + E2E), and builds to ensure code quality. Always use this tool to verify all CI checks pass, never run the individual commands manually.',
+   args: {},
+  }),
+ )
+}
+
+function execute() {
+ console.log('→ Running full CI pipeline locally...\n')
+
+ // 1. Backend format check
+ console.log('→ Checking backend formatting...')
+ let result = spawnSync('uv', ['run', '--active', 'ruff', 'format', '--check', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 2. Backend linting and type checking
+ console.log('→ Checking backend code quality...')
+ result = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ result = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 3. Backend tests
+ console.log('→ Running backend tests...')
+ result = spawnSync('uv', ['run', '--active', 'pytest'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 4. Frontend format check
+ console.log('→ Checking frontend formatting...')
+ result = spawnSync('npx', ['prettier', '--check', '.'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 5. Frontend linting
+ console.log('→ Running frontend lint...')
+ result = spawnSync('npm', ['run', 'lint'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 6. Frontend type checking
+ console.log('→ Checking frontend types...')
+ result = spawnSync('npx', ['tsc', '--noEmit'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 7. Frontend build
+ console.log('→ Building frontend...')
+ result = spawnSync('npm', ['run', 'build'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ // 8. E2E tests
+ console.log('→ Running E2E tests...')
+ result = spawnSync('npx', ['playwright', 'test'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
+
+ console.log('\n✓ All CI checks passed!')
+}

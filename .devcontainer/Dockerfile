@@ -69,6 +69,13 @@ RUN set -eux; \
     uv --version
 
 # ─────────────────────────────────────────────────────────────────
+# Install Bun (JavaScript runtime for Amp toolbox)
+# ─────────────────────────────────────────────────────────────────
+RUN curl -fsSL https://bun.sh/install | bash \
+ && ln -sf /root/.bun/bin/bun /usr/local/bin/bun \
+ && bun --version
+
+# ─────────────────────────────────────────────────────────────────
 # Configure Python virtual environment path
 # ─────────────────────────────────────────────────────────────────
 # Install to /opt/venvs/backend (outside workspace) to prevent conflicts

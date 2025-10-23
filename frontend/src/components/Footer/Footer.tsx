@@ -1,19 +1,19 @@
-import { Flex, Heading, Link, VStack } from "@chakra-ui/react";
+import { Flex, Heading, Link, VStack } from '@chakra-ui/react'
 
-import ContactDetails from "../ContactDetails";
+import ContactDetails from '../ContactDetails'
 
 const Footer = () => {
   return (
     <Flex
       as="footer"
-      display={{ base: "none", smallTablet: "flex" }}
+      display={{ base: 'none', smallTablet: 'flex' }}
       bg="bg.footer"
       color="text.footer"
-      pl={{ base: 16, md: "236px" }}
+      pl={{ base: 16, md: '236px' }}
       pr={{ base: 16, md: 8 }}
       py={5}
-      direction={{ base: "column", sm: "row" }}
-      align={{ base: "center", sm: "flex-start" }}
+      direction={{ base: 'column', sm: 'row' }}
+      align={{ base: 'center', sm: 'flex-start' }}
       borderTop="1px solid"
       borderColor="border.footer"
     >
@@ -33,35 +33,35 @@ const Footer = () => {
             <Link
               fontWeight={500}
               color="text.footer"
-              _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
               Home
             </Link>
             <Link
               fontWeight={500}
               color="text.footer"
-              _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
               Product
             </Link>
             <Link
               fontWeight={500}
               color="text.footer"
-              _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
               Pricing
             </Link>
             <Link
               fontWeight={500}
               color="text.footer"
-              _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
               About
             </Link>
             <Link
               fontWeight={500}
               color="text.footer"
-              _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+              _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
             >
               Contact
             </Link>
@@ -83,35 +83,35 @@ const Footer = () => {
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Eleanor Edwards
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Ted Robertson
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Annette Russell
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Jennie Mckinney
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Gloria Richards
               </Link>
@@ -120,35 +120,35 @@ const Footer = () => {
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Philip Jones
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Product
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Colleen Russell
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Marvin Hawkins
               </Link>
               <Link
                 fontWeight={500}
                 color="text.footer"
-                _hover={{ textDecoration: "underline", textUnderlineOffset: "3px" }}
+                _hover={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}
               >
                 Bruce Simmons
               </Link>
@@ -158,7 +158,7 @@ const Footer = () => {
       </Flex>
       <ContactDetails />
     </Flex>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer

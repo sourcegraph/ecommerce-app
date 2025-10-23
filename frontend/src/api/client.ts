@@ -3,10 +3,7 @@ import { Category, DeliveryOption, Product } from './types'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
 class ApiClient {
-  private async request<T>(
-    endpoint: string,
-    options: globalThis.RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: globalThis.RequestInit = {}): Promise<T> {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -30,16 +27,18 @@ class ApiClient {
     return this.request<DeliveryOption[]>('/api/delivery-options')
   }
 
-  async getProducts(params: { 
-    categoryId?: string
-    deliveryOptionId?: string
-    sort?: string 
-  } = {}): Promise<Product[]> {
+  async getProducts(
+    params: {
+      categoryId?: string
+      deliveryOptionId?: string
+      sort?: string
+    } = {}
+  ): Promise<Product[]> {
     const searchParams = new globalThis.URLSearchParams()
     if (params.categoryId) searchParams.set('categoryId', params.categoryId)
     if (params.deliveryOptionId) searchParams.set('deliveryOptionId', params.deliveryOptionId)
     if (params.sort) searchParams.set('sort', params.sort)
-    
+
     return this.request<Product[]>(`/api/products?${searchParams.toString()}`)
   }
 }

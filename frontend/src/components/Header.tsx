@@ -1,34 +1,25 @@
-import { HamburgerIcon } from "@chakra-ui/icons";
-import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Icon,
-  Link,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useRef } from "react";
-import { FaShoppingCart } from "react-icons/fa";
-import { Route, Link as RouterLink, Routes, useLocation } from "react-router-dom";
-import { useGlobalContext } from "../context/useGlobalContext";
-import Logo from "./Logo";
-import MUIBadge from "./MUI/MUIBadge";
-import SearchBar from "./SearchBar";
-import SidebarMobile from "./Sidebar/SidebarMobile";
+import { HamburgerIcon } from '@chakra-ui/icons'
+import { Avatar, Box, Button, Flex, HStack, Icon, Link, useDisclosure } from '@chakra-ui/react'
+import { useRef } from 'react'
+import { FaShoppingCart } from 'react-icons/fa'
+import { Route, Link as RouterLink, Routes, useLocation } from 'react-router-dom'
+import { useGlobalContext } from '../context/useGlobalContext'
+import Logo from './Logo'
+import MUIBadge from './MUI/MUIBadge'
+import SearchBar from './SearchBar'
+import SidebarMobile from './Sidebar/SidebarMobile'
 
 const Header = () => {
-  const { cartItemCount } = useGlobalContext();
+  const { cartItemCount } = useGlobalContext()
 
-  const location = useLocation();
-  const hamburgerRef = useRef<SVGSVGElement>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const location = useLocation()
+  const hamburgerRef = useRef<SVGSVGElement>(null)
+  const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <Flex
       as="header"
       direction="column"
-      height={{ base: "100px", sm: "fit-content" }}
+      height={{ base: '100px', sm: 'fit-content' }}
       px={{ base: 4, md: 6 }}
       position="fixed"
       top={0}
@@ -40,8 +31,8 @@ const Header = () => {
       borderColor="border.subtle"
       boxShadow="header"
       sx={{
-        "@supports (backdrop-filter: blur(8px))": {
-          bg: "rgba(250, 250, 249, 0.85)",
+        '@supports (backdrop-filter: blur(8px))': {
+          bg: 'rgba(250, 250, 249, 0.85)',
         },
       }}
     >
@@ -54,7 +45,7 @@ const Header = () => {
       >
         <Flex align="center">
           <HamburgerIcon
-            display={{ base: "inline-block", sm: "none" }}
+            display={{ base: 'inline-block', sm: 'none' }}
             color="ink.800"
             w="1.5rem"
             h="1.5rem"
@@ -62,37 +53,40 @@ const Header = () => {
             cursor="pointer"
             ref={hamburgerRef}
             onClick={onOpen}
-            _hover={{ color: "ink.600" }}
+            _hover={{ color: 'ink.600' }}
           />
-          <Link as={RouterLink} to="/" _hover={{ textDecoration: "none" }}>
+          <Link as={RouterLink} to="/" _hover={{ textDecoration: 'none' }}>
             <Logo />
           </Link>
         </Flex>
-        <SearchBar display={{ base: "none", sm: "block" }} />
+        <SearchBar display={{ base: 'none', sm: 'block' }} />
         <Flex justify="space-between" align="center">
           <HStack spacing={{ base: 3, sm: 5 }}>
             <Link
               as={RouterLink}
-              to={location.pathname === "/login" ? "/register" : "/login"}
-              _hover={{ textDecoration: "none" }}
+              to={location.pathname === '/login' ? '/register' : '/login'}
+              _hover={{ textDecoration: 'none' }}
             >
               <Button
                 height={{ base: 8, sm: 9 }}
                 minW={{ base: 8, sm: 9 }}
-                fontSize={{ base: "sm", sm: "md" }}
+                fontSize={{ base: 'sm', sm: 'md' }}
                 variant="ghost"
               >
-                {location.pathname === "/login" ? "Sign Up" : "Sign In"}
+                {location.pathname === '/login' ? 'Sign Up' : 'Sign In'}
               </Button>
             </Link>
             <Box
               mr={
-                location.pathname === "/login" || location.pathname === "/register"
-                  ? 2
-                  : undefined
+                location.pathname === '/login' || location.pathname === '/register' ? 2 : undefined
               }
             >
-              <Link as={RouterLink} to="/cart" _hover={{ textDecoration: "none" }} data-testid="cart-link">
+              <Link
+                as={RouterLink}
+                to="/cart"
+                _hover={{ textDecoration: 'none' }}
+                data-testid="cart-link"
+              >
                 <MUIBadge badgeContent={cartItemCount}>
                   <Icon
                     as={FaShoppingCart}
@@ -100,8 +94,8 @@ const Header = () => {
                     width={{ base: 25, smallTablet: 27, sm: 30 }}
                     color="ink.500"
                     cursor="pointer"
-                    _hover={{ color: "ink.600" }}
-                    _active={{ color: "ink.700" }}
+                    _hover={{ color: 'ink.600' }}
+                    _active={{ color: 'ink.700' }}
                   />
                 </MUIBadge>
               </Link>
@@ -127,10 +121,10 @@ const Header = () => {
           </Routes>
         </Flex>
       </Flex>
-      <SearchBar display={{ base: "block", sm: "none" }} />
+      <SearchBar display={{ base: 'block', sm: 'none' }} />
       <SidebarMobile isOpen={isOpen} onClose={onClose} hamburgerRef={hamburgerRef} />
     </Flex>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

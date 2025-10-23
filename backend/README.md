@@ -4,35 +4,21 @@ FastAPI backend for the e-commerce demo application.
 
 ## Development Setup
 
-### Container Testing (Recommended)
-Container testing provides guaranteed consistency across environments:
-
-```bash
-# Run tests in container (default approach)
-just test                 # Backend unit tests
-just test-cov            # Backend tests with coverage
-```
-
-### Local Testing (Faster Development)
-For faster iteration during development, you can run tests locally:
-
-```bash
-# Setup local environment
-./setup-dev.sh
-
-# Run tests locally
-just test-local          # Backend unit tests locally
-just test-cov-local      # Backend tests with coverage locally
-just test-local-single   # Run specific test file/function
-```
-
 ### Local Development Requirements
 - Python 3.13+
 - [uv](https://github.com/astral-sh/uv) package manager
 
-### Switching Between Approaches
-- **Container testing**: Use for CI/CD, onboarding new developers, or ensuring perfect reproducibility
-- **Local testing**: Use for faster feedback loops during active development
+### Running Tests
+
+```bash
+# Run all backend tests
+just test-local
+
+# Run specific test file/function
+just test-local-single tests/test_products.py::test_create_product
+```
+
+For Amp agents, use the `run_tests` tool with action "backend" instead of just commands.
 
 ## Architecture
 - FastAPI framework with async/await patterns

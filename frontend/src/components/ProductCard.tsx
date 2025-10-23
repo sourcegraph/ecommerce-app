@@ -9,25 +9,25 @@ import {
   Skeleton,
   Text,
   AspectRatio,
-} from "@chakra-ui/react";
-import { FaShoppingCart } from "react-icons/fa";
-import { Link as RouterLink } from "react-router-dom";
-import { useGlobalContext } from "../context/useGlobalContext";
-import MUIRating from "./MUI/MUIRating";
-import MotionBox from "./MotionBox";
-import { DeliveryOptionsSummary } from "./Delivery";
-import { useState } from "react";
-import { ProductType, getImageUrl } from "../context/GlobalState";
-import { BookmarkIcon } from "./Icons/BookmarkIcon";
+} from '@chakra-ui/react'
+import { FaShoppingCart } from 'react-icons/fa'
+import { Link as RouterLink } from 'react-router-dom'
+import { useGlobalContext } from '../context/useGlobalContext'
+import MUIRating from './MUI/MUIRating'
+import MotionBox from './MotionBox'
+import { DeliveryOptionsSummary } from './Delivery'
+import { useState } from 'react'
+import { ProductType, getImageUrl } from '../context/GlobalState'
+import { BookmarkIcon } from './Icons/BookmarkIcon'
 
 type Props = {
-  product: ProductType;
-  className?: string;
-};
+  product: ProductType
+  className?: string
+}
 
 const ProductCard = ({ product }: Props) => {
-  const { addToCart, toggleSaved } = useGlobalContext();
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const { addToCart, toggleSaved } = useGlobalContext()
+  const [imgLoaded, setImgLoaded] = useState(false)
 
   return (
     <MotionBox
@@ -42,7 +42,7 @@ const ProductCard = ({ product }: Props) => {
       shadow="cardHover"
       transition="box-shadow 200ms ease-in-out"
       whileHover={{
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
       }}
       sx={{
         '@media (prefers-reduced-motion: reduce)': {
@@ -78,21 +78,17 @@ const ProductCard = ({ product }: Props) => {
               size="sm"
               variant="ghost"
               onClick={(e) => {
-                e.preventDefault();
-                toggleSaved(product.id);
+                e.preventDefault()
+                toggleSaved(product.id)
               }}
               bg="sand.200"
-              _hover={{ bg: "sand.50" }}
+              _hover={{ bg: 'sand.50' }}
               data-testid="save-button"
               aria-pressed={product.isSaved}
-              aria-label={product.isSaved ? "Unsave" : "Save"}
+              aria-label={product.isSaved ? 'Unsave' : 'Save'}
               zIndex={1}
             >
-              <BookmarkIcon 
-                filled={product.isSaved} 
-                boxSize={4} 
-                color="ink.600" 
-              />
+              <BookmarkIcon filled={product.isSaved} boxSize={4} color="ink.600" />
             </Button>
           </Box>
         </AspectRatio>
@@ -105,7 +101,7 @@ const ProductCard = ({ product }: Props) => {
               color="ink.900"
               noOfLines={2}
               minH="48px"
-              _hover={{ color: "ink.600" }}
+              _hover={{ color: 'ink.600' }}
               data-testid="product-title"
             >
               {product.title}
@@ -140,19 +136,19 @@ const ProductCard = ({ product }: Props) => {
             size="md"
             mt={2}
             onClick={(e) => {
-              e.preventDefault();
-              addToCart(product);
+              e.preventDefault()
+              addToCart(product)
             }}
             isDisabled={product.inCart}
             leftIcon={<Icon as={FaShoppingCart} />}
             data-testid="add-to-cart"
           >
-            {product.inCart ? "Added" : "Add to Cart"}
+            {product.inCart ? 'Added' : 'Add to Cart'}
           </Button>
         </Flex>
       </LinkBox>
     </MotionBox>
-  );
-};
+  )
+}
 
-export default ProductCard;
+export default ProductCard

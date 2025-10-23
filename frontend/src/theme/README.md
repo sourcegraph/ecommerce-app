@@ -130,13 +130,13 @@ To add a new component theme:
 export const Accordion = {
   baseStyle: {
     container: {
-      borderColor: "border.subtle",
+      borderColor: 'border.subtle',
     },
   },
-};
+}
 
 // index.ts
-import { Accordion } from "./components/accordion";
+import { Accordion } from './components/accordion'
 
 export default extendTheme({
   // ...
@@ -144,7 +144,7 @@ export default extendTheme({
     Accordion,
     // ...
   },
-});
+})
 ```
 
 ## Modifying Colors

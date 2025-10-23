@@ -168,6 +168,9 @@ brew install node
 # Install gh CLI and authenticate
 brew install gh
 gh auth login
+
+# Install direnv for toolboxes to work
+brew install direnv
 ```
 
 ```bash
@@ -177,6 +180,7 @@ just --version
 python --version
 uv --version
 node --version
+direnv --version
 ```
 
 ```bash
@@ -247,7 +251,6 @@ just setup-e2e        # Install Playwright browsers
 ```bash
 # Backend tests
 just test-local                        # Backend tests
-just test-cov-local                    # Backend tests with coverage
 just test-local-single TEST            # Run single test
 
 # E2E tests (Playwright)
@@ -265,10 +268,13 @@ just test-all-local   # All tests (backend + E2E)
 ```bash
 # backend
 just check            # Run linting (ruff) and type checking (mypy)
-just format           # Format backend code
+
+# formatting
+just format           # Format backend (ruff) and frontend (prettier) code
 
 # frontend
 just lint             # Lint frontend TypeScript
+cd frontend && npm run format:check  # Check frontend formatting without changes
 ```
 
 #### Pre-Push Validation (Recommended)

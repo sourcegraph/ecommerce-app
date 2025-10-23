@@ -5,6 +5,15 @@
 **Stack:** Python 3.13+, FastAPI, SQLModel, SQLite, Alembic, pytest  
 **Architecture:** Feature-based structure with dependency injection via FastAPI Depends()
 
+## Essential Tools
+
+Amp provides custom tools in `.amp/tools/` for common development tasks. Always use these tools instead of just commands or Bash directly:
+
+**Run tests:** Use `run_tests` tool with action "backend" for backend tests  
+**Lint & check:** Use `lint_and_check` tool with target "backend"  
+**Format:** Use `format_code` tool with target "backend" for code formatting  
+**Run CI:** Use `run_ci` tool to run complete CI pipeline (format checks, linting, type checking, all tests, build)
+
 ## Essential Commands
 
 **Development:**

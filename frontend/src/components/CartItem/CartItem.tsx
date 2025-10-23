@@ -12,34 +12,34 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-} from "@chakra-ui/react";
-import { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import { ProductInCart, getImageUrl } from "../../context/GlobalState";
-import { useGlobalContext } from "../../context/useGlobalContext";
-import MotionBox from "../MotionBox";
+} from '@chakra-ui/react'
+import { useState } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
+import { ProductInCart, getImageUrl } from '../../context/GlobalState'
+import { useGlobalContext } from '../../context/useGlobalContext'
+import MotionBox from '../MotionBox'
 
 type Props = {
-  product: ProductInCart;
-};
+  product: ProductInCart
+}
 
 const formatUSD = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
 
 const CartItem = ({ product }: Props) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const { setQuantity, deleteFromCart, toggleSaved } = useGlobalContext();
-  const subTotal = +product.price * +product.quantity;
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const { setQuantity, deleteFromCart, toggleSaved } = useGlobalContext()
+  const subTotal = +product.price * +product.quantity
 
   const handleQuantityChange = (_: string, valueAsNumber: number) => {
     if (!isNaN(valueAsNumber) && valueAsNumber >= 1 && valueAsNumber <= 10) {
-      setQuantity(valueAsNumber.toString(), product.id);
+      setQuantity(valueAsNumber.toString(), product.id)
     }
-  };
+  }
 
   return (
     <MotionBox
-      display={{ base: "none", bigTablet: "flex" }}
+      display={{ base: 'none', bigTablet: 'flex' }}
       alignItems="flex-start"
       gap={6}
       opacity={0}
@@ -48,7 +48,7 @@ const CartItem = ({ product }: Props) => {
       exit={{ opacity: 0 }}
       transition={{
         duration: 0.3,
-        ease: "easeInOut",
+        ease: 'easeInOut',
       }}
       data-testid="cart-item"
     >
@@ -89,7 +89,7 @@ const CartItem = ({ product }: Props) => {
             color="ink.900"
             fontWeight="semibold"
             fontSize="md"
-            _hover={{ textDecoration: "underline" }}
+            _hover={{ textDecoration: 'underline' }}
             noOfLines={2}
           >
             {product.title}
@@ -101,19 +101,19 @@ const CartItem = ({ product }: Props) => {
               size="sm"
               color="charcoal.700"
               fontWeight="normal"
-              _hover={{ color: "ink.900", textDecoration: "underline" }}
+              _hover={{ color: 'ink.900', textDecoration: 'underline' }}
               onClick={() => {
-                toggleSaved(product.id);
+                toggleSaved(product.id)
               }}
             >
-              {product.isSaved ? "Unsave" : "Save for later"}
+              {product.isSaved ? 'Unsave' : 'Save for later'}
             </Button>
             <Button
               variant="link"
               size="sm"
               color="charcoal.700"
               fontWeight="normal"
-              _hover={{ color: "ink.900", textDecoration: "underline" }}
+              _hover={{ color: 'ink.900', textDecoration: 'underline' }}
               onClick={() => deleteFromCart(product.id)}
               data-testid="remove-item"
             >
@@ -138,24 +138,18 @@ const CartItem = ({ product }: Props) => {
           >
             <NumberInputField
               borderColor="sand.300"
-              _hover={{ borderColor: "sand.400" }}
+              _hover={{ borderColor: 'sand.400' }}
               _focus={{
-                borderColor: "slate.500",
-                boxShadow: "0 0 0 1px var(--chakra-colors-slate-500)",
+                borderColor: 'slate.500',
+                boxShadow: '0 0 0 1px var(--chakra-colors-slate-500)',
               }}
               textAlign="center"
               rounded="md"
               data-testid="quantity-display"
             />
             <NumberInputStepper>
-              <NumberIncrementStepper
-                borderColor="sand.300"
-                _hover={{ bg: "sand.100" }}
-              />
-              <NumberDecrementStepper
-                borderColor="sand.300"
-                _hover={{ bg: "sand.100" }}
-              />
+              <NumberIncrementStepper borderColor="sand.300" _hover={{ bg: 'sand.100' }} />
+              <NumberDecrementStepper borderColor="sand.300" _hover={{ bg: 'sand.100' }} />
             </NumberInputStepper>
           </NumberInput>
 
@@ -165,7 +159,7 @@ const CartItem = ({ product }: Props) => {
         </VStack>
       </HStack>
     </MotionBox>
-  );
-};
+  )
+}
 
-export default CartItem;
+export default CartItem

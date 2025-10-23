@@ -1,36 +1,52 @@
 # Frontend Agent Guide - Linea Supply
 
 ## Overview
+
 **Brand:** Linea Supply - Premium minimal e-commerce with monochrome design  
 **Purpose:** React TypeScript frontend for e-commerce demo with strict TDD practices  
 **Stack:** React 18, TypeScript, Vite, Chakra UI, Playwright  
 **Design System:** Modular theme with semantic tokens (sand/ink/charcoal colors, Inter font)  
 **Architecture:** Component-based with Context API for state management
 
+## Essential Tools
+
+Amp provides custom tools in `.amp/tools/` for common development tasks. Always use these tools instead of just commands or Bash directly:
+
+**Run tests:** Use `run_tests` tool with action "e2e" for frontend E2E tests  
+**Lint & check:** Use `lint_and_check` tool with target "frontend"  
+**Format:** Use `format_code` tool with target "frontend" for code formatting  
+**Build:** Use `build_app` tool to verify production builds  
+**Run CI:** Use `run_ci` tool to run complete CI pipeline (format checks, linting, type checking, all tests, build)
+
 ## Essential Commands
 
 **Development:**
+
 - `npm run dev` - Start development server (localhost:3001)
 - `npm install` - Install dependencies
 - `npm run preview` - Preview production build
 
 **Testing:**
+
 - `npx playwright test` - Run E2E tests
 - `npx playwright test --ui` - Run E2E tests with UI mode
 
 **Quality Checks:**
+
 - `npm run lint` - ESLint checking
 - `npm run lint:fix` - Fix linting issues
-- `npm run type-check` - TypeScript type checking
-- `npm run build` - Production build
+- `npm run build` - Production build (includes TypeScript type checking)
+- `npx tsc --noEmit` - TypeScript type checking only
 
 **Playwright:**
+
 - `npx playwright install` - Install browser dependencies
 - `npx playwright codegen localhost:3001` - Generate test code
 
 ## TypeScript Standards
 
 ### Strict Configuration Required
+
 ```json
 {
   "compilerOptions": {
@@ -46,6 +62,7 @@
 ```
 
 ### Type Definitions
+
 ```typescript
 // Domain Types
 export interface Product {
@@ -88,6 +105,7 @@ export interface ApiError {
 ## E2E Testing with Playwright
 
 ### Page Object Pattern
+
 ```typescript
 // pages/ProductPage.ts
 import { Page, expect } from '@playwright/test'
@@ -105,20 +123,17 @@ export class ProductPage {
   }
 
   async expectProductVisible(productName: string) {
-    await expect(
-      this.page.locator(`[data-testid="product-${productName}"]`)
-    ).toBeVisible()
+    await expect(this.page.locator(`[data-testid="product-${productName}"]`)).toBeVisible()
   }
 
   async expectCartItemCount(count: number) {
-    await expect(
-      this.page.locator('[data-testid="cart-count"]')
-    ).toHaveText(count.toString())
+    await expect(this.page.locator('[data-testid="cart-count"]')).toHaveText(count.toString())
   }
 }
 ```
 
 ### E2E Test Example
+
 ```typescript
 // e2e/shopping.spec.ts
 import { test } from '@playwright/test'
@@ -126,10 +141,10 @@ import { ProductPage } from '../pages/ProductPage'
 
 test('user can add products to cart', async ({ page }) => {
   const productPage = new ProductPage(page)
-  
+
   await productPage.goto()
   await productPage.expectProductVisible('Gaming Laptop')
-  
+
   await productPage.addProductToCart('Gaming Laptop')
   await productPage.expectCartItemCount(1)
 })

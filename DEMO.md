@@ -33,6 +33,7 @@ Demo blocks are organized by estimated demo time, ranging from 5 to 30 minutes p
 - [15 Minute Demos](#15-minute-demos)
   - [New Feature Implementation](#new-feature-implementation)
   - [Sourcegraph MCP](#sourcegraph-mcp)
+  - [Toolboxes](#toolboxes)
 - [30 Minute Demos](#30-minute-demos)
   - [Complex Multi-Currency Feature with Subagents](#complex-multi-currency-feature-with-subagents)
   - [Error Handling Modernization](#error-handling-modernization)
@@ -359,6 +360,25 @@ Once found, do not code but come up with a plan to remediate the issues.
 ```
 
 **[Thread](https://ampcode.com/threads/T-70ef55e4-d390-42b5-b611-ff2d298e5272)**
+
+---
+
+### Toolboxes
+
+Toolboxes allow you to extend Amp with simple scripts instead of needing to provide an MCP server. This is an effective way for developers to write deterministic scripts which Amp can then choose to run.
+
+These are frequently used for running tests, builds and other frequently invoked commands where a developer has specific commands and flags they want run each time. Instead of relying on the LLM to get it right each time (even if its in AGENTS.md it sometimes gets confused and runs other commands), developers can setup their own tools in the toolbox.
+
+A tool needs to have a description and a script to execute. Amp uses these descriptions to decide when to invoke the tool, making it very important to get the description right. This is a pretty technical area, there is more information in the [Amp Manual here](https://ampcode.com/manual#toolboxes).
+
+This demo repo has 5 tools setup in `.amp/tools`:
+- `build_app`: type checks Typescript & builds frontend bundle with Vite
+- `lint_and_check`: lints the frontend and runs ruff + mypy checks on the backend
+- `format_code`: auto formats code using ruff for the backend and Prettier for frontend
+- `run_ci`: runs all the same checks that run in CI locally including formatting checks, tests, linting, build, and e2e tests
+- `run_tests`: runs individual or all e2e or backend tests
+
+You can show the source code of one or more of the Toolboxes and how Amp can be used to scaffold these in the first place. Running through most bug fix/feature building demos on this page will show the various tools being invoked automatically.
 
 ---
 
