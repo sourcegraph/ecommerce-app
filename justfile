@@ -48,16 +48,16 @@ dev-headless: _ensure-logs-dir
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
     # backend
-    ( cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/backend.pid )
+    cd backend && nohup uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
     # frontend
-    ( cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/frontend.pid )
+    cd frontend && nohup npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 &
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    @if [ -f {{LOG_DIR}}/backend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/backend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/backend.pid; else PIDS="$$(lsof -ti:8001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
-    @if [ -f {{LOG_DIR}}/frontend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/frontend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/frontend.pid; else PIDS="$$(lsof -ti:3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
+    @PIDS="$$(lsof -ti:8001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi
+    @PIDS="$$(lsof -ti:3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi
     @sleep 3
     @PIDS="$$(lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -KILL $$PIDS 2>/dev/null || true; fi
     @sleep 1
