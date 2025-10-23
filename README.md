@@ -251,7 +251,6 @@ just setup-e2e        # Install Playwright browsers
 ```bash
 # Backend tests
 just test-local                        # Backend tests
-just test-cov-local                    # Backend tests with coverage
 just test-local-single TEST            # Run single test
 
 # E2E tests (Playwright)

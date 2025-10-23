@@ -93,10 +93,6 @@ seed:
 test-local:
     cd backend && uv run --active pytest
 
-# Run backend tests with coverage locally
-test-cov-local:
-    cd backend && uv run --active pytest --cov=app --cov-report=html --cov-report=term
-
 # Run single test locally
 test-local-single TEST:
     cd backend && uv run --active pytest {{TEST}}
@@ -123,8 +119,10 @@ test-all-local:
 # Run CI checks locally (mirrors CI pipeline)
 ci:
     @echo "Running full CI pipeline locally..."
+    cd backend && uv run --active ruff format --check .
     @just check
-    @just test-cov-local
+    @just test-local
+    cd frontend && npx prettier --check .
     cd frontend && npm run lint
     @just build
     @just test-e2e

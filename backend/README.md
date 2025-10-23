@@ -22,7 +22,6 @@ For faster iteration during development, you can run tests locally:
 
 # Run tests locally
 just test-local          # Backend unit tests locally
-just test-cov-local      # Backend tests with coverage locally
 just test-local-single   # Run specific test file/function
 ```
 
