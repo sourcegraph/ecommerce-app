@@ -224,7 +224,6 @@
             "action": "ask",
             "matches": {
               "cmd": [
-                "*find*-exec*",
                 "*find*-delete*"
               ]
             }
