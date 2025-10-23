@@ -36,9 +36,9 @@ function showDescription() {
  // they are carefully crafted for a specific purpose.
  process.stdout.write(
   JSON.stringify({
-   name: "lint_and_check",
-   description: 'Use this tool (NEVER use Bash or just commands directly) to run code quality checks and linting. This handles both backend (Python with ruff/mypy) and frontend (TypeScript/React with ESLint). Always use this tool before committing code or after making changes to ensure code quality. This is read-only and does not modify files.',
-   args: { target: ['string', 'The target to check: "backend" (ruff check + mypy), "frontend" (ESLint), or "both" (backend + frontend)'] },
+   name: "format_code",
+   description: 'Use this tool (NEVER use Bash or just commands directly) to format code. This modifies files in place using ruff format for backend Python code and Prettier for frontend TypeScript/React code. Use this when you need to auto-format code to match project style guidelines.',
+   args: { target: ['string', 'The target to format: "backend" (ruff format), "frontend" (Prettier), or "both" (backend + frontend)'] },
   }),
  )
 }
@@ -59,68 +59,56 @@ function execute() {
  // output goes directly to the model
  switch (target) {
   case "backend": {
-   console.log("→ Running backend checks (ruff + mypy)...")
+   console.log("→ Formatting backend code (ruff format)...")
    
-   // Run ruff check
-   const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+   const format = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
     cwd: 'backend',
     stdio: 'inherit',
    })
    
-   // Run mypy
-   const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
-   
-   if (ruffCheck.status !== 0 || mypy.status !== 0) {
-    process.exit(ruffCheck.status || mypy.status || 1)
+   if (format.status !== 0) {
+    process.exit(format.status || 1)
    }
-   console.log("✓ Backend checks passed")
+   console.log("✓ Backend code formatted")
    break
   }
 
   case "frontend": {
-   console.log("→ Running frontend lint (ESLint)...")
+   console.log("→ Formatting frontend code (Prettier)...")
    
-   const lint = spawnSync('npm', ['run', 'lint'], {
+   const format = spawnSync('npm', ['run', 'format'], {
     cwd: 'frontend',
     stdio: 'inherit',
    })
    
-   if (lint.status !== 0) {
-    process.exit(lint.status || 1)
+   if (format.status !== 0) {
+    process.exit(format.status || 1)
    }
-   console.log("✓ Frontend lint passed")
+   console.log("✓ Frontend code formatted")
    break
   }
 
   case "both": {
-   console.log("→ Running all checks (backend + frontend)...")
+   console.log("→ Formatting all code (backend + frontend)...")
    
-   // Backend checks
-   console.log("\n=== Backend (ruff + mypy) ===")
-   const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+   // Backend
+   console.log("\n=== Backend (ruff format) ===")
+   const backendFormat = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
     cwd: 'backend',
     stdio: 'inherit',
    })
    
-   const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
-   
-   // Frontend checks
-   console.log("\n=== Frontend (ESLint) ===")
-   const lint = spawnSync('npm', ['run', 'lint'], {
+   // Frontend
+   console.log("\n=== Frontend (Prettier) ===")
+   const frontendFormat = spawnSync('npm', ['run', 'format'], {
     cwd: 'frontend',
     stdio: 'inherit',
    })
    
-   if (ruffCheck.status !== 0 || mypy.status !== 0 || lint.status !== 0) {
-    process.exit(ruffCheck.status || mypy.status || lint.status || 1)
+   if (backendFormat.status !== 0 || frontendFormat.status !== 0) {
+    process.exit(backendFormat.status || frontendFormat.status || 1)
    }
-   console.log("\n✓ All checks passed")
+   console.log("\n✓ All code formatted")
    break
   }
 

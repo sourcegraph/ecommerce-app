@@ -8,6 +8,15 @@
 **Design System:** Modular theme with semantic tokens (sand/ink/charcoal colors, Inter font)  
 **Architecture:** Component-based with Context API for state management
 
+## Essential Tools
+
+Amp provides custom tools in `.amp/tools/` for common development tasks. Always use these tools instead of just commands or Bash directly:
+
+**Run tests:** Use `run_tests` tool with action "e2e" for frontend E2E tests  
+**Lint & check:** Use `lint_and_check` tool with target "frontend"  
+**Format:** Use `format_code` tool with target "frontend" for code formatting  
+**Build:** Use `build_app` tool to verify production builds
+
 ## Essential Commands
 
 **Development:**

@@ -11,12 +11,13 @@
 
 ## Essential Tools
 
-Amp provides custom tools for common development tasks. Always use these instead of just commands or Bash:
+Amp provides custom tools in `.amp/tools/` for common development tasks. Always use these tools instead of just commands or Bash directly:
 
 **Pass CI:** Use `run_ci` tool (runs lint, tests, build, e2e)  
 **Run tests:** Use `run_tests` tool with action "all" (backend + e2e tests)  
 **Lint & check:** Use `lint_and_check` tool for backend/frontend  
-**Build:** Use `build_app` tool for production builds
+**Build:** Use `build_app` tool for production builds  
+**Format:** Use `format_code` tool for backend/frontend code formatting
 
 ## Development Commands
 
@@ -37,7 +38,7 @@ Amp provides custom tools for common development tasks. Always use these instead
 
 - Use `lint_and_check` tool with target: "backend", "frontend", or "both"
 - Use `build_app` tool to verify TypeScript compilation
-- `just format` - Format backend (ruff) and frontend (prettier) code
+- Use `format_code` tool with target: "backend", "frontend", or "both" to format code
 
 **Error Handling:**
 
@@ -210,7 +211,7 @@ def process_payment(payment_data: dict) -> Result:
 
 ### Pre-commit Checklist
 
-1. Run `just format` to format all code changes
+1. Format all code changes (use `format_code` tool with target "both")
 2. All tests pass (use `run_tests` tool with action "all")
 3. Code follows TDD process (tests written first)
 4. Linting passes (use `lint_and_check` tool with target "both")

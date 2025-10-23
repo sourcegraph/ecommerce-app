@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 import fs from "node:fs"
-import path from "node:path"
-import { execSync } from "node:child_process"
+import { spawnSync } from "node:child_process"
 
 /**
  * This program implements the Amp Toolbox protocol to provide
@@ -22,166 +21,100 @@ const action = process.env.TOOLBOX_ACTION
 if (action === 'describe') showDescription()
 else if (action === 'execute') execute()
 
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
 function showDescription() {
-  process.stdout.write(
-    JSON.stringify({
-      name: "run_ci",
-      description: 'Run the complete CI pipeline locally to verify all checks pass before pushing. Runs checks, tests with coverage, linting, build, and e2e tests in sequence. Use this tool for comprehensive pre-commit validation or to simulate what CI will run. Always prefer this tool over running CI commands directly via Bash.',
-      args: { 
-        stopOnError: ['string', 'Whether to stop at first failure. Options: "true" (default, stops at first failure), "false" (continues and reports all failures at end)'],
-        help: ['string', 'Set to any value to show available options']
-      },
-    }),
-  )
-}
-
-function findRoot(start) {
-  let dir = start
-  while (true) {
-    if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
-      return dir
-    }
-    const parent = path.dirname(dir)
-    if (parent === dir) return null
-    dir = parent
-  }
-}
-
-function resolveWorkspaceRoot() {
-  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
-    return process.env.WORKSPACE_ROOT
-  }
-  const fromCwd = findRoot(process.cwd())
-  if (fromCwd) return fromCwd
-  
-  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
-  const fromScript = findRoot(scriptDir)
-  if (fromScript) return fromScript
-  
-  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
-}
-
-function runJust(recipe) {
-  const root = resolveWorkspaceRoot()
-  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
-  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
-  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "run_ci",
+   description: 'Use this tool (NEVER use Bash or just commands directly) to run the complete CI pipeline before pushing code. This runs format checks, linting, type checking, all tests (backend + E2E), and builds to ensure code quality. Always use this tool to verify all CI checks pass, never run the individual commands manually.',
+   args: {},
+  }),
+ )
 }
 
 function execute() {
-  const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
-  const stopOnError = params['stopOnError'] !== 'false'
-  const showHelp = params['help']
+ console.log('→ Running full CI pipeline locally...\n')
 
-  if (showHelp) {
-    console.log(`
-CI Pipeline Tool
+ // 1. Backend format check
+ console.log('→ Checking backend formatting...')
+ let result = spawnSync('uv', ['run', '--active', 'ruff', 'format', '--check', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-This tool runs the complete CI pipeline locally, matching the steps in justfile:
-  1. Backend checks (ruff + mypy)
-  2. Backend tests
-  3. Frontend lint
-  4. Frontend build
-  5. E2E tests
+ // 2. Backend linting and type checking
+ console.log('→ Checking backend code quality...')
+ result = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-Parameters:
-  stopOnError: "true" (default) - stops at first failure
-               "false" - runs all steps and reports all failures
+ result = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-Examples:
-  {"stopOnError": "true"}   - Stop at first failure (default behavior)
-  {"stopOnError": "false"}  - Run all steps, collect all failures
-    `.trim())
-    return
-  }
+ // 3. Backend tests
+ console.log('→ Running backend tests...')
+ result = spawnSync('uv', ['run', '--active', 'pytest'], {
+  cwd: 'backend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-  const steps = [
-    { name: "Backend checks (ruff + mypy)", command: "just check" },
-    { name: "Backend tests", command: "just test-local" },
-    { name: "Frontend lint", command: "just lint" },
-    { name: "Frontend build", command: "just build" },
-    { name: "E2E tests", command: "just test-e2e" }
-  ]
+ // 4. Frontend format check
+ console.log('→ Checking frontend formatting...')
+ result = spawnSync('npx', ['prettier', '--check', '.'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-  const results = []
-  const startTime = Date.now()
+ // 5. Frontend linting
+ console.log('→ Running frontend lint...')
+ result = spawnSync('npm', ['run', 'lint'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-  console.log("Starting CI pipeline...\n")
-  console.log(`Mode: ${stopOnError ? "Stop on first error" : "Run all steps"}\n`)
+ // 6. Frontend type checking
+ console.log('→ Checking frontend types...')
+ result = spawnSync('npx', ['tsc', '--noEmit'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-  for (let i = 0; i < steps.length; i++) {
-    const step = steps[i]
-    const stepNum = i + 1
-    const stepStartTime = Date.now()
-    
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    console.log(`Step ${stepNum}/${steps.length}: ${step.name}`)
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-    console.log(`Running: ${step.command}\n`)
+ // 7. Frontend build
+ console.log('→ Building frontend...')
+ result = spawnSync('npm', ['run', 'build'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-    try {
-      const recipe = step.command.replace('just ', '')
-      const output = runJust(recipe)
-      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2)
-      console.log(output)
-      console.log(`\n✅ Step ${stepNum}/${steps.length} passed (${elapsed}s)\n`)
-      results.push({ step: stepNum, name: step.name, status: 'passed', elapsed })
-    } catch (error) {
-      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2)
-      const errorOutput = error.stdout || error.stderr || error.message
-      console.error(`\n❌ Step ${stepNum}/${steps.length} failed (${elapsed}s)`)
-      console.error(errorOutput)
-      console.error("")
-      
-      results.push({ step: stepNum, name: step.name, status: 'failed', elapsed, error: errorOutput })
-      
-      if (stopOnError) {
-        console.error(`\n⛔ Stopping at first failure (step ${stepNum}/${steps.length})\n`)
-        printSummary(results, startTime, false)
-        process.exit(1)
-      }
-    }
-  }
+ // 8. E2E tests
+ console.log('→ Running E2E tests...')
+ result = spawnSync('npx', ['playwright', 'test'], {
+  cwd: 'frontend',
+  stdio: 'inherit'
+ })
+ if (result.status !== 0) process.exit(result.status || 1)
 
-  const allPassed = results.every(r => r.status === 'passed')
-  printSummary(results, startTime, true)
-  
-  if (!allPassed) {
-    process.exit(1)
-  }
-}
-
-function printSummary(results, startTime, showAll) {
-  const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(2)
-  
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-  console.log(`CI PIPELINE SUMMARY`)
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`)
-
-  const passed = results.filter(r => r.status === 'passed').length
-  const failed = results.filter(r => r.status === 'failed').length
-  const total = showAll ? results.length : results.length + (5 - results.length)
-
-  for (const result of results) {
-    const icon = result.status === 'passed' ? '✅' : '❌'
-    console.log(`${icon} Step ${result.step}: ${result.name} (${result.elapsed}s)`)
-  }
-
-  if (!showAll) {
-    const remaining = 5 - results.length
-    for (let i = 0; i < remaining; i++) {
-      console.log(`⏭️  Step ${results.length + i + 1}: (skipped)`)
-    }
-  }
-
-  console.log(`\n${'─'.repeat(50)}`)
-  console.log(`Passed: ${passed}/${total}  Failed: ${failed}/${total}`)
-  console.log(`Total time: ${totalElapsed}s`)
-  console.log(`${'─'.repeat(50)}`)
-
-  if (failed > 0) {
-    console.log(`\n❌ CI pipeline failed with ${failed} error(s)`)
-  } else {
-    console.log(`\n✅ CI pipeline passed! Ready to commit.`)
-  }
+ console.log('\n✓ All CI checks passed!')
 }
