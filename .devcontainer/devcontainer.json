@@ -84,7 +84,8 @@
     "VIRTUAL_ENV": "/opt/venvs/backend",
     "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
-    "AMP_TOOLBOX": "/workspaces/app/.amp/tools:/root/.config/amp/tools"
+    "AMP_TOOLBOX": "/workspaces/app/.amp/tools:/root/.config/amp/tools",
+    "GIT_PAGER": "cat"
   },
   
   // ─────────────────────────────────────────────────────────────────
