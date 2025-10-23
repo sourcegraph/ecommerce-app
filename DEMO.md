@@ -38,7 +38,6 @@ Demo blocks are organized by estimated demo time, ranging from 5 to 30 minutes p
   - [Complex Multi-Currency Feature with Subagents](#complex-multi-currency-feature-with-subagents)
   - [Error Handling Modernization](#error-handling-modernization)
 
-
 ## Prerequisites
 
 Follow the [README Quick Start Guide](README.md#quick-start) (we recommend you follow option 1, using dev containers)
@@ -127,7 +126,6 @@ Show how easy a developer can manage multiple threads in VS Code. Make sure you 
 Most of the "general commands" shown in the screenshot in red are used to create and move between threads.
 
 The "custom / commands" shown in the screenshot in blue are the custom commands saved within this project under `.agents/commands/`, you can also put them in a user directory for use across projects in `~/.config/amp/commands/`. More information in the [Custom slash commands demo block](#custom-slash-commands).
-
 
 #### CLI thread management
 
@@ -371,14 +369,7 @@ These are frequently used for running tests, builds and other frequently invoked
 
 A tool needs to have a description and a script to execute. Amp uses these descriptions to decide when to invoke the tool, making it very important to get the description right. This is a pretty technical area, there is more information in the [Amp Manual here](https://ampcode.com/manual#toolboxes).
 
-This demo repo has 5 tools setup in `.amp/tools`:
-- `build_app`: type checks Typescript & builds frontend bundle with Vite
-- `lint_and_check`: lints the frontend and runs ruff + mypy checks on the backend
-- `format_code`: auto formats code using ruff for the backend and Prettier for frontend
-- `run_ci`: runs all the same checks that run in CI locally including formatting checks, tests, linting, build, and e2e tests
-- `run_tests`: runs individual or all e2e or backend tests
-
-You can show the source code of one or more of the Toolboxes and how Amp can be used to scaffold these in the first place. Running through most bug fix/feature building demos on this page will show the various tools being invoked automatically.
+There are not any toolboxes in this repo yet but you can show the process of creating them by viewing this [news post](https://ampcode.com/news/more-tools-for-the-agent).
 
 ---
 
