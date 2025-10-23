@@ -56,8 +56,11 @@ dev-headless: _ensure-logs-dir
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    @pkill -f "uvicorn.*--port 8001" || echo "Backend was not running"
-    @pkill -f "vite.*--port 3001" || echo "Frontend was not running"
+    @pkill -9 -f "uvicorn.*--port 8001" || echo "Backend was not running"
+    @pkill -9 -f "vite.*--port 3001" || echo "Frontend was not running"
+    @pkill -9 -f "node.*vite.*--port 3001" || true
+    @pkill -9 -f "sh -c vite.*--port 3001" || true
+    @sleep 2
     @echo "Services stopped."
 
 # Independent servers (sometimes handy)
@@ -100,6 +103,8 @@ test-local-single TEST:
 # Run E2E tests natively (headless - default)
 test-e2e:
     @echo "Running E2E tests natively (headless)..."
+    @just stop
+    @sleep 2
     cd frontend && npx playwright test
 
 # Run E2E tests natively (headed mode for debugging)
