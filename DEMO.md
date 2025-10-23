@@ -371,10 +371,11 @@ These are frequently used for running tests, builds and other frequently invoked
 
 A tool needs to have a description and a script to execute. Amp uses these descriptions to decide when to invoke the tool, making it very important to get the description right. This is a pretty technical area, there is more information in the [Amp Manual here](https://ampcode.com/manual#toolboxes).
 
-This demo repo has 4 tools setup in `.amp/tools`:
+This demo repo has 5 tools setup in `.amp/tools`:
 - `build_app`: type checks Typescript & builds frontend bundle with Vite
 - `lint_and_check`: lints the frontend and runs ruff + mypy checks on the backend
-- `run_ci`: runs all the same checks that run in CI locally including tests, linting, build, and e2e tests
+- `format_code`: auto formats code using ruff for the backend and Prettier for frontend
+- `run_ci`: runs all the same checks that run in CI locally including formatting checks, tests, linting, build, and e2e tests
 - `run_tests`: runs individual or all e2e or backend tests
 
 You can show the source code of one or more of the Toolboxes and how Amp can be used to scaffold these in the first place. Running through most bug fix/feature building demos on this page will show the various tools being invoked automatically.
