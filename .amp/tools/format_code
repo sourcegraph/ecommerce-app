@@ -89,28 +89,35 @@ function execute() {
   }
 
   case "both": {
-   console.log("→ Formatting all code (backend + frontend)...")
-   
-   // Backend
-   console.log("\n=== Backend (ruff format) ===")
-   const backendFormat = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
-   
-   // Frontend
-   console.log("\n=== Frontend (Prettier) ===")
-   const frontendFormat = spawnSync('npm', ['run', 'format'], {
-    cwd: 'frontend',
-    stdio: 'inherit',
-   })
-   
-   if (backendFormat.status !== 0 || frontendFormat.status !== 0) {
-    process.exit(backendFormat.status || frontendFormat.status || 1)
+  console.log("→ Formatting all code (backend + frontend)...")
+  
+  // Backend
+  console.log("\n=== Backend (ruff format) ===")
+  const backendFormat = spawnSync('uv', ['run', '--active', 'ruff', 'format', '.'], {
+  cwd: 'backend',
+  stdio: 'inherit',
+  })
+  
+  // Frontend
+  console.log("\n=== Frontend (Prettier) ===")
+  const frontendFormat = spawnSync('npm', ['run', 'format'], {
+  cwd: 'frontend',
+  stdio: 'inherit',
+  })
+  
+  const backendFailed = backendFormat.status !== 0
+  const frontendFailed = frontendFormat.status !== 0
+  
+  if (backendFailed || frontendFailed) {
+   const failures = []
+    if (backendFailed) failures.push(`backend (exit ${backendFormat.status})`)
+     if (frontendFailed) failures.push(`frontend (exit ${frontendFormat.status})`)
+     console.error(`\n✗ Formatting failed: ${failures.join(', ')}`)
+     process.exit(1)
+    }
+    console.log("\n✓ All code formatted")
+    break
    }
-   console.log("\n✓ All code formatted")
-   break
-  }
 
   default:
    process.stderr.write(`Unknown target: ${target}. Use "backend", "frontend", or "both"\n`)

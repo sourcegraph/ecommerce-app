@@ -96,33 +96,39 @@ function execute() {
   }
 
   case "both": {
-   console.log("→ Running all checks (backend + frontend)...")
-   
-   // Backend checks
-   console.log("\n=== Backend (ruff + mypy) ===")
-   const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
-   
-   const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
-    cwd: 'backend',
-    stdio: 'inherit',
-   })
-   
-   // Frontend checks
-   console.log("\n=== Frontend (ESLint) ===")
-   const lint = spawnSync('npm', ['run', 'lint'], {
-    cwd: 'frontend',
-    stdio: 'inherit',
-   })
-   
-   if (ruffCheck.status !== 0 || mypy.status !== 0 || lint.status !== 0) {
-    process.exit(ruffCheck.status || mypy.status || lint.status || 1)
+  console.log("→ Running all checks (backend + frontend)...")
+  
+  const failures = []
+  
+  // Backend checks
+  console.log("\n=== Backend (ruff + mypy) ===")
+  const ruffCheck = spawnSync('uv', ['run', '--active', 'ruff', 'check', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
+  })
+  if (ruffCheck.status !== 0) failures.push('ruff check')
+  
+  const mypy = spawnSync('uv', ['run', '--active', 'mypy', '.'], {
+   cwd: 'backend',
+   stdio: 'inherit',
+  })
+  if (mypy.status !== 0) failures.push('mypy')
+  
+  // Frontend checks
+  console.log("\n=== Frontend (ESLint) ===")
+  const lint = spawnSync('npm', ['run', 'lint'], {
+   cwd: 'frontend',
+  stdio: 'inherit',
+  })
+  if (lint.status !== 0) failures.push('ESLint')
+  
+   if (failures.length > 0) {
+     console.error(`\n✗ Failed checks: ${failures.join(', ')}`)
+     process.exit(1)
+    }
+    console.log("\n✓ All checks passed")
+    break
    }
-   console.log("\n✓ All checks passed")
-   break
-  }
 
   default:
    process.stderr.write(`Unknown target: ${target}. Use "backend", "frontend", or "both"\n`)
