@@ -50,12 +50,12 @@ dev-headless: _ensure-logs-dir
     # backend (use setsid for process group to handle reload spawned processes)
     ( cd backend; \
       setsid sh -c 'exec uv run --active uvicorn app.main:app --reload --reload-exclude .venv/* --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1' & \
-      pid=$$!; sleep 0.1; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
+      pid=$$!; sleep 0.5; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
       echo "$$pid" > ../{{LOG_DIR}}/backend.pid; echo "$$pgid" > ../{{LOG_DIR}}/backend.pgid )
     # frontend
     ( cd frontend; \
       setsid sh -c 'exec npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1' & \
-      pid=$$!; sleep 0.1; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
+      pid=$$!; sleep 0.5; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
       echo "$$pid" > ../{{LOG_DIR}}/frontend.pid; echo "$$pgid" > ../{{LOG_DIR}}/frontend.pgid )
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
@@ -67,9 +67,9 @@ stop:
     -@test -f {{LOG_DIR}}/backend.pid && kill -TERM `cat {{LOG_DIR}}/backend.pid` 2>/dev/null || true
     -@test -f {{LOG_DIR}}/frontend.pid && kill -TERM `cat {{LOG_DIR}}/frontend.pid` 2>/dev/null || true
     @sleep 2
-    -@lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -TERM 2>/dev/null || true
+    -@lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -TERM 2>/dev/null || true
     @sleep 2
-    -@lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -KILL 2>/dev/null || true
+    -@lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null | grep . | xargs kill -KILL 2>/dev/null || true
     @rm -f {{LOG_DIR}}/backend.pid {{LOG_DIR}}/backend.pgid {{LOG_DIR}}/frontend.pid {{LOG_DIR}}/frontend.pgid
     @echo "Services stopped."
 
