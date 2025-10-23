@@ -48,19 +48,19 @@ dev-headless: _ensure-logs-dir
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
     # backend
-    cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 &
+    ( cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/backend.pid )
     # frontend
-    cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 &
+    ( cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/frontend.pid )
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    @pkill -9 -f "uvicorn.*--port 8001" || echo "Backend was not running"
-    @pkill -9 -f "vite.*--port 3001" || echo "Frontend was not running"
-    @pkill -9 -f "node.*vite.*--port 3001" || true
-    @pkill -9 -f "sh -c vite.*--port 3001" || true
-    @sleep 2
+    @if [ -f {{LOG_DIR}}/backend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/backend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/backend.pid; else PIDS="$$(lsof -ti:8001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
+    @if [ -f {{LOG_DIR}}/frontend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/frontend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/frontend.pid; else PIDS="$$(lsof -ti:3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
+    @sleep 3
+    @PIDS="$$(lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -KILL $$PIDS 2>/dev/null || true; fi
+    @sleep 1
     @echo "Services stopped."
 
 # Independent servers (sometimes handy)
@@ -104,7 +104,7 @@ test-local-single TEST:
 test-e2e:
     @echo "Running E2E tests natively (headless)..."
     @just stop
-    @sleep 2
+    @sleep 3
     cd frontend && npx playwright test
 
 # Run E2E tests natively (headed mode for debugging)
@@ -124,18 +124,13 @@ test-all-local:
 # Run CI checks locally (mirrors CI pipeline)
 ci:
     @echo "Running full CI pipeline locally..."
-    @just stop
-    @sleep 2
     cd backend && uv run --active ruff format --check .
     @just check
     @just test-local
     cd frontend && npx prettier --check .
     cd frontend && npm run lint
     @just build
-    @just dev-headless
-    @sleep 5
     @just test-e2e
-    @just stop
     @echo "All CI checks passed!"
 
 
