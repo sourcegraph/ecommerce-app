@@ -47,20 +47,43 @@ dev-headless: _ensure-logs-dir
     # truncate old logs so each run starts fresh
     > {{LOG_DIR}}/backend.log
     > {{LOG_DIR}}/frontend.log
-    # backend
-    ( cd backend && uv run --active uvicorn app.main:app --reload --reload-exclude '.venv/*' --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/backend.pid )
+    # backend (use setsid for process group to handle reload spawned processes)
+    ( cd backend; \
+      setsid sh -c 'exec uv run --active uvicorn app.main:app --reload --reload-exclude .venv/* --host 0.0.0.0 --port 8001 >> ../{{LOG_DIR}}/backend.log 2>&1' & \
+      pid=$$!; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
+      echo "$$pid" > ../{{LOG_DIR}}/backend.pid; echo "$$pgid" > ../{{LOG_DIR}}/backend.pgid )
     # frontend
-    ( cd frontend && npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1 & echo $$! > ../{{LOG_DIR}}/frontend.pid )
+    ( cd frontend; \
+      setsid sh -c 'exec npm run dev -- --host 0.0.0.0 --port 3001 >> ../{{LOG_DIR}}/frontend.log 2>&1' & \
+      pid=$$!; pgid=$$(ps -o pgid= -p "$$pid" | tr -d " "); \
+      echo "$$pid" > ../{{LOG_DIR}}/frontend.pid; echo "$$pgid" > ../{{LOG_DIR}}/frontend.pgid )
     @echo "Services started in background. Use 'just logs' to inspect and 'just stop' to stop."
 
 # Stop headless dev servers
 stop:
     @echo "Stopping headless dev servers..."
-    @if [ -f {{LOG_DIR}}/backend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/backend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/backend.pid; else PIDS="$$(lsof -ti:8001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
-    @if [ -f {{LOG_DIR}}/frontend.pid ]; then kill -TERM "$$(cat {{LOG_DIR}}/frontend.pid)" 2>/dev/null || true; rm -f {{LOG_DIR}}/frontend.pid; else PIDS="$$(lsof -ti:3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -TERM $$PIDS 2>/dev/null || true; fi; fi
-    @sleep 3
-    @PIDS="$$(lsof -ti:8001,3001 -sTCP:LISTEN 2>/dev/null || true)"; if [ -n "$$PIDS" ]; then kill -KILL $$PIDS 2>/dev/null || true; fi
-    @sleep 1
+    @for name in backend frontend; do \
+      if [ -f {{LOG_DIR}}/$$name.pgid ]; then \
+        PGID="$$(cat {{LOG_DIR}}/$$name.pgid)"; kill -TERM -"$${PGID}" 2>/dev/null || true; \
+      elif [ -f {{LOG_DIR}}/$$name.pid ]; then \
+        PID="$$(cat {{LOG_DIR}}/$$name.pid)"; PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
+        if [ -n "$${PGID}" ]; then kill -TERM -"$${PGID}" 2>/dev/null || kill -TERM "$${PID}" 2>/dev/null || true; \
+        else kill -TERM "$${PID}" 2>/dev/null || true; fi; \
+      fi; \
+    done
+    @sleep 2
+    @for PORT in 8001 3001; do \
+      for PID in $$(lsof -ti :$${PORT} -sTCP:LISTEN 2>/dev/null || true); do \
+        PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
+        if [ -n "$${PGID}" ]; then kill -TERM -"$${PGID}" 2>/dev/null || true; else kill -TERM "$${PID}" 2>/dev/null || true; fi; \
+      done; \
+    done
+    @sleep 2
+    @for PID in $$(lsof -ti :8001,3001 -sTCP:LISTEN 2>/dev/null || true); do \
+      PGID="$$(ps -o pgid= -p "$${PID}" 2>/dev/null | tr -d ' ')"; \
+      if [ -n "$${PGID}" ]; then kill -KILL -"$${PGID}" 2>/dev/null || true; else kill -KILL "$${PID}" 2>/dev/null || true; fi; \
+    done
+    @rm -f {{LOG_DIR}}/backend.pid {{LOG_DIR}}/backend.pgid {{LOG_DIR}}/frontend.pid {{LOG_DIR}}/frontend.pgid
     @echo "Services stopped."
 
 # Independent servers (sometimes handy)

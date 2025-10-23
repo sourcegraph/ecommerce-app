@@ -40,7 +40,7 @@ export default defineConfig({
       command:
         'cd ../backend && uv run --active python -m app.seed && uv run --active uvicorn app.main:app --host 0.0.0.0 --port 8001',
       url: 'http://localhost:8001/health',
-      reuseExistingServer: !!process.env.REUSE_EXISTING_SERVER || false, // Always fresh for deterministic state unless REUSE_EXISTING_SERVER is set
+      reuseExistingServer: !!process.env.REUSE_EXISTING_SERVER || !process.env.CI, // Reuse locally to avoid port conflicts, fresh in CI
       timeout: 180000, // Increased timeout for CI
     },
     {
