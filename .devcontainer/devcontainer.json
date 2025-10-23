@@ -41,7 +41,9 @@
     // Amp CLI authentication (from local machine)
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.local/share/amp/secrets.json,target=/root/.local/share/amp/secrets.json,type=bind,consistency=cached",
     // GitHub CLI auth persisted in named volume (run 'gh auth login' once inside container)
-    "source=linea-supply-gh-config,target=/root/.config/gh,type=volume"
+    "source=linea-supply-gh-config,target=/root/.config/gh,type=volume",
+    // Amp custom tools (direct mount with consistent semantics for reliable discovery)
+    "source=${localWorkspaceFolder}/.amp/tools,target=/root/.config/amp/tools,type=bind,consistency=consistent"
   ],
 
   // ─────────────────────────────────────────────────────────────────
@@ -84,8 +86,15 @@
     "VIRTUAL_ENV": "/opt/venvs/backend",
     "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
-    "AMP_TOOLBOX": "/workspaces/app/.amp/tools:/root/.config/amp/tools",
     "GIT_PAGER": "cat"
+  },
+
+  // ─────────────────────────────────────────────────────────────────
+  // VS Code Remote Environment Variables
+  // ─────────────────────────────────────────────────────────────────
+  // These variables are guaranteed to be available to the VS Code extension host
+  "remoteEnv": {
+    "AMP_TOOLBOX": "/root/.config/amp/tools"
   },
   
   // ─────────────────────────────────────────────────────────────────
