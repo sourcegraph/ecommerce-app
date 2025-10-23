@@ -351,3 +351,17 @@ def test_product_search_functionality(client: TestClient, session: Session):
     else:
         # Search not implemented, skip this test
         pytest.skip("Search functionality not implemented")
+
+
+def test_delivery_fastest_sort_no_duplicates(client: TestClient):
+    """Test that delivery_fastest sort does not return duplicate products"""
+    response = client.get("/products?sort=delivery_fastest")
+    assert response.status_code == 200
+    products = response.json()
+
+    product_ids = [p["id"] for p in products]
+    unique_product_ids = set(product_ids)
+
+    assert len(product_ids) == len(unique_product_ids), (
+        f"Found {len(product_ids) - len(unique_product_ids)} duplicate products"
+    )
