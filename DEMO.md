@@ -168,12 +168,12 @@ It is also worth continuing and old thread and discussing how you use `tab` and 
 3. Amp prompt:
 
 ```
-Fix bug https://github.com/sourcegraph/amp-demo/issues/35 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request
+Fix bug https://github.com/sourcegraph/amp-demo/issues/35 in a new branch, test and validate changes, ci checks must all pass. Then create a pull request.
 ```
 
 4. Show the fix (no duplicates show up) at [localhost:3001](http://localhost:3001)
 
-**[Thread](https://ampcode.com/threads/T-d3e778f1-914d-46e3-a8a8-a9f077946010) | [Branch](https://github.com/sourcegraph/amp-demo/tree/fix/duplicate-items-fastest-delivery)**
+**[Thread](https://ampcode.com/threads/T-0ebd5d3f-5c1a-4411-87a1-54461571c65f) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/fix-duplicate-items-fastest-delivery)**
 
 <img width="1400" height="818" alt="CleanShot 2025-10-22 at 10 55 50@2x" src="https://github.com/user-attachments/assets/e0e4aa43-d552-4b6c-b210-dcac6d0dfb79" />
 
