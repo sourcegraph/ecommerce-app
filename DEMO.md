@@ -69,9 +69,19 @@ Amp will use diagnostics when using the VS Code extension or using the Amp CLI i
 
 This is a minimal viable demo used to introduce Amp and begin building an understanding of Agentic tools. This is not a realistic scenario where a developer would reach for Amp. It is helpful to start here with developers who are new to Agentic tools and then move to more advanced demos. It is also helpful if you are severely time-constrained.
 
-1. Amp prompt: `start the frontend and backend in the background`
+1. Amp prompt:
+
+```
+start the frontend and backend in the background
+```
+
 2. Show [localhost:3001](http://localhost:3001) white background
-3. Amp prompt: `Make the background light blue instead of white`
+3. Amp prompt:
+
+```
+Make the background light blue instead of white
+```
+
 4. Reload [localhost:3001](http://localhost:3001) light blue background
 
 ---
@@ -164,7 +174,12 @@ It is also worth continuing and old thread and discussing how you use `tab` and 
 
 **Solution:** Ask Amp to investigate the issue, find a solution, verify tests pass and push a PR
 
-1. Amp prompt: `start frontend and backend in the background`
+1. Amp prompt:
+
+```
+start frontend and backend in the background
+```
+
 2. Show the bug (sorting by "Fastest Delivery", duplicate items show up) at [localhost:3001](http://localhost:3001)
 3. Amp prompt:
 
@@ -174,7 +189,7 @@ Fix bug https://github.com/sourcegraph/amp-demo/issues/35 in a new branch, test 
 
 4. Show the fix (no duplicates show up) at [localhost:3001](http://localhost:3001)
 
-**[Thread](https://ampcode.com/threads/T-0ebd5d3f-5c1a-4411-87a1-54461571c65f) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/fix-duplicate-items-fastest-delivery)**
+**[Thread](https://ampcode.com/threads/T-0ebd5d3f-5c1a-4411-87a1-54461571c65f) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/fix-duplicate-items-fastest-delivery) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/78)**
 
 <img width="1400" height="818" alt="CleanShot 2025-10-22 at 10 55 50@2x" src="https://github.com/user-attachments/assets/e0e4aa43-d552-4b6c-b210-dcac6d0dfb79" />
 
@@ -293,8 +308,18 @@ git checkout broken-tests
 ```
 
 2. Run `amp` in the terminal
-3. Run local backend tests `$just test-local`
-4. Amp prompt: `Fix these failures so the tests pass`
+3. Run local backend tests with the `$` prefix:
+
+```
+$just test-local
+```
+
+4. Amp prompt:
+
+```
+Fix these failures so the tests pass
+```
+
 5. Point out Amp fixed and verified the fix by running the test suite
 
 **[Thread](https://ampcode.com/threads/T-8d3988e3-29e6-4fe9-be40-19539fc85408)**
@@ -310,7 +335,12 @@ This demo illustrates a common multi-step plan and execution paradigm when worki
 **Problem:** The current featured product banner is not engaging and doesn't cycle through products.  
 **Solution:** We want Amp to create a carousel to highlight products, making it more interactive and responsive, based on a feature spec written in a [GitHub issue](https://github.com/sourcegraph/amp-demo/issues/38).
 
-1. Amp prompt: `start frontend and backend in the background`
+1. Amp prompt:
+
+```
+start frontend and backend in the background
+```
+
 2. Show the current state of the product carousel at [localhost:3001](http://localhost:3001)
 3. Amp prompt:
 
@@ -328,7 +358,7 @@ Execute the @NEW_FEATURE.md plan, test and validate. CI checks must all pass. Th
 6. Show the new feature at [localhost:3001](http://localhost:3001)
 7. Show the new PR on GitHub (click the direct PR link in the `gh` command run or go to the [PR list here](https://github.com/sourcegraph/ecommerce-app/pulls)). Note the code review bot automatically runs and makes suggestions.
 
-**[Thread](https://ampcode.com/threads/T-fee44ba4-ea71-48af-8144-e84de8063b8c) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/featured-carousel)**
+**[Thread](https://ampcode.com/threads/T-fee44ba4-ea71-48af-8144-e84de8063b8c) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/featured-carousel) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/40)**
 
 <img width="1200" height="693" alt="new-feature-implementation" src="https://github.com/user-attachments/assets/76b8df01-cd13-47e0-952b-c99b3ea71282" />
 
@@ -340,22 +370,28 @@ Execute the @NEW_FEATURE.md plan, test and validate. CI checks must all pass. Th
 
 The Librarian is a subagent built for searching remote codebases. It allows Amp to search all public code on GitHub as well as your private GitHub repositories. There are two big benefits here, neither require a Sourcegraph Code Search instance:
 
-1. Search across multiple private repos, no longer constrained to local machine
-2. Search across public repos to gain context about how other libraries/projects work/implement features
+1. Search across one or more private repos, no longer constrained to code on local machines
+2. Search across public repos to gain context about how other libraries/projects work
 
-Without The Librarian, Amp relies on web search, other local tools and/or MCP tools to retrieve external context. The Librarian is a huge step up because it is purpose built for cross repo search. More information in [the manual](https://ampcode.com/manual#librarian).
+Without the Librarian, Amp relies on web search, other local tools, and/or MCP tools to retrieve external context. The Librarian is a huge step up because it is purpose-built for cross-repo search. More information in [the manual](https://ampcode.com/manual#librarian).
 
 #### Demo
 
-We will use The Librarian to research and refactor how API requests from the front end are made to eliminate duplicate requests following best practices used in popular React data-fetching libraries.
+**Problem:** The current React front end makes duplicate requests, each coming from different components
+**Solution:** Have Amp use the Librarian to research and utilize the oracle to refactor how API requests from the front end are made to eliminate duplicate requests following best practices used in popular React data-fetching libraries.
 
-1. Amp prompt: `start the frontend and backend in the background`
-2. Show [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the following duplicate requests (can just show one of these, paste in the search box):
+1. Amp prompt:
 
 ```
-/products?include_delivery_summary=true - 2 requests
-/api/categories - 2 requests
-/api/products?sort=created_desc - 2 requests
+start the frontend and backend in the background
+```
+
+2. Show [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the following duplicate requests (2x) (can just show one of these, paste in the search box):
+
+```
+/products?include_delivery_summary=true
+/api/categories
+/api/products?sort=created_desc
 ```
 
 3. Amp prompt:
@@ -376,6 +412,8 @@ Before executing the plan, add specific failing e2e tests first. Then create a n
 ```
 
 6. Return to [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the duplicate requests are no more! In fact there is only one request now.
+
+**[Thread](https://ampcode.com/threads/T-3c3a93a0-1e22-4e7c-9093-f155c6b44368) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feat/deduplicate-api-requests) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/84)**
 
 ---
 
@@ -450,7 +488,7 @@ Amp prompt:
 Implement multi-currency support using Oracle's plan in @MULTI_CURRENCY_PLAN.md, using sub-agents
 ```
 
-**[Thread](https://ampcode.com/threads/T-bcaec5de-87d9-4fc9-a498-bf4bfed807bc) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/multi-currency-support)**
+**[Thread](https://ampcode.com/threads/T-bcaec5de-87d9-4fc9-a498-bf4bfed807bc) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/multi-currency-support) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/43)**
 
 **Highlights:**
 
@@ -480,6 +518,6 @@ Once you have a plan, implement the changes, ensure all tests pass, and make sur
 Lastly, summarize the changes made an consistency improvements.
 ```
 
-**[Thread](https://ampcode.com/threads/T-0156f467-52ed-47cb-a1fc-59b8d26b5beb) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/error-logging-modernization)**
+**[Thread](https://ampcode.com/threads/T-0156f467-52ed-47cb-a1fc-59b8d26b5beb) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/error-logging-modernization) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/52)**
 
 ---
