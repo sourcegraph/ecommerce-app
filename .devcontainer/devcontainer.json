@@ -17,6 +17,11 @@
   },
 
   // ─────────────────────────────────────────────────────────────────
+  // Initialize Command (runs on host before container starts)
+  // ─────────────────────────────────────────────────────────────────
+  "initializeCommand": "mkdir -p ~/.local/share/amp > /dev/null 2>&1",
+
+  // ─────────────────────────────────────────────────────────────────
   // Workspace Configuration
   // ─────────────────────────────────────────────────────────────────
   // Set to match the path used in Dockerfile for dependency installation
@@ -38,8 +43,8 @@
     "source=linea-supply-npm-cache,target=/root/.npm,type=volume",
     // Amp CLI settings (committed to repo)
     "source=${localWorkspaceFolder}/.devcontainer/amp-settings.json,target=/root/.config/amp/settings.json,type=bind,consistency=cached",
-    // Amp CLI authentication (from local machine)
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.local/share/amp/secrets.json,target=/root/.local/share/amp/secrets.json,type=bind,consistency=cached",
+    // Amp CLI authentication directory (from local machine - carries over host auth or allows in-container auth to persist)
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.local/share/amp,target=/root/.local/share/amp,type=bind,consistency=cached",
     // GitHub CLI auth persisted in named volume (run 'gh auth login' once inside container)
     "source=linea-supply-gh-config,target=/root/.config/gh,type=volume"
   ],

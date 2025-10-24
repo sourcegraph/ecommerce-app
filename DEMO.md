@@ -32,6 +32,7 @@ Demo blocks are organized by estimated demo time, ranging from 5 to 30 minutes p
   - [Debugging with Amp Shell **CLI only**](#debugging-with-amp-shell-cli-only)
 - [15 Minute Demos](#15-minute-demos)
   - [New Feature Implementation](#new-feature-implementation)
+  - [The Librarian](#the-librarian)
   - [Sourcegraph MCP](#sourcegraph-mcp)
   - [Toolboxes](#toolboxes)
 - [30 Minute Demos](#30-minute-demos)
@@ -330,6 +331,46 @@ Execute the @NEW_FEATURE.md plan, test and validate. CI checks must all pass. Th
 **[Thread](https://ampcode.com/threads/T-fee44ba4-ea71-48af-8144-e84de8063b8c) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/featured-carousel)**
 
 <img width="1200" height="693" alt="new-feature-implementation" src="https://github.com/user-attachments/assets/76b8df01-cd13-47e0-952b-c99b3ea71282" />
+
+---
+
+### The Librarian
+
+#### Core Concepts
+
+The Librarian is a subagent built for searching remote codebases. It allows Amp to search all public code on GitHub as well as your private GitHub repositories. There are two big benefits here, neither require a Sourcegraph Code Search instance:
+
+1. Search across multiple private repos, no longer constrained to local machine
+2. Search across public repos to gain context about how other libraries/projects work/implement features
+
+Without The Librarian, Amp relies on web search, other local tools and/or MCP tools to retrieve external context. The Librarian is a huge step up because it is purpose built for cross repo search. More information in [the manual](https://ampcode.com/manual#librarian).
+
+#### Demo
+
+We will use The Librarian to research and refactor how API requests from the front end are made to eliminate duplicate requests following best practices used in popular React data-fetching libraries.
+
+1. Amp prompt: `start the frontend and backend in the background`
+2. Show [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the following duplicate requests (can just show one of these, paste in the search box):
+
+```
+/products?include_delivery_summary=true - 2 requests
+/api/categories - 2 requests
+/api/products?sort=created_desc - 2 requests
+```
+
+3. Amp prompt:
+
+```
+Address the issue filed in https://github.com/sourcegraph/ecommerce-app/issues/80
+
+First, use the librarian to research how popular React data-fetching libraries and HTTP clients handle in-flight request deduplication. Then locate which components in our codebase are making these duplicate calls.
+
+Then consult the oracle and recommend a minimal refactoring (less code, more concise the better) based on OSS best practices to add request deduplication to our existing API client, eliminating these duplicate concurrent requests. Provide step by step implementation guidance with specific code references, code snippets and explanations.
+```
+
+4. Review the plan
+5. Amp prompt: `Add specific failing e2e tests first. Execute this refactoring plan and then ensure e2e tests pass.`
+6. Return to [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the duplicate requests are no more! In fact there is only one request now.
 
 ---
 
