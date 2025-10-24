@@ -231,6 +231,7 @@ def get_products_api(
                             ).asc(),
                             cast(ColumnElement[float], Product.price).asc(),
                         )
+                        .distinct()
                     )
                 else:
                     stmt = (
@@ -242,6 +243,7 @@ def get_products_api(
                             ).asc(),
                             cast(ColumnElement[float], Product.price).asc(),
                         )
+                        .distinct()
                     )
             else:
                 stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
@@ -253,6 +255,7 @@ def get_products_api(
                     cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                     cast(ColumnElement[float], Product.price).asc(),
                 )
+                .distinct()
             )
     elif sort == "price_asc":
         stmt = stmt.order_by(cast(ColumnElement[float], Product.price).asc())
