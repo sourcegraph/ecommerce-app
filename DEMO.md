@@ -365,12 +365,17 @@ Address the issue filed in https://github.com/sourcegraph/ecommerce-app/issues/8
 
 First, use the librarian to research how popular React data-fetching libraries and HTTP clients handle in-flight request deduplication. Then locate which components in our codebase are making these duplicate calls.
 
-Then consult the oracle and recommend a minimal refactoring (less code, more concise the better) based on OSS best practices to add request deduplication to our existing API client, eliminating these duplicate concurrent requests. Provide step by step implementation guidance with specific code references, code snippets and explanations.
-
-Before executing the plan, add specific failing e2e tests first. Then execute this refactoring plan and lastly ensure e2e tests all pass and the rest of the ci checks.
+Then consult the oracle and recommend a minimal refactoring (less code, more concise the better) based on OSS best practices to add request deduplication to our existing API client, eliminating these duplicate concurrent requests. Provide step by step implementation guidance with specific code references, code snippets and explanations. Let me review the plan before you implement anything.
 ```
 
-4. Return to [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the duplicate requests are no more! In fact there is only one request now.
+4. Review the plan
+5. Amp prompt:
+
+```
+Before executing the plan, add specific failing e2e tests first. Then create a new branch, execute this refactoring plan, ensure e2e tests and other front end ci checks pass, then commit and open a PR.
+```
+
+6. Return to [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the duplicate requests are no more! In fact there is only one request now.
 
 ---
 
