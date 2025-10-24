@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from 'react'
 import { FaShoppingCart } from 'react-icons/fa'
 import { Link as RouterLink, useParams } from 'react-router-dom'
+import { api } from '../api/client'
 import ProgressLine from '../components/Loading/ProgressLine'
 import MUIRating from '../components/MUI/MUIRating'
 import { DeliveryOptionsSelector } from '../components/Delivery'
@@ -50,14 +51,7 @@ const Product = () => {
   const fetchProductWithDelivery = async (productId: string) => {
     try {
       setIsLoadingProduct(true)
-      const API_BASE_URL = 'http://localhost:8001'
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const product: ProductWithDelivery = await response.json()
+      const product = (await api.getProductById(productId)) as ProductWithDelivery
       setProductWithDelivery(product)
 
       // Auto-select the cheapest or free option
