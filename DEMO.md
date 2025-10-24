@@ -340,8 +340,8 @@ Execute the @NEW_FEATURE.md plan, test and validate. CI checks must all pass. Th
 
 The Librarian is a subagent built for searching remote codebases. It allows Amp to search all public code on GitHub as well as your private GitHub repositories. There are two big benefits here, neither require a Sourcegraph Code Search instance:
 
-1. Search across multiple private repos, no longer constrained to whats on the local machine
-2. Search across public repos to gain context about how other libraries/projects work/implement features
+1. Search across one or more private repos, no longer constrained to code on local machines
+2. Search across public repos to gain context about how other libraries/projects work
 
 Without the Librarian, Amp relies on web search, other local tools, and/or MCP tools to retrieve external context. The Librarian is a huge step up because it is purpose-built for cross-repo search. More information in [the manual](https://ampcode.com/manual#librarian).
 
