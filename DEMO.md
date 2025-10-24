@@ -69,9 +69,19 @@ Amp will use diagnostics when using the VS Code extension or using the Amp CLI i
 
 This is a minimal viable demo used to introduce Amp and begin building an understanding of Agentic tools. This is not a realistic scenario where a developer would reach for Amp. It is helpful to start here with developers who are new to Agentic tools and then move to more advanced demos. It is also helpful if you are severely time-constrained.
 
-1. Amp prompt: `start the frontend and backend in the background`
+1. Amp prompt:
+
+```
+start the frontend and backend in the background
+```
+
 2. Show [localhost:3001](http://localhost:3001) white background
-3. Amp prompt: `Make the background light blue instead of white`
+3. Amp prompt:
+
+```
+Make the background light blue instead of white
+```
+
 4. Reload [localhost:3001](http://localhost:3001) light blue background
 
 ---
@@ -164,7 +174,12 @@ It is also worth continuing and old thread and discussing how you use `tab` and 
 
 **Solution:** Ask Amp to investigate the issue, find a solution, verify tests pass and push a PR
 
-1. Amp prompt: `start frontend and backend in the background`
+1. Amp prompt:
+
+```
+start frontend and backend in the background
+```
+
 2. Show the bug (sorting by "Fastest Delivery", duplicate items show up) at [localhost:3001](http://localhost:3001)
 3. Amp prompt:
 
@@ -293,8 +308,18 @@ git checkout broken-tests
 ```
 
 2. Run `amp` in the terminal
-3. Run local backend tests `$just test-local`
-4. Amp prompt: `Fix these failures so the tests pass`
+3. Run local backend tests with the `$` prefix:
+
+```
+$just test-local
+```
+
+4. Amp prompt:
+
+```
+Fix these failures so the tests pass
+```
+
 5. Point out Amp fixed and verified the fix by running the test suite
 
 **[Thread](https://ampcode.com/threads/T-8d3988e3-29e6-4fe9-be40-19539fc85408)**
@@ -310,7 +335,12 @@ This demo illustrates a common multi-step plan and execution paradigm when worki
 **Problem:** The current featured product banner is not engaging and doesn't cycle through products.  
 **Solution:** We want Amp to create a carousel to highlight products, making it more interactive and responsive, based on a feature spec written in a [GitHub issue](https://github.com/sourcegraph/amp-demo/issues/38).
 
-1. Amp prompt: `start frontend and backend in the background`
+1. Amp prompt:
+
+```
+start frontend and backend in the background
+```
+
 2. Show the current state of the product carousel at [localhost:3001](http://localhost:3001)
 3. Amp prompt:
 
@@ -350,13 +380,18 @@ Without the Librarian, Amp relies on web search, other local tools, and/or MCP t
 **Problem:** The current React front end makes duplicate requests, each coming from different components
 **Solution:** Have Amp use the Librarian to research and utilize the oracle to refactor how API requests from the front end are made to eliminate duplicate requests following best practices used in popular React data-fetching libraries.
 
-1. Amp prompt: `start the frontend and backend in the background`
-2. Show [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the following duplicate requests (can just show one of these, paste in the search box):
+1. Amp prompt:
 
 ```
-/products?include_delivery_summary=true - 2 requests
-/api/categories - 2 requests
-/api/products?sort=created_desc - 2 requests
+start the frontend and backend in the background
+```
+
+2. Show [localhost:3001](http://localhost:3001), go to the networking tab, refresh the page and show the following duplicate requests (2x) (can just show one of these, paste in the search box):
+
+```
+/products?include_delivery_summary=true
+/api/categories
+/api/products?sort=created_desc
 ```
 
 3. Amp prompt:
