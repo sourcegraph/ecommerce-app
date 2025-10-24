@@ -1,5 +1,6 @@
 import { FC, ReactNode, createContext, useEffect, useState } from 'react'
 import seed from './products.json'
+import { api } from '../api/client'
 
 type DeliverySpeed = 'standard' | 'express' | 'next_day' | 'same_day'
 
@@ -149,14 +150,7 @@ export const Provider: FC<Props> = ({ children }) => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true)
-      const API_BASE_URL = 'http://localhost:8001'
-      const response = await fetch(`${API_BASE_URL}/products?include_delivery_summary=true`)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const products: ProductType[] = await response.json()
+      const products = await api.getJSON<ProductType[]>('/products?include_delivery_summary=true')
 
       // Convert backend format to frontend format and apply saved cart state
       const savedCartState = loadCartState()

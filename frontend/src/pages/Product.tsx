@@ -23,6 +23,7 @@ import { DeliveryOptionsSelector } from '../components/Delivery'
 import { useGlobalContext } from '../context/useGlobalContext'
 import { getImageUrl, ProductType, DeliveryOption } from '../context/GlobalState'
 import { BookmarkIcon } from '../components/Icons/BookmarkIcon'
+import { api } from '../api/client'
 
 interface ProductWithDelivery {
   id: string | number
@@ -50,14 +51,7 @@ const Product = () => {
   const fetchProductWithDelivery = async (productId: string) => {
     try {
       setIsLoadingProduct(true)
-      const API_BASE_URL = 'http://localhost:8001'
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const product: ProductWithDelivery = await response.json()
+      const product = await api.getJSON<ProductWithDelivery>(`/products/${productId}`)
       setProductWithDelivery(product)
 
       // Auto-select the cheapest or free option
