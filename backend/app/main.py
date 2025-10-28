@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import func
 from typing import List, Optional, cast, Any
 from sqlalchemy.sql.elements import ColumnElement
 import io
@@ -246,13 +247,22 @@ def get_products_api(
             else:
                 stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
         else:
-            stmt = (
-                stmt.join(ProductDeliveryLink)
-                .join(DeliveryOption)
-                .order_by(
-                    cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
-                    cast(ColumnElement[float], Product.price).asc(),
+            # Use subquery to get minimum delivery days per product to avoid duplicates
+            min_delivery_subq = (
+                select(
+                    ProductDeliveryLink.product_id,
+                    func.min(DeliveryOption.estimated_days_min).label("min_days"),
                 )
+                .join(DeliveryOption)
+                .group_by(cast(Any, ProductDeliveryLink.product_id))
+                .subquery()
+            )
+            stmt = stmt.join(
+                min_delivery_subq,
+                cast(Any, Product.id == min_delivery_subq.c.product_id),
+            ).order_by(
+                cast(ColumnElement[int], min_delivery_subq.c.min_days).asc(),
+                cast(ColumnElement[float], Product.price).asc(),
             )
     elif sort == "price_asc":
         stmt = stmt.order_by(cast(ColumnElement[float], Product.price).asc())
