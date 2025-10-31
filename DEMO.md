@@ -553,7 +553,7 @@ Review the error handling patterns you found from Sourcegraph and create an impl
 **Amp Prompt:**
 
 ```
-Implement the ERROR_HANDLING_IMPLEMENTATION_PLAN.md plan you recommended
+Create a new branch and implement the ERROR_HANDLING_IMPLEMENTATION_PLAN.md plan you recommended. Make sure all existing and new tests pass. No not simplify anything just for the sake of passing, do it right.
 ```
 
 **Demo talking point:** _"Excellent! Now our error handling matches the standard used across all our services. We used Sourcegraph to discover patterns across multiple repos, the oracle to analyze and plan, and Amp to implement. Any developer can jump between repos and see familiar patterns."_
