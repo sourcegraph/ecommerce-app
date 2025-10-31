@@ -17,11 +17,6 @@
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // Initialize Command (runs on host before container starts)
-  // ─────────────────────────────────────────────────────────────────
-  "initializeCommand": "mkdir -p ~/.local/share/amp > /dev/null 2>&1",
-
-  // ─────────────────────────────────────────────────────────────────
   // Workspace Configuration
   // ─────────────────────────────────────────────────────────────────
   // Set to match the path used in Dockerfile for dependency installation
