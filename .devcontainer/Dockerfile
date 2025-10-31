@@ -16,6 +16,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # - procps: Provides pkill command used by 'just stop'
 # - bash-completion, unzip: Developer convenience
 # - zsh: Default shell with oh-my-zsh
+# - jq: JSON processor for command-line
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -28,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     unzip \
     zsh \
+    jq \
  && rm -rf /var/lib/apt/lists/*
 
 # ─────────────────────────────────────────────────────────────────
