@@ -233,3 +233,7 @@ Run `just ci` to verify all checks pass before pushing.
 - **Database:** Use SQLModel with proper relationships, no raw SQL queries
 - **Authentication:** JWT tokens, proper session management
 - **Dependencies:** Regular security audits, address vulnerabilities within 3 days
+
+### Sourcegraph CLI
+
+If a user asks Amp to use Sourcegraph or Sourcegraph Code Search and does not specify MCP then always utilize the Sourcegraph CLI `src`. Always run `src --help` first and review the query syntax at [https://sourcegraph.com/docs/code-search/queries](https://sourcegraph.com/docs/code-search/queries). No web search.

@@ -16,6 +16,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # - procps: Provides pkill command used by 'just stop'
 # - bash-completion, unzip: Developer convenience
 # - zsh: Default shell with oh-my-zsh
+# - jq: JSON processor for command-line
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -28,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     unzip \
     zsh \
+    jq \
  && rm -rf /var/lib/apt/lists/*
 
 # ─────────────────────────────────────────────────────────────────
@@ -44,6 +46,21 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 # Install Amp CLI
 # ─────────────────────────────────────────────────────────────────
 RUN curl -fsSL https://ampcode.com/install.sh | bash
+
+# ─────────────────────────────────────────────────────────────────
+# Install Sourcegraph CLI
+# ─────────────────────────────────────────────────────────────────
+RUN set -eux; \
+    ARCH=$(dpkg --print-architecture); \
+    case "$ARCH" in \
+        arm64|amd64) ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac; \
+    if [ "$ARCH" = "arm64" ]; then ARCH="arm64"; \
+    elif [ "$ARCH" = "amd64" ]; then ARCH="amd64"; \
+    else echo "Unsupported architecture: $ARCH" && exit 1; fi; \
+    curl -L "https://sourcegraph.com/.api/src-cli/src_linux_${ARCH}" -o /usr/local/bin/src \
+ && chmod +x /usr/local/bin/src
 
 # ─────────────────────────────────────────────────────────────────
 # Configure git safe.directory for bind-mounted workspace

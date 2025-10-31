@@ -33,7 +33,7 @@ Demo blocks are organized by estimated demo time, ranging from 5 to 30 minutes p
 - [15 Minute Demos](#15-minute-demos)
   - [New Feature Implementation](#new-feature-implementation)
   - [The Librarian](#the-librarian)
-  - [Sourcegraph MCP](#sourcegraph-mcp)
+  - [Sourcegraph Code Search](#sourcegraph-code-search)
   - [Toolboxes](#toolboxes)
 - [30 Minute Demos](#30-minute-demos)
   - [Complex Multi-Currency Feature with Subagents](#complex-multi-currency-feature-with-subagents)
@@ -417,13 +417,21 @@ Before executing the plan, add specific failing e2e tests first. Then create a n
 
 ---
 
-### Sourcegraph MCP
+### Sourcegraph Code Search
 
-The [Sourcegraph MCP server](https://sourcegraph.com/docs/api/mcp) is an excellent way for existing Code Search to leverage their investment there and efficiently search across repos from Amp. It supports token and OAuth-based authentication, but Amp only supports token-based at this time.
+While Amp has powerful search capabilities built in, there are inherit limitations to code local to your machine and even in large repos can take time. Sourcegraph Code Search is an excellent complement to Amp as it can efficiently search large code bases within a single repo or across multiple. This is a great way for existing Code Search customers to leverage their investment and expand its usage by opening it up to search via natural language through Amp.
 
-This example doesn't specifically involve code in this repo; it's more about Amp using Sourcegraph MCP to search across multiple repos and identify cross-repo issues.
+There are two main ways one could use Code Search from Amp, the [MCP server](https://sourcegraph.com/docs/api/mcp) or the [CLI](https://github.com/sourcegraph/src-cli) `src`, each are covered below. Choose a method, complete the set up and then follow the demo script.
 
-1. Show the MCP server registered in Amp in the VS Code extension settings or `/settings` in the CLI.
+#### Sourcegraph MCP Server
+
+The [Sourcegraph MCP server](https://sourcegraph.com/docs/api/mcp) is an excellent way for existing Code Search to leverage their investment there and efficiently search across repos from Amp. It supports token and OAuth-based authentication (note Sourcegraph does not support dynamic/automatic OAuth client registration).
+
+##### Access Token Setup
+
+The two ways you can setup Sourcegraph MCP with Amp are as follows.
+
+To use a fixed token, retrieve a token from the Settings > Access Token page on [https://demo.sourcegraph.com](https://demo.sourcegraph.com) and add it to the Amp config as follows:
 
 ```json
 "sourcegraph": {
@@ -433,15 +441,131 @@ This example doesn't specifically involve code in this repo; it's more about Amp
 }
 ```
 
-2. Amp prompt
+##### Manual OAuth Setup
+
+To use OAuth, follow the steps for "Manual OAuth Client Registration" in the [Amp Manual](https://ampcode.com/manual#mcp), described below as well.
+
+1. Create an OAuth client in [Sourcegraph Demo](https://demo.sourcegraph.com) settings:
+   - Redirect URI: `http://localhost:8976/oauth/callback`
+   - Client ype: `Private Client (Confidential)`
+   - Scopes: Keep all checked + check `user:all`
+   - Save the Client ID and Client Secret
+
+2. Add the MCP server to your configuration (must use the terminal):
+
+```bash
+amp mcp add sg https://demo.sourcegraph.com/.api/mcp/v1
+```
+
+3. Perform a (one time) OAuth login (must use the terminal):
+
+```bash
+amp mcp oauth login sg \
+  --server-url https://demo.sourcegraph.com/.api/mcp/v1 \
+  --client-id sgo_cid_<your-client-id> \
+  --client-secret sgo_cs_<your-client-secret> \
+  --scopes "openid,profile,email,user:all"
+```
+
+#### Sourcegraph CLI
+
+Sourcegraph has a CLI `src` on a [public GitHub repo](https://github.com/sourcegraph/src-cli) which is an efficient way for Amp to make use of Code Search without requiring an MCP set up.
+
+[This clause](AGENTS.md#sourcegraph-cli) has been added to the `AGENTS.md` file to trigger the CLI use anytime a user asks to use Sourcegraph or Sourcegraph Code Search and does NOT mention MCP.
+
+##### Setup
+
+The `src` CLI has already been installed in the devcontainer. If you are outside the devcontainer then run through the [install instructions here](https://github.com/sourcegraph/src-cli?tab=readme-ov-file#installation-mac-os).
+
+You will need to set the following environment variables for the `src login` command to work. Retrieve the access token from the Settings > Access Token page on [https://demo.sourcegraph.com](https://demo.sourcegraph.com). You can run these one time, or if you put it into your shell of choices dot file, the devcontainer will carry these over so they will be persistent in the future.
+
+```bash
+export SRC_ENDPOINT=https://demo.sourcegraph.com
+export SRC_ACCESS_TOKEN=(your access token)
+```
+
+Once set run:
+
+```bash
+src login
+```
+
+#### Sourcegraph Code Search Demo: Multi-Repo Pattern Consistency
+
+This demo shows how to use Sourcegraph Code Search to find and adopt error handling patterns from across multiple repos in your organization. While we use public repos for the demo, imagine these are your company's internal microservices (auth-service, payment-service, inventory-service, etc.)
+
+Repos to Search (Public Stand-ins for "Internal Services"). These are already indexed in the Demo Sourcegraph instance:
+
+- `fastapi-practices/fastapi_best_architecture`
+- `teamhide/fastapi-boilerplate`
+- `iam-abbas/FastAPI-Production-Boilerplate`
+
+##### Demo Narrative
+
+_"We're building a new checkout endpoint for our ecommerce service. We want to handle errors consistently with how our other backend teams do it. Let's search across our existing services to find the standard patterns."_
+
+##### Step 1: Discover Error Handling Patterns
+
+**Goal:** Find how our other services handle custom exceptions and error responses
+
+**Amp Prompt:**
 
 ```
-Use the Sourcegraph MCP to find everywhere log4j is used across our repos and identify ones susceptible to this vulnerability: https://logging.apache.org/security.html#CVE-2021-45105
+Use Sourcegraph to search for error handling patterns across our FastAPI backend services (fastapi-practices/fastapi_best_architecture, teamhide/fastapi-boilerplate, iam-abbas/FastAPI-Production-Boilerplate):
 
-Once found, do not code but come up with a plan to remediate the issues.
+1. Custom exception classes with message, type, and code attributes
+2. Global exception handlers using @app.exception_handler decorators
+3. Structured error response formats
+
+Show me how these repos implement similar patterns, including file paths and code examples.
 ```
 
-**[Thread](https://ampcode.com/threads/T-70ef55e4-d390-42b5-b611-ff2d298e5272)**
+**What to show:**
+
+- Custom exception classes
+- Global exception handlers with `@app.exception_handler`
+- Structured JSON with `code`, `msg` and `data` fields for standardized responses
+
+**Demo talking point:** _"Great! I found several different approaches across our services. Let me ask the oracle to analyze these patterns and recommend the best approach for our checkout service."_
+
+##### Step 2: Analyze & Plan
+
+**Goal:** Use the Oracle to review patterns to adopt and create an implementation plan
+
+**Amp Prompt:**
+
+```
+Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce backend service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidance with code references and code snippets. Save this plan as ERROR_HANDLING_IMPLEMENTATION_PLAN.md
+```
+
+**What to show:**
+
+- Oracle analyzes the different approaches
+- Identifies best practices vs anti-patterns
+- Creates a tailored step by step implementation plan specific to our needs
+
+**Demo talking point:** _"Perfect! The oracle synthesized the patterns from all our services and created a specific plan that fits our FastAPI service needs. Now let's review (revise if needed) then implement it."_
+
+##### Step 3: Implementation
+
+**Goal:** Review (and revises as needed) then build based on the oracle's recommendations
+
+**Amp Prompt:**
+
+```
+Create a new branch and implement the ERROR_HANDLING_IMPLEMENTATION_PLAN.md plan you recommended. Make sure all existing and new tests pass. No not simplify anything just for the sake of passing, do it right.
+```
+
+**Demo talking point:** _"Excellent! Now our error handling matches the standard used across all our services. We used Sourcegraph to discover patterns across multiple repos, the oracle to analyze and plan, and Amp to implement. Any developer can jump between repos and see familiar patterns."_
+
+##### Key Talking Points for Demo
+
+1. **Speed:** "Found 3 different team's approaches in just 30 seconds"
+2. **Consistency:** "Ensures new services match existing standards"
+3. **Onboarding:** "New devs learn org patterns instantly"
+4. **Private Repos:** "In reality, these would be our private internal services - payment-service, auth-service, inventory-service"
+5. **Multi-Model Research, Plan, Implement:** Used Sourcegraph to research, Oracle (GPT5) to plan and the main model (Sonnet 4.5) to implement.
+6. **Scale:** "Works across hundreds of repos as your org grows"
 
 ---
 
