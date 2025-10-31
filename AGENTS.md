@@ -236,4 +236,4 @@ Run `just ci` to verify all checks pass before pushing.
 
 ### Sourcegraph CLI
 
-If a user asks Amp to use Sourcegraph or Sourcegraph Code Search and does not specify MCP then always utilize the Sourcegraph CLI `src`. Review the query syntax at [https://sourcegraph.com/docs/code-search/queries](https://sourcegraph.com/docs/code-search/queries) and then run `src search -json 'query'` to search.
+If a user asks Amp to use Sourcegraph or Sourcegraph Code Search and does not specify MCP then always utilize the Sourcegraph CLI `src`. Always run `src --help` first and review the query syntax at [https://sourcegraph.com/docs/code-search/queries](https://sourcegraph.com/docs/code-search/queries). No web search.

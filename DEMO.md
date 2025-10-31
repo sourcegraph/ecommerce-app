@@ -495,78 +495,77 @@ src login
 This demo shows how to use Sourcegraph Code Search to find and adopt error handling patterns from across multiple repos in your organization. While we use public repos for the demo, imagine these are your company's internal microservices (auth-service, payment-service, inventory-service, etc.)
 
 Repos to Search (Public Stand-ins for "Internal Services"). These are already indexed in the Demo Sourcegraph instance:
-- `github.com/mealie-recipes/mealie` (production recipe manager & meal planner with 7k+ stars)
-- `github.com/argilla-io/argilla` (production AI data annotation platform, enterprise-grade)
-- `github.com/tiangolo/full-stack-fastapi-template` (FastAPI production template by framework author)
-- `github.com/zhanymkanov/fastapi-best-practices` (curated best practices compilation)
+
+- `fastapi-practices/fastapi_best_architecture`
+- `teamhide/fastapi-boilerplate`
+- `iam-abbas/FastAPI-Production-Boilerplate`
 
 ##### Demo Narrative
 
-*"We're building a new checkout endpoint for our ecommerce service. We want to handle errors consistently with how our other backend teams do it. Let's search across our existing services to find the standard patterns."*
-
+_"We're building a new checkout endpoint for our ecommerce service. We want to handle errors consistently with how our other backend teams do it. Let's search across our existing services to find the standard patterns."_
 
 ##### Step 1: Discover Error Handling Patterns
 
 **Goal:** Find how our other services handle custom exceptions and error responses
 
 **Amp Prompt:**
+
 ```
-Use Sourcegraph to search for custom HTTPException classes and exception handlers across our backend services (mealie-recipes, argilla-io, tiangolo, zhanymkanov). Show me the common patterns.
+Use Sourcegraph to search for error handling patterns across our FastAPI backend services (fastapi-practices/fastapi_best_architecture, teamhide/fastapi-boilerplate, iam-abbas/FastAPI-Production-Boilerplate):
+
+1. Custom exception classes with message, type, and code attributes
+2. Global exception handlers using @app.exception_handler decorators
+3. Structured error response formats
+
+Show me how these repos implement similar patterns, including file paths and code examples.
 ```
 
 **What to show:**
-- Custom exception classes (NotFoundException, ValidationException, etc.)
+
+- Custom exception classes
 - Global exception handlers with `@app.exception_handler`
-- Structured error responses with consistent JSON format
-- Logging patterns with request context
+- Structured JSON with `code`, `msg` and `data` fields for standardized responses
 
-**Demo talking point:** *"Great! I found several different approaches across our services. Let me ask the oracle to analyze these patterns and recommend the best approach for our checkout service."*
-
+**Demo talking point:** _"Great! I found several different approaches across our services. Let me ask the oracle to analyze these patterns and recommend the best approach for our checkout service."_
 
 ##### Step 2: Analyze & Plan
 
 **Goal:** Use the Oracle to review patterns to adopt and create an implementation plan
 
 **Amp Prompt:**
+
 ```
-Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce checkout service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidence with code references and code snippets.
+Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce backend service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidance with code references and code snippets.
 ```
 
 **What to show:**
+
 - Oracle analyzes the different approaches
 - Identifies best practices vs anti-patterns
-- Creates a tailored plan specific to our checkout needs
-- Provides clear recommendations with reasoning
+- Creates a tailored step by step implementation plan specific to our needs
 
-**Demo talking point:** *"Perfect! The oracle synthesized the patterns from all our services and created a specific plan that fits our checkout service needs. Now let's implement it."*
-
+**Demo talking point:** _"Perfect! The oracle synthesized the patterns from all our services and created a specific plan that fits our FastAPI service needs. Now let's implement it."_
 
 ##### Step 3: Implementation
 
 **Goal:** Build based on the oracle's recommendations
 
 **Amp Prompt:**
+
 ```
 Implement the error handling plan you recommended.
 ```
 
-**Expected Implementation:**
-- Custom exceptions in `backend/app/core/exceptions.py`
-- Global handler in `backend/app/main.py` with structured logging
-- Consistent error response format
-
-**Demo talking point:** *"Excellent! Now our error handling matches the standard used across all our services. We used Sourcegraph to discover patterns across multiple repos, the oracle to analyze and plan, and Amp to implement. Any developer can jump between repos and see familiar patterns."*
-
+**Demo talking point:** _"Excellent! Now our error handling matches the standard used across all our services. We used Sourcegraph to discover patterns across multiple repos, the oracle to analyze and plan, and Amp to implement. Any developer can jump between repos and see familiar patterns."_
 
 ##### Key Talking Points for Demo
 
-1. **Speed:** "Found 4 different team's approaches in 30 seconds"
+1. **Speed:** "Found 3 different team's approaches in just 30 seconds"
 2. **Consistency:** "Ensures new services match existing standards"
 3. **Onboarding:** "New devs learn org patterns instantly"
 4. **Private Repos:** "In reality, these would be our private internal services - payment-service, auth-service, inventory-service"
 5. **Multi-Model Research, Plan, Implement:** Used Sourcegraph to research, Oracle (GPT5) to plan and the main model (Sonnet 4.5) to implement.
 6. **Scale:** "Works across hundreds of repos as your org grows"
-
 
 ---
 
