@@ -535,7 +535,7 @@ Show me how these repos implement similar patterns, including file paths and cod
 **Amp Prompt:**
 
 ```
-Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce backend service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidance with code references and code snippets.
+Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce backend service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidance with code references and code snippets. Save this plan as ERROR_HANDLING_IMPLEMENTATION_PLAN.md
 ```
 
 **What to show:**
@@ -544,16 +544,16 @@ Review the error handling patterns you found from Sourcegraph and create an impl
 - Identifies best practices vs anti-patterns
 - Creates a tailored step by step implementation plan specific to our needs
 
-**Demo talking point:** _"Perfect! The oracle synthesized the patterns from all our services and created a specific plan that fits our FastAPI service needs. Now let's implement it."_
+**Demo talking point:** _"Perfect! The oracle synthesized the patterns from all our services and created a specific plan that fits our FastAPI service needs. Now let's review (revise if needed) then implement it."_
 
 ##### Step 3: Implementation
 
-**Goal:** Build based on the oracle's recommendations
+**Goal:** Review (and revises as needed) then build based on the oracle's recommendations
 
 **Amp Prompt:**
 
 ```
-Implement the error handling plan you recommended.
+Implement the ERROR_HANDLING_IMPLEMENTATION_PLAN.md plan you recommended
 ```
 
 **Demo talking point:** _"Excellent! Now our error handling matches the standard used across all our services. We used Sourcegraph to discover patterns across multiple repos, the oracle to analyze and plan, and Amp to implement. Any developer can jump between repos and see familiar patterns."_
