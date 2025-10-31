@@ -52,6 +52,10 @@ RUN curl -fsSL https://ampcode.com/install.sh | bash
 # ─────────────────────────────────────────────────────────────────
 RUN set -eux; \
     ARCH=$(dpkg --print-architecture); \
+    case "$ARCH" in \
+        arm64|amd64) ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac; \
     if [ "$ARCH" = "arm64" ]; then ARCH="arm64"; \
     elif [ "$ARCH" = "amd64" ]; then ARCH="amd64"; \
     else echo "Unsupported architecture: $ARCH" && exit 1; fi; \
