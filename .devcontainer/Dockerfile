@@ -46,6 +46,17 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 RUN curl -fsSL https://ampcode.com/install.sh | bash
 
 # ─────────────────────────────────────────────────────────────────
+# Install Sourcegraph CLI
+# ─────────────────────────────────────────────────────────────────
+RUN set -eux; \
+    ARCH=$(dpkg --print-architecture); \
+    if [ "$ARCH" = "arm64" ]; then ARCH="arm64"; \
+    elif [ "$ARCH" = "amd64" ]; then ARCH="amd64"; \
+    else echo "Unsupported architecture: $ARCH" && exit 1; fi; \
+    curl -L "https://sourcegraph.com/.api/src-cli/src_linux_${ARCH}" -o /usr/local/bin/src \
+ && chmod +x /usr/local/bin/src
+
+# ─────────────────────────────────────────────────────────────────
 # Configure git safe.directory for bind-mounted workspace
 # ─────────────────────────────────────────────────────────────────
 RUN git config --global --add safe.directory /workspaces/app
