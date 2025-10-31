@@ -494,6 +494,8 @@ src login
 
 This demo shows how to use Sourcegraph Code Search to find and adopt error handling patterns from across multiple repos in your organization. While we use public repos for the demo, imagine these are your company's internal microservices (auth-service, payment-service, inventory-service, etc.)
 
+You can use MCP or the CLI. The current step 1 prompt includes the word MCP. If you prefer to run it with the CLI then just remove the word "MCP".
+
 Repos to Search (Public Stand-ins for "Internal Services"). These are already indexed in the Demo Sourcegraph instance:
 
 - `fastapi-practices/fastapi_best_architecture`
@@ -502,7 +504,7 @@ Repos to Search (Public Stand-ins for "Internal Services"). These are already in
 
 ##### Demo Narrative
 
-_"We're building a new checkout endpoint for our ecommerce service. We want to handle errors consistently with how our other backend teams do it. Let's search across our existing services to find the standard patterns."_
+_"We're building this backend for our ecommerce service. We want to handle errors consistently with how our other backend teams do it. Let's search across our existing services to find the standard patterns."_
 
 ##### Step 1: Discover Error Handling Patterns
 
@@ -511,7 +513,7 @@ _"We're building a new checkout endpoint for our ecommerce service. We want to h
 **Amp Prompt:**
 
 ```
-Use Sourcegraph to search for error handling patterns across our FastAPI backend services (fastapi-practices/fastapi_best_architecture, teamhide/fastapi-boilerplate, iam-abbas/FastAPI-Production-Boilerplate):
+Use Sourcegraph MCP to search for error handling patterns across our FastAPI backend services (fastapi-practices/fastapi_best_architecture, teamhide/fastapi-boilerplate, iam-abbas/FastAPI-Production-Boilerplate):
 
 1. Custom exception classes with message, type, and code attributes
 2. Global exception handlers using @app.exception_handler decorators
@@ -535,7 +537,7 @@ Show me how these repos implement similar patterns, including file paths and cod
 **Amp Prompt:**
 
 ```
-Review the error handling patterns you found from Sourcegraph and create an implementation plan for our ecommerce backend service. Recommend which elements to adopt and explain the rationale. The plan should contain step by step guidance with code references and code snippets. Save this plan as ERROR_HANDLING_IMPLEMENTATION_PLAN.md
+Review the error handling patterns you found from Sourcegraph and consult the oracle to create an implementation plan for our ecommerce backend service. The plan should contain step by step guidance with code references and code snippets. Save this plan as ERROR_HANDLING_IMPLEMENTATION_PLAN.md
 ```
 
 **What to show:**
@@ -560,12 +562,14 @@ Create a new branch and implement the ERROR_HANDLING_IMPLEMENTATION_PLAN.md plan
 
 ##### Key Talking Points for Demo
 
-1. **Speed:** "Found 3 different team's approaches in just 30 seconds"
+1. **Speed:** "Found 3 different team's approaches quickly"
 2. **Consistency:** "Ensures new services match existing standards"
 3. **Onboarding:** "New devs learn org patterns instantly"
 4. **Private Repos:** "In reality, these would be our private internal services - payment-service, auth-service, inventory-service"
 5. **Multi-Model Research, Plan, Implement:** Used Sourcegraph to research, Oracle (GPT5) to plan and the main model (Sonnet 4.5) to implement.
 6. **Scale:** "Works across hundreds of repos as your org grows"
+
+**[Thread](https://ampcode.com/threads/T-99ac3974-7980-4570-a919-7317aa90678d) | [Branch](https://github.com/sourcegraph/ecommerce-app/tree/feature/structured-error-handling) | [Existing PR](https://github.com/sourcegraph/ecommerce-app/pull/91)**
 
 ---
 
