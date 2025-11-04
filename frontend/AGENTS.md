@@ -8,6 +8,16 @@
 **Design System:** Modular theme with semantic tokens (sand/ink/charcoal colors, Inter font)  
 **Architecture:** Component-based with Context API for state management
 
+## Built-in Tools
+
+For testing, linting, building, formatting, and CI operations, use the built-in tools documented in the root [AGENTS.md](../AGENTS.md#built-in-tools-must-use):
+
+- `run_tests` - Run E2E tests with optional path and pattern filtering
+- `lint_and_check` - Run ESLint checking
+- `build_app` - Build for production and verify TypeScript compilation
+- `format_code` - Format code with prettier
+- `run_ci` - Run complete CI pipeline
+
 ## Essential Commands
 
 **Development:**
@@ -18,15 +28,16 @@
 
 **Testing:**
 
-- `npx playwright test` - Run E2E tests
+- Use `run_tests` tool with action "e2e" to run E2E tests (preferred)
+- `npx playwright test` - Run E2E tests directly
 - `npx playwright test --ui` - Run E2E tests with UI mode
 
 **Quality Checks:**
 
-- `just lint` - ESLint checking
-- `just build` - Production build (includes TypeScript type checking)
-- `just format` - Format frontend code with prettier
-- `just ci` - Run complete CI pipeline (format checks, linting, type checking, all tests, build)
+- Use `lint_and_check` tool with target "frontend" for ESLint checking
+- Use `build_app` tool for production build (includes TypeScript type checking)
+- Use `format_code` tool with target "frontend" to format code with prettier
+- Use `run_ci` tool to run complete CI pipeline
 
 **Playwright:**
 

@@ -20,10 +20,10 @@ test.describe('Product Browsing', () => {
   test('should show loading state initially', async ({ page }) => {
     await page.goto('/')
 
-    const loading = page.getByTestId('loading')
+    const loading = page.getByTestId('loading').first()
 
     // If loading element exists, it should become hidden (not removed from DOM)
-    if ((await loading.count()) > 0) {
+    if ((await page.getByTestId('loading').count()) > 0) {
       await expect(loading).toBeVisible()
       await expect(loading).toBeHidden({ timeout: 10000 })
     }
