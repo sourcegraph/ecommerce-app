@@ -581,7 +581,7 @@ These are frequently used for running tests, builds and other frequently invoked
 
 A tool needs to have a description and a script to execute. Amp uses these descriptions to decide when to invoke the tool, making it very important to get the description right. This is a pretty technical area, there is more information in the [Amp Manual here](https://ampcode.com/manual#toolboxes). This [news post](https://ampcode.com/news/more-tools-for-the-agent) has a good walk through of how to create them.
 
-This repo has several tools in `.agents/tools/` which are setup for testing, linting, building, formatting, and CI operations. They will automatically be used when making changes with the repo as long as you instruct Amp to run tests, format code, etc.
+This repo has several tools in `.agents/tools/` which are setup for testing, linting, building, formatting, and CI operations. In the devcontainer they will automatically be used when making changes with the repo as long as you instruct Amp to run tests, format code, etc. If you are not running in a container you must ensure `AMP_TOOLBOX="$PWD/.agents/tools"` is set for Amp to pick them up.
 
 To explicitly trigger a tool call so you can describe what is occurring, use the prompt:
 
