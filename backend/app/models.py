@@ -43,6 +43,10 @@ class Product(SQLModel, table=True):
     image_filename: Optional[str] = Field(default=None)  # Original filename
     is_saved: bool = Field(default=False)
 
+    # Featured products fields
+    is_featured: bool = Field(default=False, index=True)
+    featured_order: Optional[int] = Field(default=None, index=True)
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 

@@ -1,10 +1,12 @@
 import { HStack, Tag, Text } from '@chakra-ui/react'
 import FeaturedBanner from '../components/FeaturedBanner'
+import FeaturedCarousel from '../components/FeaturedCarousel'
 import LoadingProduct from '../components/Loading/LoadingProduct'
 import Main from '../components/Main'
 import ProductCard from '../components/ProductCard'
 import ProductsGrid from '../components/ProductsGrid'
 import { useFilteredProducts } from '../hooks/useFilteredProducts'
+import { useFeaturedProducts } from '../hooks/useFeaturedProducts'
 import { searchTags } from '../mockDB/db'
 import { ProductType } from '../context/GlobalState'
 import { Product } from '../api/types'
@@ -13,6 +15,7 @@ import { useMemo } from 'react'
 
 const Home = () => {
   const { products: filteredProducts, loading: isLoading } = useFilteredProducts()
+  const { data: featured, loading: featuredLoading } = useFeaturedProducts(5)
   const { products: globalProducts } = useGlobalContext()
 
   // Transform API Product objects to ProductType and merge with global state (cart/saved)
@@ -50,7 +53,12 @@ const Home = () => {
 
   return (
     <Main>
-      {!isLoading && products.length > 0 && <FeaturedBanner product={products[0]} />}
+      {/* Show carousel when 3+ featured products, fallback to single banner */}
+      {!featuredLoading && featured.length >= 3 ? (
+        <FeaturedCarousel products={featured} intervalMs={6000} />
+      ) : (
+        !isLoading && products.length > 0 && <FeaturedBanner product={products[0]} />
+      )}
 
       <HStack p={3} mb={5} spacing={2} flexWrap="wrap">
         <Text fontWeight="bold" fontSize="sm" mr={3} color="text.primary">

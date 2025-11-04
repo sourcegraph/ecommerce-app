@@ -23,6 +23,8 @@
     "@heroicons/react": "^2.2.0",
     "@loadable/component": "^5.15.3",
     "@mui/material": "^5.12.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "focus-visible": "^5.2.0",
     "formik": "^2.2.9",
     "framer-motion": "^10.12.4",

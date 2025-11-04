@@ -472,6 +472,65 @@ def get_product_image(product_id: int, session: Session = Depends(get_session)):
     )
 
 
+@app.get("/api/products/featured", response_model=List[ProductRead])
+def get_featured_products(
+    limit: int = Query(5, ge=1, le=10),
+    include_delivery_summary: bool = Query(True),
+    session: Session = Depends(get_session),
+):
+    """Get featured products for carousel display"""
+    stmt = (
+        select(Product)
+        .where(Product.is_featured == True)  # noqa: E712
+        .options(selectinload(cast(Any, Product.delivery_options)))
+        .options(selectinload(cast(Any, Product.category)))
+        .order_by(
+            # Order by featured_order (nulls last), then newest first
+            cast(ColumnElement, Product.featured_order).asc().nullslast(),
+            cast(ColumnElement, Product.created_at).desc(),
+        )
+        .limit(limit)
+    )
+    products = session.exec(stmt).all()
+
+    # Convert to response format with image URLs
+    result = []
+    for product in products:
+        product_dict = {
+            "id": product.id,
+            "title": product.title,
+            "description": product.description,
+            "price": product.price,
+            "category_id": product.category_id,
+            "is_saved": product.is_saved,
+            "is_featured": product.is_featured,
+            "featured_order": product.featured_order,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "image_url": f"/products/{product.id}/image"
+            if product.image_data
+            else None,
+            "category": {
+                "id": product.category.id,
+                "name": product.category.name,
+                "created_at": product.category.created_at,
+                "updated_at": product.category.updated_at,
+            }
+            if product.category
+            else None,
+            "delivery_summary": None,
+        }
+
+        if include_delivery_summary and hasattr(product, "delivery_options"):
+            summary = calculate_delivery_summary(product.delivery_options)
+            if summary:
+                product_dict["delivery_summary"] = summary.model_dump()
+
+        result.append(product_dict)
+
+    return result
+
+
 if __name__ == "__main__":
     import uvicorn
 

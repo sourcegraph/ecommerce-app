@@ -48,6 +48,8 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     category_id: int
+    is_featured: bool = False
+    featured_order: Optional[int] = None
 
 
 class ProductUpdate(BaseModel):
@@ -56,6 +58,8 @@ class ProductUpdate(BaseModel):
     price: Optional[float] = None
     is_saved: Optional[bool] = None
     category_id: Optional[int] = None
+    is_featured: Optional[bool] = None
+    featured_order: Optional[int] = None
 
 
 class ProductRead(ProductBase):
@@ -64,6 +68,8 @@ class ProductRead(ProductBase):
     image_url: Optional[str] = None  # Generated URL for frontend
     created_at: datetime
     updated_at: datetime
+    is_featured: bool = False
+    featured_order: Optional[int] = None
     category: Optional[CategoryRead] = None
     delivery_summary: Optional["DeliverySummary"] = None
 

@@ -220,6 +220,19 @@ def assign_delivery_options_to_products(
 
     session.commit()
 
+    # Mark some products as featured (5 products with images)
+    products_with_images = [p for p in products if p.image_data is not None]
+    if len(products_with_images) >= 5:
+        # Deterministically select first 5 products with images
+        featured_products = products_with_images[:5]
+        for idx, product in enumerate(featured_products):
+            product.is_featured = True
+            product.featured_order = idx + 1
+            session.add(product)
+            print(f"Marked '{product.title}' as featured (order: {idx + 1})")
+        session.commit()
+        print(f"\nMarked {len(featured_products)} products as featured")
+
 
 def seed_database(custom_engine=None):
     """Main seeding function"""
