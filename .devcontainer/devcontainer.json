@@ -85,7 +85,7 @@
     "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
     "GIT_PAGER": "cat",
-    "AMP_TOOLBOX": "/workspaces/app/.agents/tools:/root/.config/amp/tools"
+    "AMP_TOOLBOX": "${containerWorkspaceFolder}/.agents/tools"
   },
 
   // ─────────────────────────────────────────────────────────────────
