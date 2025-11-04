@@ -90,8 +90,13 @@ target = target && target.length > 0 ? target : 'both'
    case "backend":
      console.log("Formatting backend Python code with ruff...\n")
      try {
-     const output = runJust('format')
-     console.log(output)
+       const root = resolveWorkspaceRoot()
+       const output = execSync('uv run --active ruff format .', { 
+         encoding: 'utf-8', 
+         stdio: 'pipe',
+         cwd: path.join(root, 'backend')
+       })
+       console.log(output)
        console.log("\n✅ Backend code formatted!")
      } catch (error) {
        console.error("\n❌ Backend formatting failed:\n")

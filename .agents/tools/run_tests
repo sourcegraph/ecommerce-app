@@ -93,11 +93,11 @@ action = action && action.length > 0 ? action : 'help'
 
  // output goes directly to the model
  switch (action) {
-   case "all":
-     console.log("Running all tests (backend + e2e)...")
-     if (path || pattern) {
-       console.warn("Warning: 'path' and 'pattern' options are ignored when action is 'all'")
-     }
+ case "all":
+ console.log("Running all tests (backend + e2e)...")
+ if (testPath || pattern) {
+ console.warn("Warning: 'path' and 'pattern' options are ignored when action is 'all'")
+ }
      try {
      const output = runJust('test-all-local')
      console.log(output)
@@ -110,48 +110,48 @@ action = action && action.length > 0 ? action : 'help'
      break;
    
    case "backend":
-     console.log("Running backend tests...")
-     try {
-     let cmd = 'cd backend && uv run --active pytest'
-     if (testPath) {
-     cmd += ` ${testPath}`
-     console.log(`  → Testing specific file: ${testPath}`)
-     }
-     if (pattern) {
-     cmd += ` -k "${pattern}"`
-     console.log(`  → Filtering by pattern: ${pattern}`)
-     }
-       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
-       console.log(output)
-       console.log("\n✅ Backend tests passed!")
-     } catch (error) {
-       console.error("\n❌ Backend tests failed:\n")
-       console.error(error.stdout || error.stderr || error.message)
-       process.exit(1)
-     }
-     break;
+   console.log("Running backend tests...")
+   try {
+   let cmd = 'uv run --active pytest'
+   if (testPath) {
+   cmd += ` ${testPath}`
+   console.log(`  → Testing specific file: ${testPath}`)
+   }
+   if (pattern) {
+   cmd += ` -k "${pattern}"`
+   console.log(`  → Filtering by pattern: ${pattern}`)
+   }
+   const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: path.join(workspaceRoot, 'backend') })
+   console.log(output)
+   console.log("\n✅ Backend tests passed!")
+   } catch (error) {
+   console.error("\n❌ Backend tests failed:\n")
+   console.error(error.stdout || error.stderr || error.message)
+   process.exit(1)
+   }
+   break;
    
    case "e2e":
-     console.log("Running e2e tests (headless)...")
-     try {
-     let cmd = 'cd frontend && npx playwright test'
-     if (testPath) {
-     cmd += ` ${testPath}`
-     console.log(`  → Testing specific file: ${testPath}`)
-     }
-     if (pattern) {
-     cmd += ` -g "${pattern}"`
-     console.log(`  → Filtering by pattern: ${pattern}`)
-     }
-       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
-       console.log(output)
-       console.log("\n✅ E2E tests passed!")
-     } catch (error) {
-       console.error("\n❌ E2E tests failed:\n")
-       console.error(error.stdout || error.stderr || error.message)
-       process.exit(1)
-     }
-     break;
+   console.log("Running e2e tests (headless)...")
+   try {
+   let cmd = 'npx playwright test'
+   if (testPath) {
+   cmd += ` ${testPath}`
+   console.log(`  → Testing specific file: ${testPath}`)
+   }
+   if (pattern) {
+   cmd += ` -g "${pattern}"`
+   console.log(`  → Filtering by pattern: ${pattern}`)
+   }
+   const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: path.join(workspaceRoot, 'frontend') })
+   console.log(output)
+   console.log("\n✅ E2E tests passed!")
+   } catch (error) {
+   console.error("\n❌ E2E tests failed:\n")
+   console.error(error.stdout || error.stderr || error.message)
+   process.exit(1)
+   }
+   break;
    
    case "help":
      console.log(`
