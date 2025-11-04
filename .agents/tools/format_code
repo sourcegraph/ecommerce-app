@@ -1,0 +1,201 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import path from "node:path"
+import { execSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
+function showDescription() {
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "format_code",
+   description: 'Format backend and frontend code automatically. Runs ruff format on backend Python code and prettier on frontend TypeScript/JavaScript code. Use this tool to ensure consistent code formatting across the project. Always prefer this tool over running format commands directly via Bash.',
+   args: { 
+     target: ['string', 'The target to format. Options: "backend" (runs ruff format on Python code), "frontend" (runs prettier on TypeScript/JavaScript), "both" (formats both backend and frontend), "help" (shows available options). Default: "both"']
+   },
+  }),
+ )
+}
+
+function findRoot(start) {
+  let dir = start
+  while (true) {
+    if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
+      return dir
+    }
+    const parent = path.dirname(dir)
+    if (parent === dir) return null
+    dir = parent
+  }
+}
+
+function resolveWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
+    return process.env.WORKSPACE_ROOT
+  }
+  const fromCwd = findRoot(process.cwd())
+  if (fromCwd) return fromCwd
+  
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  const fromScript = findRoot(scriptDir)
+  if (fromScript) return fromScript
+  
+  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
+}
+
+function runJust(recipe) {
+  const root = resolveWorkspaceRoot()
+  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
+  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
+  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
+}
+
+function execute() {
+// parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
+const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
+let target = params['target']
+target = target && target.length > 0 ? target : 'both'
+  
+  // output goes directly to the model
+ switch (target) {
+   case "backend":
+     console.log("Formatting backend Python code with ruff...\n")
+     try {
+     const output = runJust('format')
+     console.log(output)
+       console.log("\n✅ Backend code formatted!")
+     } catch (error) {
+       console.error("\n❌ Backend formatting failed:\n")
+       console.error(error.stdout || error.stderr || error.message)
+       process.exit(1)
+     }
+     break;
+   
+   case "frontend":
+     console.log("Formatting frontend code with prettier...\n")
+     try {
+       const root = resolveWorkspaceRoot()
+       const output = execSync('npm run format', { 
+         encoding: 'utf-8', 
+         stdio: 'pipe',
+         cwd: path.join(root, 'frontend')
+       })
+       console.log(output)
+       console.log("\n✅ Frontend code formatted!")
+     } catch (error) {
+       console.error("\n❌ Frontend formatting failed:\n")
+       console.error(error.stdout || error.stderr || error.message)
+       process.exit(1)
+     }
+     break;
+   
+   case "both":
+     console.log("Formatting all code (backend + frontend)...\n")
+     let backendFailed = false
+     let frontendFailed = false
+     let backendOutput = ""
+     let frontendOutput = ""
+
+     console.log("=".repeat(60))
+     console.log("BACKEND FORMATTING (ruff)")
+     console.log("=".repeat(60) + "\n")
+     
+     try {
+       const root = resolveWorkspaceRoot()
+       backendOutput = execSync('uv run --active ruff format .', {
+         encoding: 'utf-8',
+         stdio: 'pipe',
+         cwd: path.join(root, 'backend')
+       })
+       console.log(backendOutput)
+       console.log("\n✅ Backend formatting complete!")
+     } catch (error) {
+       backendFailed = true
+       backendOutput = error.stdout || error.stderr || error.message
+       console.error(backendOutput)
+       console.error("\n❌ Backend formatting failed!")
+     }
+
+     console.log("\n" + "=".repeat(60))
+     console.log("FRONTEND FORMATTING (prettier)")
+     console.log("=".repeat(60) + "\n")
+     
+     try {
+       const root = resolveWorkspaceRoot()
+       frontendOutput = execSync('npm run format', {
+         encoding: 'utf-8',
+         stdio: 'pipe',
+         cwd: path.join(root, 'frontend')
+       })
+       console.log(frontendOutput)
+       console.log("\n✅ Frontend formatting complete!")
+     } catch (error) {
+       frontendFailed = true
+       frontendOutput = error.stdout || error.stderr || error.message
+       console.error(frontendOutput)
+       console.error("\n❌ Frontend formatting failed!")
+     }
+
+     console.log("\n" + "=".repeat(60))
+     console.log("SUMMARY")
+     console.log("=".repeat(60))
+     console.log(`Backend:  ${backendFailed ? "❌ FAILED" : "✅ FORMATTED"}`)
+     console.log(`Frontend: ${frontendFailed ? "❌ FAILED" : "✅ FORMATTED"}`)
+
+     if (backendFailed || frontendFailed) {
+       console.error("\n❌ Some formatting failed!")
+       process.exit(1)
+     } else {
+       console.log("\n✅ All code formatted!")
+     }
+     break;
+   
+   case "help":
+     console.log(`
+Available targets:
+  backend     - Format backend Python code with ruff
+  frontend    - Format frontend TypeScript/JavaScript with prettier
+  both        - Format both backend and frontend (default)
+  help        - Show this help message
+
+Examples:
+  {"target": "backend"}
+  {"target": "frontend"}
+  {"target": "both"}
+     `.trim())
+     break;
+   
+   default: 
+     process.stderr.write(`Unknown target: ${target}\n\nUse target "help" to see available options.`)
+     process.exit(1)
+ }
+}

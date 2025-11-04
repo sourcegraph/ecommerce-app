@@ -1,0 +1,180 @@
+#!/usr/bin/env bun
+import fs from "node:fs"
+import path from "node:path"
+import { execSync } from "node:child_process"
+
+/**
+ * This program implements the Amp Toolbox protocol to provide
+ * custom tools to an LLM without writing an MCP server.
+ *
+ * Amp invokes this program once at startup with TOOLBOX_ACTION set
+ * to "describe".  The program then needs to write its tool schema
+ * to stdout.
+ *
+ * When the model wants to use the tool, TOOLBOX_ACTION is set to
+ * "execute" and tool parameters are passed to stdin as a JSON object.
+ *
+ * Any output on stdout/stderr goes directly to the model and need not
+ * be structured.
+ */
+const action = process.env.TOOLBOX_ACTION
+
+if (action === 'describe') showDescription()
+else if (action === 'execute') execute()
+
+/**
+ * Use args for a simplified tool description:
+ *  - [type, description]
+ *  - where type is "string", "number", "object", "array", "boolean"
+ *
+ * Use inputSchema instead for full JSON schema support.
+ */
+function showDescription() {
+ // The description MUST mention when to use this tool instead of Bash,
+ // otherwise the model will prefer unstructured command line tools.
+ //
+ // Tools like this one should always have highest priority, because
+ // they are carefully crafted for a specific purpose.
+ process.stdout.write(
+  JSON.stringify({
+   name: "run_tests",
+   description: 'Run tests in the Linea Supply e-commerce app. Use this tool whenever you need to run any kind of tests (backend, frontend, e2e, or all tests), verify code changes, or check if tests pass. This tool runs the appropriate test commands via justfile. Always prefer this tool over running test commands directly via Bash.',
+   args: { 
+     action: ['string', 'The type of tests to run. Options: "all" (runs all backend + e2e tests via just test-all-local), "backend" (runs backend pytest tests only via just test), "e2e" (runs Playwright e2e tests headless via just test-e2e), "help" (shows available test commands)'],
+     path: ['string', 'Optional: specific test file path to run (e.g., "backend/tests/test_products.py" or "frontend/e2e/checkout.spec.ts")'],
+     pattern: ['string', 'Optional: test name pattern to match. For backend uses pytest -k flag, for e2e uses playwright -g flag (e.g., "test_create_product" or "checkout flow")']
+   },
+  }),
+ )
+}
+
+function findRoot(start) {
+  let dir = start
+  while (true) {
+    if (fs.existsSync(path.join(dir, 'justfile')) || fs.existsSync(path.join(dir, 'Justfile'))) {
+      return dir
+    }
+    const parent = path.dirname(dir)
+    if (parent === dir) return null
+    dir = parent
+  }
+}
+
+function resolveWorkspaceRoot() {
+  if (process.env.WORKSPACE_ROOT && findRoot(process.env.WORKSPACE_ROOT)) {
+    return process.env.WORKSPACE_ROOT
+  }
+  const fromCwd = findRoot(process.cwd())
+  if (fromCwd) return fromCwd
+  
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname)
+  const fromScript = findRoot(scriptDir)
+  if (fromScript) return fromScript
+  
+  throw new Error('Could not locate justfile. Set WORKSPACE_ROOT or ensure justfile is at repository root.')
+}
+
+function runJust(recipe) {
+  const root = resolveWorkspaceRoot()
+  const jf = fs.existsSync(path.join(root, 'justfile')) ? 'justfile' : 'Justfile'
+  const cmd = `just -f "${path.join(root, jf)}" -d "${root}" ${recipe}`
+  return execSync(cmd, { encoding: 'utf-8', stdio: 'pipe' })
+}
+
+function execute() {
+// parse parameters as JSON from stdin (matches inputSchema/args from showDescription)
+const params = JSON.parse(fs.readFileSync(0, 'utf-8'))
+let action = params['action']
+const testPath = params['path']
+const pattern = params['pattern']
+action = action && action.length > 0 ? action : 'help'
+  
+  const workspaceRoot = resolveWorkspaceRoot()
+
+ // output goes directly to the model
+ switch (action) {
+   case "all":
+     console.log("Running all tests (backend + e2e)...")
+     if (path || pattern) {
+       console.warn("Warning: 'path' and 'pattern' options are ignored when action is 'all'")
+     }
+     try {
+     const output = runJust('test-all-local')
+     console.log(output)
+       console.log("\n✅ All tests passed!")
+     } catch (error) {
+       console.error("\n❌ Tests failed:\n")
+       console.error(error.stdout || error.stderr || error.message)
+       process.exit(1)
+     }
+     break;
+   
+   case "backend":
+     console.log("Running backend tests...")
+     try {
+     let cmd = 'cd backend && uv run --active pytest'
+     if (testPath) {
+     cmd += ` ${testPath}`
+     console.log(`  → Testing specific file: ${testPath}`)
+     }
+     if (pattern) {
+     cmd += ` -k "${pattern}"`
+     console.log(`  → Filtering by pattern: ${pattern}`)
+     }
+       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+       console.log(output)
+       console.log("\n✅ Backend tests passed!")
+     } catch (error) {
+       console.error("\n❌ Backend tests failed:\n")
+       console.error(error.stdout || error.stderr || error.message)
+       process.exit(1)
+     }
+     break;
+   
+   case "e2e":
+     console.log("Running e2e tests (headless)...")
+     try {
+     let cmd = 'cd frontend && npx playwright test'
+     if (testPath) {
+     cmd += ` ${testPath}`
+     console.log(`  → Testing specific file: ${testPath}`)
+     }
+     if (pattern) {
+     cmd += ` -g "${pattern}"`
+     console.log(`  → Filtering by pattern: ${pattern}`)
+     }
+       const output = execSync(cmd, { encoding: 'utf-8', stdio: 'pipe', cwd: workspaceRoot })
+       console.log(output)
+       console.log("\n✅ E2E tests passed!")
+     } catch (error) {
+       console.error("\n❌ E2E tests failed:\n")
+       console.error(error.stdout || error.stderr || error.message)
+       process.exit(1)
+     }
+     break;
+   
+   case "help":
+     console.log(`
+Available test actions:
+  all         - Run all tests (backend + e2e) via 'just test-all-local'
+  backend     - Run backend pytest tests only via 'just test'
+  e2e         - Run Playwright e2e tests (headless) via 'just test-e2e'
+  help        - Show this help message
+
+Optional parameters:
+  path        - Specific test file to run (e.g., "backend/tests/test_products.py")
+  pattern     - Test name pattern to match (pytest -k or playwright -g)
+
+Examples:
+  {"action": "all"}
+  {"action": "backend", "path": "backend/tests/test_products.py"}
+  {"action": "backend", "pattern": "test_create"}
+  {"action": "e2e", "pattern": "checkout"}
+     `.trim())
+     break;
+   
+   default: 
+     process.stderr.write(`Unknown action: ${action}\n\nUse action "help" to see available options.`)
+     process.exit(1)
+ }
+}

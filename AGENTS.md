@@ -9,32 +9,29 @@
 **Design System:** Monochrome palette (sand/ink/charcoal) with subtle slate blue accents  
 **URLs:** Frontend http://localhost:3001, Backend http://localhost:8001/docs
 
+## Built-in Tools (MUST USE)
+
+**IMPORTANT:** Amp has custom built-in tools in `.agents/tools/` that MUST be used instead of running commands directly via Bash. These tools provide better error handling, structured output, and are optimized for agentic workflows.
+
+**Available Tools:**
+
+- `run_tests` - Run backend/e2e/all tests with optional path and pattern filtering
+- `lint_and_check` - Run static analysis and linting on backend/frontend/both
+- `build_app` - Build frontend for production and verify TypeScript compilation
+- `format_code` - Format backend (ruff) and frontend (prettier) code
+- `run_ci` - Run complete CI pipeline with configurable stop-on-error behavior
+
+**ALWAYS use these tools for testing, linting, building, formatting, and CI operations.**
+
 ## Development Commands
 
-**Quick start:**
+**Service Management:**
 
 - `just dev-headless` - Start both services in background (detached for agentic development, always use this to start the services for testing)
 - `just stop` - Stop both services (always do this when you are done)
 - `just logs` - View last 100 lines from both service logs (use for troubleshooting)
 - `just seed` - Add sample data to the sqlite database
-
-**Testing:**
-
-- `just test-all-local` - Run all tests (backend + E2E)
-- `just test-local` - Run backend tests only
-- `just test-e2e` - Run E2E tests (headless)
 - `just setup-e2e` - Install Playwright browsers
-
-**Code Quality:**
-
-- `just check` - Run linting (ruff) and type checking (mypy) for backend
-- `just lint` - Lint frontend TypeScript
-- `just format` - Format backend (ruff) and frontend (prettier) code
-- `just build` - Build frontend for production
-
-**Pass CI:**
-
-- `just ci` - Run complete CI pipeline (lint, tests, build, e2e)
 
 **Error Handling:**
 
@@ -87,7 +84,7 @@ const getMockUser = (overrides?: Partial<User>): User => ({
 **Backend:** Ruff for formatting (Black-compatible)  
 **Frontend:** Prettier for formatting, ESLint for code quality
 
-**Always run `just format` after making code changes** to ensure consistent formatting across backend and frontend. ESLint is configured with `eslint-config-prettier` to disable conflicting style rules.
+**Always use the `format_code` tool after making code changes** to ensure consistent formatting across backend and frontend. ESLint is configured with `eslint-config-prettier` to disable conflicting style rules.
 
 ### TypeScript Guidelines (Frontend)
 
@@ -207,15 +204,15 @@ def process_payment(payment_data: dict) -> Result:
 
 ### Pre-commit Checklist
 
-1. Format all code changes (`just format`)
-2. All tests pass (`just test-all-local`)
+1. Format all code changes (use `format_code` tool)
+2. All tests pass (use `run_tests` tool)
 3. Code follows TDD process (tests written first)
-4. Linting passes (`just check` for backend, `just lint` for frontend)
-5. No type errors in TypeScript (`just build`)
+4. Linting passes (use `lint_and_check` tool)
+5. No type errors in TypeScript (use `build_app` tool)
 6. Factory functions used for all test data
 7. Business behavior documented through tests
 
-Run `just ci` to verify all checks pass before pushing.
+Run `run_ci` tool to verify all checks pass before pushing.
 
 ### GitHub Workflow
 

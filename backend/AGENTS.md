@@ -5,6 +5,14 @@
 **Stack:** Python 3.13+, FastAPI, SQLModel, SQLite, Alembic, pytest  
 **Architecture:** Feature-based structure with dependency injection via FastAPI Depends()
 
+## Built-in Tools
+
+For testing, linting, formatting, and CI operations, use the built-in tools documented in the root [AGENTS.md](../AGENTS.md#built-in-tools-must-use):
+- `run_tests` - Run backend tests with optional path and pattern filtering
+- `lint_and_check` - Run linting (ruff) and type checking (mypy)
+- `format_code` - Format code with ruff
+- `run_ci` - Run complete CI pipeline
+
 ## Essential Commands
 
 **Development:**
@@ -19,15 +27,16 @@
 - `uv run python -m app.seed` - Seed database with sample data
 
 **Testing:**
-- `uv run pytest` - Run all tests
+- Use `run_tests` tool with action "backend" to run tests (preferred)
+- `uv run pytest` - Run all tests directly
 - `uv run pytest tests/test_products.py::test_create_product` - Run specific test
 - `uv run pytest --cov=app` - Run tests with coverage
 - `uv run pytest -v` - Verbose test output
 
 **Quality Checks:**
-- `just check` - Run linting (ruff) and type checking (mypy)
-- `just format` - Format backend code with ruff
-- `just ci` - Run complete CI pipeline (format checks, linting, type checking, all tests, build)
+- Use `lint_and_check` tool with target "backend" for linting (ruff) and type checking (mypy)
+- Use `format_code` tool with target "backend" to format code with ruff
+- Use `run_ci` tool to run complete CI pipeline
 
 ## Testing Process
 
