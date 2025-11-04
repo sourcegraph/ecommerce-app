@@ -84,17 +84,18 @@
     "VIRTUAL_ENV": "/opt/venvs/backend",
     "PATH": "/opt/venvs/backend/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     "PLAYWRIGHT_BROWSERS_PATH": "/ms-playwright",
-    "GIT_PAGER": "cat",
-    "AMP_TOOLBOX": "${containerWorkspaceFolder}/.agents/tools"
+    "GIT_PAGER": "cat"
   },
 
   // ─────────────────────────────────────────────────────────────────
   // Remote Environment Variables (from host)
   // ─────────────────────────────────────────────────────────────────
   // Carry over Sourcegraph CLI configuration from local environment
+  // AMP_TOOLBOX in remoteEnv ensures VS Code extension sees it on first startup
   "remoteEnv": {
     "SRC_ENDPOINT": "${localEnv:SRC_ENDPOINT}",
-    "SRC_ACCESS_TOKEN": "${localEnv:SRC_ACCESS_TOKEN}"
+    "SRC_ACCESS_TOKEN": "${localEnv:SRC_ACCESS_TOKEN}",
+    "AMP_TOOLBOX": "${containerWorkspaceFolder}/.agents/tools"
   },
   
   // ─────────────────────────────────────────────────────────────────
