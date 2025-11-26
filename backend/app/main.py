@@ -225,6 +225,7 @@ def get_products_api(
                     stmt = (
                         stmt.join(ProductDeliveryLink)
                         .join(DeliveryOption)
+                        .distinct(cast(Any, Product.id))
                         .order_by(
                             cast(
                                 ColumnElement[int], DeliveryOption.estimated_days_min
@@ -236,6 +237,7 @@ def get_products_api(
                     stmt = (
                         stmt.join(ProductDeliveryLink)
                         .join(DeliveryOption)
+                        .distinct(cast(Any, Product.id))
                         .order_by(
                             cast(
                                 ColumnElement[int], DeliveryOption.estimated_days_min
@@ -244,11 +246,14 @@ def get_products_api(
                         )
                     )
             else:
-                stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
+                stmt = stmt.order_by(
+                    cast(ColumnElement[Any], Product.created_at).desc()
+                )
         else:
             stmt = (
                 stmt.join(ProductDeliveryLink)
                 .join(DeliveryOption)
+                .distinct(cast(Any, Product.id))
                 .order_by(
                     cast(ColumnElement[int], DeliveryOption.estimated_days_min).asc(),
                     cast(ColumnElement[float], Product.price).asc(),
@@ -262,6 +267,16 @@ def get_products_api(
         stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
 
     products = session.exec(stmt).all()
+
+    # Remove duplicates while preserving order for delivery_fastest sort
+    if sort == "delivery_fastest":
+        seen_ids = set()
+        unique_products = []
+        for product in products:
+            if product.id not in seen_ids:
+                unique_products.append(product)
+                seen_ids.add(product.id)
+        products = unique_products
 
     # Convert to response format
     result = []

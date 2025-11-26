@@ -229,3 +229,65 @@ def test_product_with_minimum_order_amount_api_response(
     # Verify minimum order amounts are correctly returned
     assert standard["min_order_amount"] == 25.0
     assert premium["min_order_amount"] is None
+
+
+def test_fastest_delivery_sort_no_duplicates(client: TestClient, session: Session):
+    """Test that fastest delivery sort does not return duplicate products (issue #35)"""
+    # Create a product with multiple delivery options
+    product = create_test_product(session, title="Multi-Option Product", price=50.0)
+    delivery_options = create_standard_delivery_options(session)
+    product.delivery_options = delivery_options
+    session.add(product)
+    session.commit()
+
+    # Fetch products with fastest delivery sort
+    response = client.get("/products?sort=delivery_fastest")
+    assert response.status_code == 200
+
+    products = response.json()
+
+    # Count occurrences of our product
+    product_count = sum(1 for p in products if p["id"] == product.id)
+
+    # Product should appear exactly once, not multiple times (one per delivery option)
+    assert product_count == 1, f"Product appeared {product_count} times, expected 1"
+
+
+def test_fastest_delivery_sort_with_category_filter_no_duplicates(
+    client: TestClient, session: Session
+):
+    """Test that fastest delivery sort with category filter does not return duplicates"""
+    # Create a unique category
+    from tests.factories import create_test_category
+    import uuid
+
+    unique_name = f"TestCategory-{uuid.uuid4().hex[:8]}"
+    category = create_test_category(session, name=unique_name)
+
+    # Create products in that category with multiple delivery options
+    product1 = create_test_product(
+        session, title="Product 1", price=30.0, category_id=category.id
+    )
+    product2 = create_test_product(
+        session, title="Product 2", price=40.0, category_id=category.id
+    )
+
+    delivery_options = create_standard_delivery_options(session)
+    product1.delivery_options = delivery_options
+    product2.delivery_options = delivery_options
+    session.add_all([product1, product2])
+    session.commit()
+
+    # Fetch products with fastest delivery sort and category filter
+    response = client.get(f"/products?sort=delivery_fastest&categoryId={category.id}")
+    assert response.status_code == 200
+
+    products = response.json()
+
+    # Count occurrences of each product
+    product1_count = sum(1 for p in products if p["id"] == product1.id)
+    product2_count = sum(1 for p in products if p["id"] == product2.id)
+
+    # Each product should appear exactly once
+    assert product1_count == 1, f"Product 1 appeared {product1_count} times"
+    assert product2_count == 1, f"Product 2 appeared {product2_count} times"
