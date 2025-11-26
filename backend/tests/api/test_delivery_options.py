@@ -234,9 +234,7 @@ def test_product_with_minimum_order_amount_api_response(
 def test_fastest_delivery_sort_no_duplicates(client: TestClient, session: Session):
     """Test that fastest delivery sort does not return duplicate products (issue #35)"""
     # Create a product with multiple delivery options
-    product = create_test_product(
-        session, title="Multi-Option Product", price=50.0
-    )
+    product = create_test_product(session, title="Multi-Option Product", price=50.0)
     delivery_options = create_standard_delivery_options(session)
     product.delivery_options = delivery_options
     session.add(product)
@@ -249,9 +247,7 @@ def test_fastest_delivery_sort_no_duplicates(client: TestClient, session: Sessio
     products = response.json()
 
     # Count occurrences of our product
-    product_count = sum(
-        1 for p in products if p["id"] == product.id
-    )
+    product_count = sum(1 for p in products if p["id"] == product.id)
 
     # Product should appear exactly once, not multiple times (one per delivery option)
     assert product_count == 1, f"Product appeared {product_count} times, expected 1"
@@ -264,6 +260,7 @@ def test_fastest_delivery_sort_with_category_filter_no_duplicates(
     # Create a unique category
     from tests.factories import create_test_category
     import uuid
+
     unique_name = f"TestCategory-{uuid.uuid4().hex[:8]}"
     category = create_test_category(session, name=unique_name)
 
@@ -282,9 +279,7 @@ def test_fastest_delivery_sort_with_category_filter_no_duplicates(
     session.commit()
 
     # Fetch products with fastest delivery sort and category filter
-    response = client.get(
-        f"/products?sort=delivery_fastest&categoryId={category.id}"
-    )
+    response = client.get(f"/products?sort=delivery_fastest&categoryId={category.id}")
     assert response.status_code == 200
 
     products = response.json()

@@ -246,7 +246,9 @@ def get_products_api(
                         )
                     )
             else:
-                stmt = stmt.order_by(cast(ColumnElement[Any], Product.created_at).desc())
+                stmt = stmt.order_by(
+                    cast(ColumnElement[Any], Product.created_at).desc()
+                )
         else:
             stmt = (
                 stmt.join(ProductDeliveryLink)
@@ -265,7 +267,7 @@ def get_products_api(
         stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
 
     products = session.exec(stmt).all()
-    
+
     # Remove duplicates while preserving order for delivery_fastest sort
     if sort == "delivery_fastest":
         seen_ids = set()
