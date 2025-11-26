@@ -265,6 +265,16 @@ def get_products_api(
         stmt = stmt.order_by(cast(ColumnElement, Product.created_at).desc())
 
     products = session.exec(stmt).all()
+    
+    # Remove duplicates while preserving order for delivery_fastest sort
+    if sort == "delivery_fastest":
+        seen_ids = set()
+        unique_products = []
+        for product in products:
+            if product.id not in seen_ids:
+                unique_products.append(product)
+                seen_ids.add(product.id)
+        products = unique_products
 
     # Convert to response format
     result = []
