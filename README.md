@@ -1,5 +1,7 @@
 # Amp Demo App
 
+hello world
+
 This repository is a carefully crafted demo that showcases the capabilities of Amp, centered around an example e-commerce platform featuring a FastAPI backend and a React frontend. Data is stored in SQLite, so it is self-contained and easy to run.
 
 For more information about Amp visit the [Amp manual](https://ampcode.com/manual).
