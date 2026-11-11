@@ -65,7 +65,7 @@ def test_create_duplicate_category(client: TestClient):
 
     response = client.post("/categories", json=category_data)
     # This should fail due to unique constraint
-    assert response.status_code in [400, 422]
+    assert response.status_code == 409
 
 
 def test_category_with_products(client: TestClient):
@@ -100,8 +100,8 @@ def test_create_category_duplicate_name(client: TestClient):
 
     # Duplicate should fail
     response2 = client.post("/categories", json=category_data)
-    assert response2.status_code == 400
-    assert "already exists" in response2.json()["detail"].lower()
+    assert response2.status_code == 409
+    assert "already exists" in response2.json()["message"].lower()
 
 
 def test_create_category_empty_name(client: TestClient):
