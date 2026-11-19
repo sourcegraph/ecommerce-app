@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, Query
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -10,6 +10,13 @@ import io
 import os
 
 from .db import get_session, create_db_and_tables
+from .errors import (
+    BadRequestError,
+    ConflictError,
+    ErrorCode,
+    NotFoundError,
+    register_exception_handlers,
+)
 
 from .schemas import (
     ProductRead,
@@ -66,6 +73,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+register_exception_handlers(app)
+
 # CORS middleware for frontend integration
 origins = os.getenv(
     "CORS_ALLOW_ORIGINS", "http://localhost:3001,http://127.0.0.1:3001"
@@ -91,9 +100,9 @@ def create_category(category: CategoryCreate, session: Session = Depends(get_ses
     # Check if category already exists
     existing_category = crud.get_category_by_name(session, category.name)
     if existing_category:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Category with name '{category.name}' already exists",
+        raise ConflictError(
+            error_code=ErrorCode.CATEGORY_EXISTS,
+            message=f"Category with name '{category.name}' already exists",
         )
 
     return crud.create_category(session, category)
@@ -116,7 +125,10 @@ def get_categories(session: Session = Depends(get_session)):
 def get_category(category_id: int, session: Session = Depends(get_session)):
     category = crud.get_category(session, category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise NotFoundError(
+            error_code=ErrorCode.CATEGORY_NOT_FOUND,
+            message="Category not found",
+        )
 
     # Convert to response format with image URLs
     products_with_images = []
@@ -166,7 +178,10 @@ def create_product(product: ProductCreate, session: Session = Depends(get_sessio
     # Verify category exists
     category = crud.get_category(session, product.category_id)
     if not category:
-        raise HTTPException(status_code=400, detail="Category not found")
+        raise BadRequestError(
+            error_code=ErrorCode.CATEGORY_NOT_FOUND,
+            message="Category not found",
+        )
 
     created_product = crud.create_product(session, product)
 
@@ -361,7 +376,10 @@ def get_product(product_id: int, session: Session = Depends(get_session)):
     )
     product = session.exec(stmt).first()
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise NotFoundError(
+            error_code=ErrorCode.PRODUCT_NOT_FOUND,
+            message="Product not found",
+        )
 
     # Filter active options and sort them
     active_options = [opt for opt in product.delivery_options if opt.is_active]
@@ -420,11 +438,17 @@ def update_product(
     if product_update.category_id:
         category = crud.get_category(session, product_update.category_id)
         if not category:
-            raise HTTPException(status_code=400, detail="Category not found")
+            raise BadRequestError(
+                error_code=ErrorCode.CATEGORY_NOT_FOUND,
+                message="Category not found",
+            )
 
     updated_product = crud.update_product(session, product_id, product_update)
     if not updated_product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise NotFoundError(
+            error_code=ErrorCode.PRODUCT_NOT_FOUND,
+            message="Product not found",
+        )
 
     # Convert to response format with image URL
     product_dict = {
@@ -447,7 +471,10 @@ def update_product(
 @app.delete("/products/{product_id}")
 def delete_product(product_id: int, session: Session = Depends(get_session)):
     if not crud.delete_product(session, product_id):
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise NotFoundError(
+            error_code=ErrorCode.PRODUCT_NOT_FOUND,
+            message="Product not found",
+        )
 
     return {"message": "Product deleted successfully"}
 
@@ -456,10 +483,16 @@ def delete_product(product_id: int, session: Session = Depends(get_session)):
 def get_product_image(product_id: int, session: Session = Depends(get_session)):
     product = crud.get_product(session, product_id)
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise NotFoundError(
+            error_code=ErrorCode.PRODUCT_NOT_FOUND,
+            message="Product not found",
+        )
 
     if not product.image_data:
-        raise HTTPException(status_code=404, detail="No image found for this product")
+        raise NotFoundError(
+            error_code=ErrorCode.IMAGE_NOT_FOUND,
+            message="No image found for this product",
+        )
 
     # Return image as streaming response
     return StreamingResponse(
